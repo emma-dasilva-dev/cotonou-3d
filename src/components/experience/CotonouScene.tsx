@@ -196,39 +196,44 @@ function HotelMarker({
         </mesh>
       )}
 
-      {!focused && (
-        <>
-          <mesh position={[0, markerY, 0]}>
-            <cylinderGeometry args={[0.012, 0.012, isHotelDuLac ? 0.7 : 0.92, 10]} />
-            <meshBasicMaterial color="#292927" />
-          </mesh>
+      <group visible={!focused}>
+        <mesh position={[0, markerY, 0]}>
+          <cylinderGeometry args={[0.012, 0.012, isHotelDuLac ? 0.7 : 0.92, 10]} />
+          <meshBasicMaterial color="#292927" />
+        </mesh>
 
-          <mesh position={[0, markerY + (isHotelDuLac ? 0.38 : 0.48), 0]}>
-            <sphereGeometry args={[0.07, 18, 18]} />
-            <meshBasicMaterial color="#292927" />
-          </mesh>
+        <mesh position={[0, markerY + (isHotelDuLac ? 0.38 : 0.48), 0]}>
+          <sphereGeometry args={[0.07, 18, 18]} />
+          <meshBasicMaterial color="#292927" />
+        </mesh>
+      </group>
 
-          <Html
-            center
-            position={[0, markerY + (isHotelDuLac ? 0.78 : 0.8), 0]}
-            distanceFactor={8.5}
-            zIndexRange={[20, 0]}
-          >
-            <button
-              type="button"
-              className={`hotel-marker${active ? " hotel-marker--active" : ""}`}
-              onClick={(event) => {
-                event.stopPropagation();
-                onSelect();
-              }}
-              aria-label={`Select ${hotel.name}`}
-            >
-              <span className="hotel-marker__index">{hotel.index}</span>
-              <span className="hotel-marker__name">{hotel.shortName}</span>
-            </button>
-          </Html>
-        </>
-      )}
+      <Html
+        center
+        position={[0, markerY + (isHotelDuLac ? 0.78 : 0.8), 0]}
+        distanceFactor={8.5}
+        zIndexRange={[20, 0]}
+        style={{
+          opacity: focused ? 0 : 1,
+          pointerEvents: focused ? "none" : "auto",
+          transition: "opacity 180ms ease",
+        }}
+      >
+        <button
+          type="button"
+          className={`hotel-marker${active ? " hotel-marker--active" : ""}`}
+          onClick={(event) => {
+            event.stopPropagation();
+            onSelect();
+          }}
+          aria-label={`Sélectionner ${hotel.name}`}
+          tabIndex={focused ? -1 : 0}
+          aria-hidden={focused}
+        >
+          <span className="hotel-marker__index">{hotel.index}</span>
+          <span className="hotel-marker__name">{hotel.shortName}</span>
+        </button>
+      </Html>
     </group>
   );
 }
