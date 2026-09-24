@@ -2742,3 +2742,99 @@ body {
     max-width: 280px;
   }
 }
+
+
+.homepage-signature {
+  position: absolute;
+  right: 32px;
+  bottom: 27px;
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  color: var(--graphite);
+  pointer-events: auto;
+  text-align: right;
+}
+
+.homepage-signature__copyright {
+  color: rgba(41, 41, 39, 0.58);
+  text-transform: uppercase;
+  font-size: 7px;
+  font-weight: 620;
+  letter-spacing: 0.14em;
+}
+
+.homepage-signature__links {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.homepage-signature__links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 3px;
+  color: var(--graphite);
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  transition:
+    border-color 180ms ease,
+    opacity 180ms ease;
+}
+
+.homepage-signature__links a span {
+  font-size: 9px;
+  transition: transform 180ms ease;
+}
+
+.homepage-signature__links a:hover {
+  border-color: rgba(41, 41, 39, 0.7);
+}
+
+.homepage-signature__links a:hover span {
+  transform: translate(2px, -2px);
+}
+
+@media (max-width: 720px) {
+  .homepage-signature {
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    gap: 6px;
+  }
+
+  .homepage-signature__copyright {
+    font-size: 6px;
+    letter-spacing: 0.11em;
+  }
+
+  .homepage-signature__links {
+    gap: 10px;
+  }
+
+  .homepage-signature__links a {
+    min-height: 34px;
+    align-items: center;
+    padding-bottom: 0;
+    font-size: 7px;
+    letter-spacing: 0.09em;
+  }
+
+  .homepage-signature__links a span {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .homepage-signature__links {
+    gap: 8px;
+  }
+
+  .homepage-signature__links a {
+    font-size: 6px;
+  }
+}
