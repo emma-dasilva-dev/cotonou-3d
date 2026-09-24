@@ -15,7 +15,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "COTONOU / 3D",
   description:
-    "Une étude 3D interactive et indépendante de six espaces hôteliers à Cotonou, Bénin.",
+    "COTONOU / 3D — étude interactive de l’architecture et de l’hospitalité à Cotonou · interactive study of architecture and hospitality in Cotonou, Benin.",
 };
 
 export const viewport: Viewport = {
