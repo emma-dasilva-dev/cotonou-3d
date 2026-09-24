@@ -134,7 +134,7 @@ export function CityRoads() {
 
       {[-9, 0, 9].map((x) => (
         <group key={x}>
-          <SidewalkStrip position={[x, 0.03, -2.6]} size={[0.5, 3.7]} />
+          <SidewalkStrip position={[x, 0.03, -7.15]} size={[0.5, 1.7]} />
           <SidewalkStrip position={[x, 0.03, 2.75]} size={[0.5, 3.1]} />
         </group>
       ))}
@@ -321,6 +321,9 @@ export function CityLife() {
     { start: [-12.0, 1.35] as Point2, end: [-6.0, 1.35] as Point2, speed: 0.05, offset: 0.42 },
     { start: [-3.1, 1.35] as Point2, end: [3.2, 1.35] as Point2, speed: 0.047, offset: 1.32 },
     { start: [5.7, 1.35] as Point2, end: [12.0, 1.35] as Point2, speed: 0.054, offset: 0.88 },
+    { start: [-9.0, -7.7] as Point2, end: [-9.0, -6.3] as Point2, speed: 0.084, offset: 0.31 },
+    { start: [0.0, -7.7] as Point2, end: [0.0, -6.55] as Point2, speed: 0.088, offset: 1.11 },
+    { start: [9.0, -7.7] as Point2, end: [9.0, -6.3] as Point2, speed: 0.082, offset: 0.56 },
     { start: [-8.8, 1.55] as Point2, end: [-8.8, 3.0] as Point2, speed: 0.085, offset: 0.21 },
     { start: [0.5, 1.55] as Point2, end: [0.5, 3.3] as Point2, speed: 0.078, offset: 1.42 },
     { start: [8.7, 1.55] as Point2, end: [8.7, 3.0] as Point2, speed: 0.082, offset: 0.63 },
