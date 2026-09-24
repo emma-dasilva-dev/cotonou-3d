@@ -42,10 +42,10 @@ const FOCUS_VIEWS: Record<
     maxDistance: 9.5,
   },
   sofitel: {
-    camera: [-9.0, 4.1, -7.1],
-    target: [-4.55, 1.55, -2.35],
-    minDistance: 4.2,
-    maxDistance: 11.5,
+    camera: [-9.85, 4.35, -7.9],
+    target: [-4.62, 1.72, -2.35],
+    minDistance: 4.8,
+    maxDistance: 12.5,
   },
 };
 
@@ -129,7 +129,7 @@ function CityBlocks() {
         const z = -4.1 + row * 1.35;
 
         if (Math.hypot(x - 4.6, z - 1.7) < 2.35) continue;
-        if (Math.hypot(x + 4.7, z + 2.2) < 2.75) continue;
+        if (Math.hypot(x + 4.7, z + 2.2) < 3.25) continue;
 
         const width = 0.52 + ((column * 3 + row) % 4) * 0.08;
         const depth = 0.48 + ((row * 5 + column) % 3) * 0.09;
