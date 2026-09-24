@@ -223,6 +223,7 @@ export function CotonouExperience() {
 
       <div className="scene-layer" aria-hidden={!entered}>
         <Canvas
+          frameloop={entered ? "always" : "demand"}
           shadows={!mobileMode}
           dpr={mobileMode ? 1 : [1, 1.5]}
           camera={{ position: [18, 16, -23], fov: 34 }}
