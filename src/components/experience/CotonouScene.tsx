@@ -9,6 +9,7 @@ import type { PerspectiveCamera } from "three";
 import { HotelDuLacExterior } from "./HotelDuLacExterior";
 import { GoldenTulipExterior } from "./GoldenTulipExterior";
 import { SofitelExterior } from "./SofitelExterior";
+import { NovotelExterior } from "./NovotelExterior";
 import { hotelStudies } from "./hotels";
 import type { HotelStudy } from "./hotels";
 
@@ -27,6 +28,7 @@ type Block = {
 const HOTEL_DU_LAC_POSITION: [number, number, number] = [4.6, 0, 1.7];
 const SOFITEL_POSITION: [number, number, number] = [-4.7, 0, -2.2];
 const GOLDEN_TULIP_POSITION: [number, number, number] = [-1.7, 0, -3.1];
+const NOVOTEL_POSITION: [number, number, number] = [1.7, 0, -2.1];
 
 const FOCUS_VIEWS: Record<
   string,
@@ -54,6 +56,12 @@ const FOCUS_VIEWS: Record<
     target: [-1.65, 1.35, -3.15],
     minDistance: 4.2,
     maxDistance: 11.5,
+  },
+  novotel: {
+    camera: [6.2, 3.45, -6.55],
+    target: [1.75, 1.2, -2.35],
+    minDistance: 4.0,
+    maxDistance: 11.0,
   },
 };
 
@@ -139,6 +147,7 @@ function CityBlocks() {
         if (Math.hypot(x - 4.6, z - 1.7) < 2.35) continue;
         if (Math.hypot(x + 4.7, z + 2.2) < 3.25) continue;
         if (Math.hypot(x + 1.7, z + 3.1) < 2.7) continue;
+        if (Math.hypot(x - 1.7, z + 2.1) < 2.85) continue;
 
         const width = 0.52 + ((column * 3 + row) % 4) * 0.08;
         const depth = 0.48 + ((row * 5 + column) % 3) * 0.09;
@@ -227,13 +236,16 @@ function HotelMarker({
   const isHotelDuLac = hotel.id === "hotel-du-lac";
   const isSofitel = hotel.id === "sofitel";
   const isGoldenTulip = hotel.id === "golden-tulip";
+  const isNovotel = hotel.id === "novotel";
   const markerY = isSofitel
     ? 4.05
     : isGoldenTulip
       ? 3.55
-      : isHotelDuLac
-        ? 3.18
-        : 0.82;
+      : isNovotel
+        ? 3.45
+        : isHotelDuLac
+          ? 3.18
+          : 0.82;
 
   return (
     <group position={hotel.position}>
@@ -322,6 +334,7 @@ export function CotonouScene({
       <HotelDuLacExterior position={HOTEL_DU_LAC_POSITION} />
       <SofitelExterior position={SOFITEL_POSITION} />
       <GoldenTulipExterior position={GOLDEN_TULIP_POSITION} />
+      <NovotelExterior position={NOVOTEL_POSITION} />
 
       {hotelStudies.map((hotel) => (
         <HotelMarker
