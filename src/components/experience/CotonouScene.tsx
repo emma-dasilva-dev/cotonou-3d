@@ -1,18 +1,32 @@
 "use client";
 
-import { Html, OrbitControls } from "@react-three/drei";
+import {
+  Billboard,
+  Html,
+  OrbitControls,
+  RoundedBox,
+  Text,
+} from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import gsap from "gsap";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ElementRef } from "react";
 import { HotelDuLacExterior } from "./HotelDuLacExterior";
+import {
+  getHotelDuLacHotspot,
+  hotelDuLacHotspots,
+} from "./hotelHotspots";
 import { hotelStudies } from "./hotels";
+import type { HotelHotspot } from "./hotelHotspots";
 import type { HotelStudy } from "./hotels";
 
 type CotonouSceneProps = {
   onSelectHotel: (hotel: HotelStudy) => void;
+  onSelectHotspot: (hotspot: HotelHotspot) => void;
   activeHotelId?: string;
   focusHotelId?: string;
+  activeHotspotId?: string;
+  showHotspots?: boolean;
 };
 
 type Block = {
@@ -23,7 +37,13 @@ type Block = {
 
 const HOTEL_DU_LAC_POSITION: [number, number, number] = [4.6, 0, 1.7];
 
-function CameraRig({ focusHotelId }: { focusHotelId?: string }) {
+function CameraRig({
+  focusHotelId,
+  activeHotspotId,
+}: {
+  focusHotelId?: string;
+  activeHotspotId?: string;
+}) {
   const { camera } = useThree();
   const controlsRef = useRef<ElementRef<typeof OrbitControls>>(null);
 
@@ -32,15 +52,33 @@ function CameraRig({ focusHotelId }: { focusHotelId?: string }) {
     if (!controls) return;
 
     const focused = focusHotelId === "hotel-du-lac";
-    const cameraTarget = focused
-      ? { x: 8.25, y: 3.25, z: -3.65 }
-      : { x: 10.5, y: 9.5, z: 13.5 };
-    const orbitTarget = focused
-      ? { x: 4.6, y: 1.0, z: 1.35 }
-      : { x: 0, y: 0, z: 0.2 };
+    const hotspot = focused ? getHotelDuLacHotspot(activeHotspotId) : undefined;
+
+    const cameraTarget = hotspot
+      ? {
+          x: hotspot.cameraPosition[0],
+          y: hotspot.cameraPosition[1],
+          z: hotspot.cameraPosition[2],
+        }
+      : focused
+        ? { x: 8.25, y: 3.25, z: -3.65 }
+        : { x: 10.5, y: 9.5, z: 13.5 };
+
+    const orbitTarget = hotspot
+      ? {
+          x: hotspot.cameraTarget[0],
+          y: hotspot.cameraTarget[1],
+          z: hotspot.cameraTarget[2],
+        }
+      : focused
+        ? { x: 4.6, y: 1.0, z: 1.35 }
+        : { x: 0, y: 0, z: 0.2 };
 
     const timeline = gsap.timeline({
-      defaults: { duration: focused ? 2.35 : 2.0, ease: "power3.inOut" },
+      defaults: {
+        duration: hotspot ? 1.45 : focused ? 2.35 : 2.0,
+        ease: "power3.inOut",
+      },
     });
 
     timeline.to(
@@ -64,9 +102,11 @@ function CameraRig({ focusHotelId }: { focusHotelId?: string }) {
     return () => {
       timeline.kill();
     };
-  }, [camera, focusHotelId]);
+  }, [camera, focusHotelId, activeHotspotId]);
 
   const focused = focusHotelId === "hotel-du-lac";
+  const hotspot = focused ? getHotelDuLacHotspot(activeHotspotId) : undefined;
+  const target = hotspot?.cameraTarget ?? (focused ? [4.6, 1, 1.35] : [0, 0, 0.2]);
 
   return (
     <OrbitControls
@@ -75,11 +115,11 @@ function CameraRig({ focusHotelId }: { focusHotelId?: string }) {
       enablePan={false}
       enableDamping
       dampingFactor={0.055}
-      minDistance={focused ? 3.4 : 8.5}
+      minDistance={focused ? 2.8 : 8.5}
       maxDistance={focused ? 9.5 : 20}
-      minPolarAngle={focused ? 0.65 : 0.55}
-      maxPolarAngle={focused ? 1.42 : 1.18}
-      target={focused ? [4.6, 1, 1.35] : [0, 0, 0.2]}
+      minPolarAngle={focused ? 0.58 : 0.55}
+      maxPolarAngle={focused ? 1.46 : 1.18}
+      target={target}
     />
   );
 }
@@ -238,10 +278,108 @@ function HotelMarker({
   );
 }
 
+function HotspotMarker({
+  hotspot,
+  active,
+  onSelect,
+}: {
+  hotspot: HotelHotspot;
+  active: boolean;
+  onSelect: () => void;
+}) {
+  const [hovered, setHovered] = useState(false);
+
+  useEffect(() => {
+    if (!hovered) return;
+
+    document.body.style.cursor = "pointer";
+    return () => {
+      document.body.style.cursor = "";
+    };
+  }, [hovered]);
+
+  const width = hotspot.label.length > 7 ? 1.15 : 0.95;
+
+  return (
+    <Billboard position={hotspot.position} follow>
+      <group
+        scale={hovered || active ? 1.08 : 1}
+        onClick={(event) => {
+          event.stopPropagation();
+          onSelect();
+        }}
+        onPointerOver={(event) => {
+          event.stopPropagation();
+          setHovered(true);
+        }}
+        onPointerOut={() => setHovered(false)}
+      >
+        <mesh position={[-width / 2 - 0.17, 0, 0.015]}>
+          <ringGeometry args={[0.055, 0.09, 28]} />
+          <meshBasicMaterial color={active ? "#a84936" : "#292927"} />
+        </mesh>
+
+        <mesh position={[-width / 2 - 0.17, 0, 0.01]}>
+          <circleGeometry args={[0.026, 24]} />
+          <meshBasicMaterial color="#eee9de" />
+        </mesh>
+
+        <RoundedBox
+          args={[width, 0.25, 0.035]}
+          radius={0.08}
+          smoothness={5}
+          position={[0.13, 0, 0]}
+        >
+          <meshBasicMaterial
+            color={active ? "#292927" : "#eee9de"}
+            transparent
+            opacity={0.96}
+          />
+        </RoundedBox>
+
+        <Text
+          position={[0.13, 0, 0.025]}
+          fontSize={0.075}
+          letterSpacing={0.06}
+          color={active ? "#eee9de" : "#292927"}
+          anchorX="center"
+          anchorY="middle"
+        >
+          {hotspot.label.toUpperCase()}
+        </Text>
+      </group>
+    </Billboard>
+  );
+}
+
+function HotelDuLacHotspots({
+  activeHotspotId,
+  onSelectHotspot,
+}: {
+  activeHotspotId?: string;
+  onSelectHotspot: (hotspot: HotelHotspot) => void;
+}) {
+  return (
+    <group>
+      {hotelDuLacHotspots.map((hotspot) => (
+        <HotspotMarker
+          key={hotspot.id}
+          hotspot={hotspot}
+          active={activeHotspotId === hotspot.id}
+          onSelect={() => onSelectHotspot(hotspot)}
+        />
+      ))}
+    </group>
+  );
+}
+
 export function CotonouScene({
   onSelectHotel,
+  onSelectHotspot,
   activeHotelId,
   focusHotelId,
+  activeHotspotId,
+  showHotspots = false,
 }: CotonouSceneProps) {
   return (
     <>
@@ -280,7 +418,17 @@ export function CotonouScene({
         />
       ))}
 
-      <CameraRig focusHotelId={focusHotelId} />
+      {showHotspots && focusHotelId === "hotel-du-lac" && (
+        <HotelDuLacHotspots
+          activeHotspotId={activeHotspotId}
+          onSelectHotspot={onSelectHotspot}
+        />
+      )}
+
+      <CameraRig
+        focusHotelId={focusHotelId}
+        activeHotspotId={activeHotspotId}
+      />
     </>
   );
 }
