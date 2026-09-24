@@ -68,7 +68,7 @@ export function HotelInfoPanel({
       <header className="hotel-paper__header" data-panel-reveal>
         <div className="hotel-paper__kicker">
           <span>Cotonou / 3D</span>
-          <span>Édition {hotel.index}</span>
+          <span>Édition spéciale</span>
         </div>
 
         <div className="hotel-paper__masthead">
@@ -100,7 +100,7 @@ export function HotelInfoPanel({
         </div>
 
         <div className="hotel-paper__rule" data-panel-reveal>
-          <span>{hotel.index}</span>
+          <span>Chronique</span>
           <span>Une adresse de Cotonou</span>
         </div>
 
