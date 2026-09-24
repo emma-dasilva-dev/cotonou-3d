@@ -11,6 +11,7 @@ export function CotonouExperience() {
   const interfaceRef = useRef<HTMLDivElement>(null);
   const [entered, setEntered] = useState(false);
   const [activeHotel, setActiveHotel] = useState<HotelStudy | null>(null);
+  const [focusHotelId, setFocusHotelId] = useState<string | undefined>();
 
   useEffect(() => {
     if (!introRef.current) return;
@@ -48,6 +49,24 @@ export function CotonouExperience() {
     }
   }
 
+  function selectHotel(hotel: HotelStudy) {
+    setActiveHotel(hotel);
+
+    if (hotel.id === "hotel-du-lac") {
+      setFocusHotelId(hotel.id);
+      return;
+    }
+
+    setFocusHotelId(undefined);
+  }
+
+  function returnToCotonou() {
+    setFocusHotelId(undefined);
+    setActiveHotel(null);
+  }
+
+  const inHotelStudy = focusHotelId === "hotel-du-lac";
+
   return (
     <main className={`experience${entered ? " experience--entered" : ""}`}>
       <div className="scene-layer" aria-hidden={!entered}>
@@ -59,7 +78,8 @@ export function CotonouExperience() {
         >
           <CotonouScene
             activeHotelId={activeHotel?.id}
-            onSelectHotel={setActiveHotel}
+            focusHotelId={focusHotelId}
+            onSelectHotel={selectHotel}
           />
         </Canvas>
       </div>
@@ -103,7 +123,7 @@ export function CotonouExperience() {
 
       <div
         ref={interfaceRef}
-        className={`interface${entered ? " interface--visible" : ""}`}
+        className={`interface${entered ? " interface--visible" : ""}${inHotelStudy ? " interface--study" : ""}`}
       >
         <header className="interface__header">
           <div className="brand">
@@ -116,33 +136,66 @@ export function CotonouExperience() {
           </nav>
         </header>
 
-        <div className="study-label">
-          <span>01 — 06</span>
-          <span>Architectural studies</span>
-        </div>
+        {!inHotelStudy && (
+          <>
+            <div className="study-label">
+              <span>01 — 06</span>
+              <span>Architectural studies</span>
+            </div>
 
-        <div className="interaction-hint">
-          <span className="interaction-hint__line" />
-          <span>Drag to explore · Scroll to zoom</span>
-        </div>
+            <div className="interaction-hint">
+              <span className="interaction-hint__line" />
+              <span>Drag to explore · Scroll to zoom</span>
+            </div>
 
-        <div className="coordinates">
-          <span>06°21&apos;N</span>
-          <span>Cotonou, Benin</span>
-        </div>
+            <div className="coordinates">
+              <span>06°21&apos;N</span>
+              <span>Cotonou, Benin</span>
+            </div>
 
-        <div className="counter">
-          <span>{activeHotel?.index ?? "—"}</span>
-          <span>/ 06</span>
-        </div>
+            <div className="counter">
+              <span>{activeHotel?.index ?? "—"}</span>
+              <span>/ 06</span>
+            </div>
+          </>
+        )}
 
-        {activeHotel && (
+        {inHotelStudy && (
+          <>
+            <div className="hotel-study-heading">
+              <span>04 / 06</span>
+              <h2>Hôtel du Lac</h2>
+              <p>Exterior study · Lake Nokoué</p>
+            </div>
+
+            <button
+              type="button"
+              className="back-to-city"
+              onClick={returnToCotonou}
+            >
+              <span aria-hidden="true">←</span>
+              <span>Back to Cotonou</span>
+            </button>
+
+            <div className="study-interaction">
+              <span className="interaction-hint__line" />
+              <span>Drag to orbit · Scroll to zoom</span>
+            </div>
+
+            <div className="study-note">
+              <span>Independent study</span>
+              <span>Stylized from public exterior references</span>
+            </div>
+          </>
+        )}
+
+        {activeHotel && !inHotelStudy && (
           <aside className="hotel-selection" aria-live="polite">
             <span>{activeHotel.index} / 06</span>
             <h2>{activeHotel.name}</h2>
             <p>{activeHotel.descriptor}</p>
             <button type="button" disabled>
-              Detailed study coming next
+              Study not built yet
             </button>
           </aside>
         )}
