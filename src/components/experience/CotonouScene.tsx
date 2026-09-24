@@ -106,7 +106,8 @@ function CameraRig({
 
   const focused = focusHotelId === "hotel-du-lac";
   const hotspot = focused ? getHotelDuLacHotspot(activeHotspotId) : undefined;
-  const target = hotspot?.cameraTarget ?? (focused ? [4.6, 1, 1.35] : [0, 0, 0.2]);
+  const target: [number, number, number] = hotspot?.cameraTarget ??
+    (focused ? [4.6, 1, 1.35] : [0, 0, 0.2]);
 
   return (
     <OrbitControls
