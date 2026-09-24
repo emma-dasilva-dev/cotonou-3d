@@ -7,7 +7,6 @@ import { ArchivePanel } from "./ArchivePanel";
 import { CotonouScene } from "./CotonouScene";
 import { HotelInfoPanel } from "./HotelInfoPanel";
 import { NewspaperTransition } from "./NewspaperTransition";
-import { hotelStudies } from "./hotels";
 import type { HotelStudy } from "./hotels";
 
 type TransitionState = {
@@ -100,7 +99,7 @@ export function CotonouExperience() {
   }
 
   function closeHotelPanel() {
-    setPanelOpen(false);
+    returnToCotonou();
   }
 
   function returnToCotonou() {
@@ -134,19 +133,7 @@ export function CotonouExperience() {
   }
 
   const inHotelStudy = focusHotelId === "hotel-du-lac";
-  const activeHotelIndex = activeHotel
-    ? hotelStudies.findIndex((hotel) => hotel.id === activeHotel.id)
-    : -1;
-  const previousHotel =
-    activeHotelIndex >= 0
-      ? hotelStudies[
-          (activeHotelIndex - 1 + hotelStudies.length) % hotelStudies.length
-        ]
-      : hotelStudies[hotelStudies.length - 1];
-  const nextHotel =
-    activeHotelIndex >= 0
-      ? hotelStudies[(activeHotelIndex + 1) % hotelStudies.length]
-      : hotelStudies[0];
+
 
   return (
     <main className={`experience${entered ? " experience--entered" : ""}`}>
@@ -291,11 +278,8 @@ export function CotonouExperience() {
           <HotelInfoPanel
             key={activeHotel.id}
             hotel={activeHotel}
-            previousHotel={previousHotel}
-            nextHotel={nextHotel}
             delay={0}
             onClose={closeHotelPanel}
-            onNavigate={selectHotel}
           />
         )}
 
