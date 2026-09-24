@@ -29,7 +29,7 @@ export const hotelStudies: HotelStudy[] = [
     summary:
       "Un hôtel cinq étoiles contemporain face au golfe de Guinée, pensé autour de la lumière côtière, des jardins paysagers et du dialogue entre sable, océan et végétation.",
     facts: [
-      { label: "Catégorie", value: "Hôtel 5 étoiles" },
+      { label: "Classement", value: "★★★★★" },
       { label: "Cadre", value: "Golfe de Guinée" },
       { label: "Style", value: "Contemporain côtier" },
     ],
@@ -46,7 +46,7 @@ export const hotelStudies: HotelStudy[] = [
     summary:
       "Un hôtel quatre étoiles urbain sur le boulevard de la Marina, mêlant hébergement d'affaires, piscine extérieure, restauration, espaces événementiels et proximité avec l'Atlantique.",
     facts: [
-      { label: "Catégorie", value: "Hôtel 4 étoiles" },
+      { label: "Classement", value: "★★★★" },
       { label: "Capacité", value: "139 chambres et suites" },
       { label: "Cadre", value: "Boulevard de la Marina" },
     ],
@@ -63,7 +63,7 @@ export const hotelStudies: HotelStudy[] = [
     summary:
       "Un hôtel quatre étoiles rénové au cœur d'un jardin arboré de sept hectares, avec un design contemporain, une piscine et une atmosphère plus calme proche du littoral.",
     facts: [
-      { label: "Catégorie", value: "Hôtel 4 étoiles" },
+      { label: "Classement", value: "★★★★" },
       { label: "Jardin", value: "7 hectares" },
       { label: "Capacité", value: "110 chambres" },
     ],
@@ -80,7 +80,7 @@ export const hotelStudies: HotelStudy[] = [
     summary:
       "Un hôtel trois étoiles installé sur les rives du lac Nokoué, connu pour son cadre paisible au bord de l'eau, ses vues sur le lac et ses espaces extérieurs autour de la piscine.",
     facts: [
-      { label: "Catégorie", value: "Hôtel 3 étoiles" },
+      { label: "Classement", value: "★★★" },
       { label: "Cadre", value: "Lac Nokoué" },
       { label: "Espaces", value: "Piscine · Restaurant · Vue lac" },
     ],
@@ -115,7 +115,7 @@ export const hotelStudies: HotelStudy[] = [
     summary:
       "Un hôtel boutique quatre étoiles à l'échelle plus intime, mêlant design soigné, art africain contemporain, jardins, deux piscines et terrasse panoramique face à la mer.",
     facts: [
-      { label: "Catégorie", value: "Hôtel 4 étoiles" },
+      { label: "Classement", value: "★★★★" },
       { label: "Piscines", value: "2 piscines extérieures" },
       { label: "Style", value: "Boutique · Art · Jardin" },
     ],
