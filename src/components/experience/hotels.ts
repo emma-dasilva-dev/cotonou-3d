@@ -16,6 +16,8 @@ export type HotelStudy = {
   website: string;
   exteriorReady?: boolean;
   studyContext?: string;
+  architecturalReading: string;
+  cityRelationship: string;
 };
 
 export const hotelStudies: HotelStudy[] = [
@@ -37,6 +39,10 @@ export const hotelStudies: HotelStudy[] = [
     website: "https://sofitel.accor.com/fr/hotels/B845.html",
     exteriorReady: true,
     studyContext: "Golfe de Guinée",
+    architecturalReading:
+      "Dans cette étude, le Sofitel se lit comme une architecture côtière de grande échelle : une façade très régulière, des terrasses répétées et un socle paysager qui installent une présence monumentale face au littoral.",
+    cityRelationship:
+      "Son rapport à Cotonou passe surtout par le front de mer. L’hôtel met en scène la lumière, la végétation et l’horizon marin comme prolongement direct de l’architecture.",
   },
   {
     id: "golden-tulip",
@@ -56,6 +62,10 @@ export const hotelStudies: HotelStudy[] = [
     website: "https://diplomate-cotonou.goldentulip.com/en-us/",
     exteriorReady: true,
     studyContext: "Boulevard de la Marina",
+    architecturalReading:
+      "Le Golden Tulip est lu ici comme une façade urbaine plus rationnelle : volumes horizontaux, trame répétitive des ouvertures et entrée marquée donnent au bâtiment un caractère plus institutionnel et métropolitain.",
+    cityRelationship:
+      "Installé sur le boulevard de la Marina, il représente une hospitalité directement liée aux flux de la ville, aux déplacements professionnels et à la logique du grand axe urbain.",
   },
   {
     id: "novotel",
@@ -75,6 +85,10 @@ export const hotelStudies: HotelStudy[] = [
     website: "https://all.accor.com/hotel/1826/index.fr.shtml",
     exteriorReady: true,
     studyContext: "Jardin arboré · Piscine",
+    architecturalReading:
+      "Le Novotel est abordé comme une architecture où le paysage compte autant que le bâtiment. Les volumes plus bas, les toitures, les jardins et la piscine créent une composition plus horizontale et plus respirante.",
+    cityRelationship:
+      "Son identité vient du contraste entre le boulevard de la Marina et le retrait végétal du site : une transition entre l’intensité urbaine et un environnement intérieur beaucoup plus calme.",
   },
   {
     id: "hotel-du-lac",
@@ -94,6 +108,10 @@ export const hotelStudies: HotelStudy[] = [
     website: "https://www.hoteldulac-benin.com/",
     exteriorReady: true,
     studyContext: "Lac Nokoué",
+    architecturalReading:
+      "Ici, la lecture architecturale est guidée par l’eau. La façade, les terrasses et les espaces extérieurs se comprennent comme un ensemble orienté vers le lac plutôt que comme un simple volume autonome.",
+    cityRelationship:
+      "Hôtel du Lac montre une autre géographie de Cotonou : celle des rives du lac Nokoué, où l’hospitalité se construit autour de la vue, du calme et de la proximité immédiate de l’eau.",
   },
   {
     id: "azalai",
@@ -113,6 +131,10 @@ export const hotelStudies: HotelStudy[] = [
     website: "https://www.azalai.com/azalai-hotel-cotonou",
     exteriorReady: true,
     studyContext: "Océan Atlantique · Piscine",
+    architecturalReading:
+      "L’Azalaï se distingue par une composition plus verticale, une façade rythmée par les ouvertures et un vaste ensemble piscine-jardin qui structure la perception du site depuis l’extérieur.",
+    cityRelationship:
+      "La proximité de l’Atlantique donne au lieu une identité de front de mer. Dans cette étude, la piscine, les palmiers et l’horizon deviennent autant d’éléments urbains que le bâtiment lui-même.",
   },
   {
     id: "maison-rouge",
@@ -132,5 +154,9 @@ export const hotelStudies: HotelStudy[] = [
     website: "https://hotel-benin-maison-rouge-cotonou.com/en/hotel-cotonou-benin/",
     exteriorReady: true,
     studyContext: "Art · Jardins · Deux piscines",
+    architecturalReading:
+      "Maison Rouge est l’étude la plus intime de la collection. Son échelle plus domestique, ses jardins, ses deux piscines et ses accents colorés rapprochent l’expérience de celle d’une maison composée plutôt que d’un grand hôtel monolithique.",
+    cityRelationship:
+      "Son rapport à Cotonou passe par l’art, le jardin et la proximité du littoral. Elle montre qu’une adresse hôtelière peut participer à la ville par l’atmosphère et la culture autant que par sa taille.",
   },
 ];
