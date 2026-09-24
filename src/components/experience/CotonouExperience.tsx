@@ -239,8 +239,8 @@ export function CotonouExperience() {
 
             <div className="intro__lower" data-intro-line>
               <p className="intro__description">
-                Une étude architecturale en temps réel de six espaces hôteliers
-                à Cotonou.
+                Une étude interactive de six lieux d’hospitalité à Cotonou,
+                entre architecture, paysage et vie urbaine.
               </p>
 
               <button
@@ -296,7 +296,7 @@ export function CotonouExperience() {
         {!inHotelStudy && (
           <>
             <div className="study-label">
-              <span>Études architecturales</span>
+              <span>Architecture · Paysage · Ville</span>
             </div>
 
             <div className="interaction-hint">
