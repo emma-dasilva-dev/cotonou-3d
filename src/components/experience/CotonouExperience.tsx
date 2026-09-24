@@ -4,6 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
 import { ArchivePanel } from "./ArchivePanel";
+import { AboutPanel } from "./AboutPanel";
 import { CotonouScene } from "./CotonouScene";
 import { HotelInfoPanel } from "./HotelInfoPanel";
 import { NewspaperTransition } from "./NewspaperTransition";
@@ -28,6 +29,7 @@ export function CotonouExperience() {
   const [focusHotelId, setFocusHotelId] = useState<string | undefined>();
   const [panelOpen, setPanelOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [transition, setTransition] = useState<TransitionState | null>(null);
   const [soundOn, setSoundOn] = useState(true);
 
@@ -103,6 +105,7 @@ export function CotonouExperience() {
     if (transition) return;
 
     setArchiveOpen(false);
+    setAboutOpen(false);
     setPanelOpen(false);
     setActiveHotel(hotel);
     setTransition({ hotel, mode: "open" });
@@ -138,8 +141,16 @@ export function CotonouExperience() {
 
   function openArchives() {
     setPanelOpen(false);
+    setAboutOpen(false);
     setTransition(null);
     setArchiveOpen(true);
+  }
+
+  function openAbout() {
+    setPanelOpen(false);
+    setArchiveOpen(false);
+    setTransition(null);
+    setAboutOpen(true);
   }
 
   function toggleSound() {
@@ -268,7 +279,9 @@ export function CotonouExperience() {
             <button type="button" onClick={openArchives}>
               Archives
             </button>
-            <button type="button">À propos</button>
+            <button type="button" onClick={openAbout}>
+              À propos
+            </button>
             <button
               type="button"
               onClick={toggleSound}
@@ -352,6 +365,8 @@ export function CotonouExperience() {
             onOpenHotel={selectHotel}
           />
         )}
+
+        {aboutOpen && <AboutPanel onClose={() => setAboutOpen(false)} />}
 
         {transition && (
           <NewspaperTransition
