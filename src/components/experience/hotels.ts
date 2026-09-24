@@ -130,5 +130,7 @@ export const hotelStudies: HotelStudy[] = [
       { label: "Style", value: "Boutique · Art · Jardin" },
     ],
     website: "https://hotel-benin-maison-rouge-cotonou.com/en/hotel-cotonou-benin/",
+    exteriorReady: true,
+    studyContext: "Art · Jardins · Deux piscines",
   },
 ];
