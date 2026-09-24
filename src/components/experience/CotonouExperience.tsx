@@ -7,6 +7,7 @@ import { ArchivePanel } from "./ArchivePanel";
 import { CotonouScene } from "./CotonouScene";
 import { HotelInfoPanel } from "./HotelInfoPanel";
 import { NewspaperTransition } from "./NewspaperTransition";
+import { hotelStudies } from "./hotels";
 import type { HotelStudy } from "./hotels";
 
 type TransitionState = {
@@ -132,8 +133,10 @@ export function CotonouExperience() {
     }
   }
 
-  const inHotelStudy = focusHotelId === "hotel-du-lac";
-
+  const focusedHotel = focusHotelId
+    ? hotelStudies.find((hotel) => hotel.id === focusHotelId)
+    : undefined;
+  const inHotelStudy = Boolean(focusedHotel);
 
   return (
     <main className={`experience${entered ? " experience--entered" : ""}`}>
@@ -248,8 +251,13 @@ export function CotonouExperience() {
         {inHotelStudy && (
           <>
             <div className="hotel-study-heading">
-              <h2>Hôtel du Lac</h2>
-              <p>Étude extérieure · Lac Nokoué</p>
+              <h2>{focusedHotel?.name}</h2>
+              <p>
+                Étude extérieure
+                {focusedHotel?.studyContext
+                  ? ` · ${focusedHotel.studyContext}`
+                  : ""}
+              </p>
             </div>
 
             <button
