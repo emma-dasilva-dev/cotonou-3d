@@ -639,11 +639,13 @@ button {
 
 .hotel-paper__article {
   flex: 1;
-  padding: 26px 0 30px;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 0 16px;
 }
 
 .hotel-paper__headline > p {
-  margin: 0 0 12px;
+  margin: 0 0 8px;
   text-transform: uppercase;
   font-size: 8px;
   font-weight: 650;
@@ -662,7 +664,7 @@ button {
 
 .hotel-paper__headline > span {
   display: block;
-  margin-top: 15px;
+  margin-top: 10px;
   text-transform: uppercase;
   font-size: 8px;
   letter-spacing: 0.13em;
@@ -673,7 +675,7 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin: 24px 0 26px;
+  margin: 16px 0 16px;
   border-top: 3px double var(--charcoal);
   border-bottom: 1px solid var(--charcoal);
   padding: 7px 0 6px;
@@ -690,17 +692,20 @@ button {
 }
 
 .hotel-paper__content {
+  flex: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1.28fr) minmax(150px, 0.72fr);
-  gap: 28px;
-  align-items: start;
+  grid-template-columns: minmax(0, 1.18fr) minmax(170px, 0.82fr);
+  gap: 22px;
+  align-items: stretch;
 }
 
 .hotel-paper__summary {
   margin: 0;
+  padding-right: 18px;
+  border-right: 1px solid rgba(23, 23, 22, 0.35);
   font-family: var(--font-editorial), Georgia, serif;
   font-size: clamp(17px, 1.45vw, 21px);
-  line-height: 1.5;
+  line-height: 1.48;
   text-align: justify;
   hyphens: auto;
 }
@@ -714,6 +719,9 @@ button {
 }
 
 .hotel-paper__facts {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   border-top: 2px solid var(--charcoal);
 }
 
@@ -730,11 +738,18 @@ button {
 }
 
 .hotel-paper__facts dl {
+  flex: 1;
+  display: grid;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
   margin: 0;
 }
 
 .hotel-paper__facts dl div {
-  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 58px;
+  padding: 9px 0;
   border-bottom: 1px solid rgba(23, 23, 22, 0.35);
 }
 
@@ -753,13 +768,21 @@ button {
   line-height: 1.15;
 }
 
+.hotel-paper__facts dd:has(> *) {
+  letter-spacing: normal;
+}
+
+.hotel-paper__facts dd {
+  letter-spacing: 0.035em;
+}
+
 .hotel-paper__footer {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 24px;
   align-items: end;
   border-top: 3px double var(--charcoal);
-  padding-top: 12px;
+  padding-top: 9px;
 }
 
 .hotel-paper__footer > div {
@@ -803,8 +826,19 @@ button {
     grid-template-columns: 1fr;
   }
 
+  .hotel-paper__summary {
+    padding-right: 0;
+    padding-bottom: 20px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(23, 23, 22, 0.35);
+  }
+
   .hotel-paper__facts {
-    margin-top: 2px;
+    margin-top: 0;
+  }
+
+  .hotel-paper__facts dl {
+    grid-template-rows: none;
   }
 }
 
