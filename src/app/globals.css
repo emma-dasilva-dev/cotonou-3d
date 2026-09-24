@@ -363,10 +363,6 @@ button {
     gap: 14px;
   }
 
-  .interface nav button:nth-child(2) {
-    display: none;
-  }
-
   .study-label,
   .coordinates {
     left: 20px;
@@ -1427,6 +1423,7 @@ body {
   .hotel-marker,
   .hotel-info-panel__close,
   .archives-panel__close,
+  .about-panel__close,
   .archive-card__footer button {
     min-height: 44px;
   }
@@ -1628,10 +1625,6 @@ body {
     padding: 0 5px;
     font-size: 8px;
     letter-spacing: 0.09em;
-  }
-
-  .interface nav button:nth-child(2) {
-    display: none;
   }
 
   .study-label {
