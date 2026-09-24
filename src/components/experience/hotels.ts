@@ -15,6 +15,7 @@ export type HotelStudy = {
   facts: HotelFact[];
   website: string;
   exteriorReady?: boolean;
+  studyContext?: string;
 };
 
 export const hotelStudies: HotelStudy[] = [
@@ -34,6 +35,8 @@ export const hotelStudies: HotelStudy[] = [
       { label: "Style", value: "Contemporain côtier" },
     ],
     website: "https://sofitel.accor.com/fr/hotels/B845.html",
+    exteriorReady: true,
+    studyContext: "Golfe de Guinée",
   },
   {
     id: "golden-tulip",
@@ -86,6 +89,7 @@ export const hotelStudies: HotelStudy[] = [
     ],
     website: "https://www.hoteldulac-benin.com/",
     exteriorReady: true,
+    studyContext: "Lac Nokoué",
   },
   {
     id: "azalai",
