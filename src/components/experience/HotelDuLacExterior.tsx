@@ -232,7 +232,7 @@ export function HotelDuLacExterior({
 
       <Text
         position={[0.15, 2.72, -0.755]}
-        rotation={[0, 0, 0]}
+        rotation={[0, Math.PI, 0]}
         fontSize={0.18}
         letterSpacing={0.08}
         color={RED}
