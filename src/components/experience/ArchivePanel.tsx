@@ -73,8 +73,8 @@ export function ArchivePanel({
       </header>
 
       <div className="archives-panel__status" data-archive-reveal>
-        <span>Six études architecturales</span>
-        <span>Choisissez librement une adresse</span>
+        <span>Six lectures de Cotonou</span>
+        <span>Comparez architecture, paysage et ville</span>
       </div>
 
       <div className="archives-grid">
@@ -90,7 +90,7 @@ export function ArchivePanel({
             </div>
 
             <div className="archive-card__body">
-              <p>Architecture & hospitalité</p>
+              <p>Architecture · Paysage · Ville</p>
               <h3>{hotel.name}</h3>
               <span>{hotel.location}</span>
             </div>
@@ -106,7 +106,7 @@ export function ArchivePanel({
       </div>
 
       <footer className="archives-panel__footer" data-archive-reveal>
-        <span>Une publication interactive indépendante</span>
+        <span>Une étude interactive de l’hospitalité à Cotonou</span>
         <strong>COTONOU / 3D — COLLECTION 2026</strong>
       </footer>
     </section>
