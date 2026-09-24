@@ -81,7 +81,7 @@ export function ArchivePanel({
         {hotelStudies.map((hotel) => (
           <article
             key={hotel.id}
-            className="archive-card archive-card--discovered"
+            className="archive-card"
             data-archive-reveal
           >
             <div className="archive-card__topline">
