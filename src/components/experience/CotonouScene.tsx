@@ -12,6 +12,7 @@ import { SofitelExterior } from "./SofitelExterior";
 import { NovotelExterior } from "./NovotelExterior";
 import { AzalaiExterior } from "./AzalaiExterior";
 import { MaisonRougeExterior } from "./MaisonRougeExterior";
+import { CityLife, CityRoads } from "./CityLife";
 import { hotelStudies } from "./hotels";
 import type { HotelStudy } from "./hotels";
 
@@ -220,29 +221,6 @@ function CityBlocks() {
   );
 }
 
-function Roads() {
-  return (
-    <group position={[0, 0.012, 0]}>
-      {[-9.0, 0.0, 9.0].map((z) => (
-        <mesh key={z} position={[0, 0, z]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[28, 0.22]} />
-          <meshBasicMaterial color="#918d85" />
-        </mesh>
-      ))}
-      {[-4.5, 4.5].map((x) => (
-        <mesh
-          key={x}
-          position={[x, 0, 0]}
-          rotation={[-Math.PI / 2, 0, Math.PI / 2]}
-        >
-          <planeGeometry args={[20, 0.2]} />
-          <meshBasicMaterial color="#918d85" />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
 function WaterBand() {
   return (
     <mesh
@@ -371,8 +349,9 @@ export function CotonouScene({
       </mesh>
 
       <WaterBand />
-      <Roads />
+      <CityRoads />
       <CityBlocks />
+      <CityLife />
 
       <HotelDuLacExterior position={HOTEL_DU_LAC_POSITION} />
       <SofitelExterior position={SOFITEL_POSITION} />
