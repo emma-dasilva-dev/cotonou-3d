@@ -6,24 +6,25 @@ import { useEffect, useRef, useState } from "react";
 import { ArchivePanel } from "./ArchivePanel";
 import { CotonouScene } from "./CotonouScene";
 import { HotelInfoPanel } from "./HotelInfoPanel";
-import { hotelStudies } from "./hotels";
+import { NewspaperTransition } from "./NewspaperTransition";
 import type { HotelStudy } from "./hotels";
 
-const ARCHIVE_STORAGE_KEY = "cotonou-3d:archives";
+type TransitionState = {
+  hotel: HotelStudy;
+  mode: "open" | "close";
+};
 
 export function CotonouExperience() {
   const introRef = useRef<HTMLDivElement>(null);
   const interfaceRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const archiveTimerRef = useRef<number | null>(null);
 
   const [entered, setEntered] = useState(false);
   const [activeHotel, setActiveHotel] = useState<HotelStudy | null>(null);
   const [focusHotelId, setFocusHotelId] = useState<string | undefined>();
   const [panelOpen, setPanelOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
-  const [archiveNotice, setArchiveNotice] = useState<string | null>(null);
-  const [discoveredIds, setDiscoveredIds] = useState<string[]>([]);
+  const [transition, setTransition] = useState<TransitionState | null>(null);
   const [soundOn, setSoundOn] = useState(true);
 
   useEffect(() => {
@@ -41,31 +42,6 @@ export function CotonouExperience() {
     }, introRef);
 
     return () => context.revert();
-  }, []);
-
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(
-        window.localStorage.getItem(ARCHIVE_STORAGE_KEY) ?? "[]",
-      );
-
-      if (Array.isArray(saved)) {
-        const validIds = new Set(hotelStudies.map((hotel) => hotel.id));
-        setDiscoveredIds(
-          saved.filter(
-            (id): id is string => typeof id === "string" && validIds.has(id),
-          ),
-        );
-      }
-    } catch {
-      window.localStorage.removeItem(ARCHIVE_STORAGE_KEY);
-    }
-
-    return () => {
-      if (archiveTimerRef.current !== null) {
-        window.clearTimeout(archiveTimerRef.current);
-      }
-    };
   }, []);
 
   function enterExperience() {
@@ -96,32 +72,13 @@ export function CotonouExperience() {
     }
   }
 
-  function archiveHotel(hotel: HotelStudy) {
-    setDiscoveredIds((currentIds) => {
-      if (currentIds.includes(hotel.id)) return currentIds;
-
-      const nextIds = [...currentIds, hotel.id];
-      window.localStorage.setItem(ARCHIVE_STORAGE_KEY, JSON.stringify(nextIds));
-
-      setArchiveNotice(hotel.name);
-
-      if (archiveTimerRef.current !== null) {
-        window.clearTimeout(archiveTimerRef.current);
-      }
-
-      archiveTimerRef.current = window.setTimeout(() => {
-        setArchiveNotice(null);
-      }, 2600);
-
-      return nextIds;
-    });
-  }
-
   function selectHotel(hotel: HotelStudy) {
-    archiveHotel(hotel);
+    if (transition) return;
+
     setArchiveOpen(false);
+    setPanelOpen(false);
     setActiveHotel(hotel);
-    setPanelOpen(true);
+    setTransition({ hotel, mode: "open" });
 
     if (hotel.exteriorReady) {
       setFocusHotelId(hotel.id);
@@ -131,14 +88,33 @@ export function CotonouExperience() {
     setFocusHotelId(undefined);
   }
 
+  function finishTransition() {
+    if (!transition) return;
+
+    if (transition.mode === "open") {
+      setPanelOpen(true);
+    }
+
+    setTransition(null);
+  }
+
+  function closeHotelPanel() {
+    if (!activeHotel || transition) return;
+
+    setPanelOpen(false);
+    setTransition({ hotel: activeHotel, mode: "close" });
+  }
+
   function returnToCotonou() {
     setPanelOpen(false);
+    setTransition(null);
     setFocusHotelId(undefined);
     setActiveHotel(null);
   }
 
   function openArchives() {
     setPanelOpen(false);
+    setTransition(null);
     setArchiveOpen(true);
   }
 
@@ -234,7 +210,7 @@ export function CotonouExperience() {
 
           <nav aria-label="Contrôles de l'expérience">
             <button type="button" onClick={openArchives}>
-              Archives {String(discoveredIds.length).padStart(2, "0")}/06
+              Archives
             </button>
             <button type="button">À propos</button>
             <button
@@ -251,7 +227,6 @@ export function CotonouExperience() {
         {!inHotelStudy && (
           <>
             <div className="study-label">
-              <span>01 — 06</span>
               <span>Études architecturales</span>
             </div>
 
@@ -264,18 +239,12 @@ export function CotonouExperience() {
               <span>06°21&apos;N</span>
               <span>Cotonou, Bénin</span>
             </div>
-
-            <div className="counter">
-              <span>{activeHotel?.index ?? "—"}</span>
-              <span>/ 06</span>
-            </div>
           </>
         )}
 
         {inHotelStudy && (
           <>
             <div className="hotel-study-heading">
-              <span>04 / 06</span>
               <h2>Hôtel du Lac</h2>
               <p>Étude extérieure · Lac Nokoué</p>
             </div>
@@ -301,30 +270,28 @@ export function CotonouExperience() {
           </>
         )}
 
-        {archiveNotice && !archiveOpen && (
-          <div className="archive-notice" role="status">
-            <span>Ajouté aux archives</span>
-            <strong>{archiveNotice}</strong>
-            <small>
-              {String(discoveredIds.length).padStart(2, "0")} / 06
-            </small>
-          </div>
-        )}
-
         {activeHotel && panelOpen && (
           <HotelInfoPanel
             key={activeHotel.id}
             hotel={activeHotel}
-            delay={activeHotel.exteriorReady ? 0.45 : 0}
-            onClose={() => setPanelOpen(false)}
+            delay={0}
+            onClose={closeHotelPanel}
           />
         )}
 
         {archiveOpen && (
           <ArchivePanel
-            discoveredIds={discoveredIds}
             onClose={() => setArchiveOpen(false)}
             onOpenHotel={selectHotel}
+          />
+        )}
+
+        {transition && (
+          <NewspaperTransition
+            key={`${transition.hotel.id}-${transition.mode}`}
+            hotel={transition.hotel}
+            mode={transition.mode}
+            onComplete={finishTransition}
           />
         )}
       </div>
