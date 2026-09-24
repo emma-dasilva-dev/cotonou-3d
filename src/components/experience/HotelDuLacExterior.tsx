@@ -1,6 +1,6 @@
 "use client";
 
-import { Html, RoundedBox } from "@react-three/drei";
+import { RoundedBox, Text } from "@react-three/drei";
 import { DoubleSide } from "three";
 
 const CREAM = "#ded6c7";
@@ -209,15 +209,17 @@ export function HotelDuLacExterior({
 
       <BalconyStack />
 
-      <Html
-        transform
-        position={[0.15, 2.76, -0.58]}
+      <Text
+        position={[0.15, 2.72, -0.755]}
         rotation={[0, 0, 0]}
-        distanceFactor={5.5}
-        zIndexRange={[12, 0]}
+        fontSize={0.18}
+        letterSpacing={0.08}
+        color={RED}
+        anchorX="center"
+        anchorY="middle"
       >
-        <div className="hotel-du-lac-sign">HÔTEL DU LAC</div>
-      </Html>
+        HÔTEL DU LAC
+      </Text>
 
       <PoolDeck />
       <TerracePavilion />
