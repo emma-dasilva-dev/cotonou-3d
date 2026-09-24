@@ -243,7 +243,12 @@ export function CotonouExperience() {
 
             <div className="interaction-hint">
               <span className="interaction-hint__line" />
-              <span>Glisser pour explorer · Faire défiler pour zoomer</span>
+              <span className="interaction-copy interaction-copy--desktop">
+                Glisser pour explorer · Faire défiler pour zoomer
+              </span>
+              <span className="interaction-copy interaction-copy--touch">
+                Glisser pour explorer · Pincer pour zoomer
+              </span>
             </div>
 
             <div className="coordinates">
@@ -271,7 +276,12 @@ export function CotonouExperience() {
 
             <div className="study-interaction">
               <span className="interaction-hint__line" />
-              <span>Glisser pour tourner · Faire défiler pour zoomer</span>
+              <span className="interaction-copy interaction-copy--desktop">
+                Glisser pour tourner · Faire défiler pour zoomer
+              </span>
+              <span className="interaction-copy interaction-copy--touch">
+                Glisser pour tourner · Pincer pour zoomer
+              </span>
             </div>
 
           </>
