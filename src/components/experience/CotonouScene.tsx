@@ -27,12 +27,24 @@ type Block = {
   scale: [number, number, number];
 };
 
-const HOTEL_DU_LAC_POSITION: [number, number, number] = [4.6, 0, 1.7];
-const SOFITEL_POSITION: [number, number, number] = [-5.4, 0, -1.0];
-const GOLDEN_TULIP_POSITION: [number, number, number] = [-1.7, 0, -3.1];
-const NOVOTEL_POSITION: [number, number, number] = [3.0, 0, -3.4];
-const AZALAI_POSITION: [number, number, number] = [0.2, 0, 2.5];
-const MAISON_ROUGE_POSITION: [number, number, number] = [-3.2, 0, 2.5];
+const HOTEL_DU_LAC_POSITION: [number, number, number] = [8.5, 0, 4.2];
+const SOFITEL_POSITION: [number, number, number] = [-9.0, 0, -5.0];
+const GOLDEN_TULIP_POSITION: [number, number, number] = [0.0, 0, -6.0];
+const NOVOTEL_POSITION: [number, number, number] = [9.0, 0, -5.0];
+const AZALAI_POSITION: [number, number, number] = [0.5, 0, 5.0];
+const MAISON_ROUGE_POSITION: [number, number, number] = [-8.5, 0, 4.3];
+
+const HOTEL_CLEARINGS: Array<{
+  position: [number, number, number];
+  radius: number;
+}> = [
+  { position: SOFITEL_POSITION, radius: 3.9 },
+  { position: GOLDEN_TULIP_POSITION, radius: 3.6 },
+  { position: NOVOTEL_POSITION, radius: 3.6 },
+  { position: MAISON_ROUGE_POSITION, radius: 3.2 },
+  { position: AZALAI_POSITION, radius: 3.7 },
+  { position: HOTEL_DU_LAC_POSITION, radius: 3.2 },
+];
 
 const FOCUS_VIEWS: Record<
   string,
@@ -44,38 +56,38 @@ const FOCUS_VIEWS: Record<
   }
 > = {
   "hotel-du-lac": {
-    camera: [8.25, 3.25, -3.65],
-    target: [4.6, 1.0, 1.35],
+    camera: [12.15, 3.25, -1.15],
+    target: [8.5, 1.0, 3.85],
     minDistance: 3.4,
     maxDistance: 9.5,
   },
   sofitel: {
-    camera: [-10.55, 4.35, -6.7],
-    target: [-5.32, 1.72, -1.15],
+    camera: [-14.15, 4.35, -10.7],
+    target: [-8.92, 1.72, -5.15],
     minDistance: 4.8,
     maxDistance: 12.5,
   },
   "golden-tulip": {
-    camera: [-5.95, 3.6, -7.85],
-    target: [-1.65, 1.35, -3.15],
+    camera: [-4.3, 3.6, -10.7],
+    target: [0.05, 1.35, -6.05],
     minDistance: 4.2,
     maxDistance: 11.5,
   },
   novotel: {
-    camera: [7.55, 3.55, -7.9],
-    target: [3.05, 1.2, -3.65],
+    camera: [13.5, 3.55, -9.25],
+    target: [9.05, 1.2, -5.25],
     minDistance: 4.0,
     maxDistance: 11.0,
   },
   azalai: {
-    camera: [5.25, 3.85, -2.15],
-    target: [0.25, 1.55, 2.15],
+    camera: [5.5, 3.85, 0.35],
+    target: [0.55, 1.55, 4.65],
     minDistance: 4.6,
     maxDistance: 12.0,
   },
   "maison-rouge": {
-    camera: [-7.3, 3.05, -0.65],
-    target: [-3.15, 0.95, 2.25],
+    camera: [-12.6, 3.05, 1.15],
+    target: [-8.45, 0.95, 4.05],
     minDistance: 3.7,
     maxDistance: 10.0,
   },
@@ -99,10 +111,10 @@ function CameraRig({ focusHotelId }: { focusHotelId?: string }) {
     const view = focusHotelId ? FOCUS_VIEWS[focusHotelId] : undefined;
     const overviewCamera =
       size.width <= 720
-        ? { x: 13.2, y: 11.4, z: 17.2 }
+        ? { x: 24.0, y: 20.0, z: 31.0 }
         : size.width <= 1024
-          ? { x: 11.8, y: 10.4, z: 15.3 }
-          : { x: 10.5, y: 9.5, z: 13.5 };
+          ? { x: 21.0, y: 18.0, z: 27.0 }
+          : { x: 18.0, y: 16.0, z: 23.0 };
     const cameraTarget = view
       ? { x: view.camera[0], y: view.camera[1], z: view.camera[2] }
       : overviewCamera;
@@ -146,8 +158,8 @@ function CameraRig({ focusHotelId }: { focusHotelId?: string }) {
       enablePan={false}
       enableDamping
       dampingFactor={0.055}
-      minDistance={view?.minDistance ?? 8.5}
-      maxDistance={view?.maxDistance ?? 20}
+      minDistance={view?.minDistance ?? 13}
+      maxDistance={view?.maxDistance ?? 46}
       minPolarAngle={view ? 0.62 : 0.55}
       maxPolarAngle={view ? 1.44 : 1.18}
       target={view?.target ?? [0, 0, 0.2]}
@@ -159,19 +171,21 @@ function CityBlocks() {
   const blocks = useMemo<Block[]>(() => {
     const result: Block[] = [];
 
-    for (let row = 0; row < 7; row += 1) {
-      for (let column = 0; column < 10; column += 1) {
-        if ((row + column) % 5 === 0 || column === 4) continue;
+    for (let row = 0; row < 8; row += 1) {
+      for (let column = 0; column < 11; column += 1) {
+        if ((row + column) % 5 === 0 || column === 5) continue;
 
-        const x = -6.3 + column * 1.4;
-        const z = -4.1 + row * 1.35;
+        const x = -10 + column * 2;
+        const z = -7 + row * 2;
 
-        if (Math.hypot(x - 4.6, z - 1.7) < 2.35) continue;
-        if (Math.hypot(x + 5.4, z + 1.0) < 3.35) continue;
-        if (Math.hypot(x + 1.7, z + 3.1) < 2.7) continue;
-        if (Math.hypot(x - 3.0, z + 3.4) < 3.0) continue;
-        if (Math.hypot(x - 0.2, z - 2.5) < 3.15) continue;
-        if (Math.hypot(x + 3.2, z - 2.5) < 2.8) continue;
+        if (
+          HOTEL_CLEARINGS.some(
+            ({ position, radius }) =>
+              Math.hypot(x - position[0], z - position[2]) < radius,
+          )
+        ) {
+          continue;
+        }
 
         const width = 0.52 + ((column * 3 + row) % 4) * 0.08;
         const depth = 0.48 + ((row * 5 + column) % 3) * 0.09;
@@ -209,19 +223,19 @@ function CityBlocks() {
 function Roads() {
   return (
     <group position={[0, 0.012, 0]}>
-      {[-2.7, 0.05, 2.75].map((z) => (
+      {[-9.0, 0.0, 9.0].map((z) => (
         <mesh key={z} position={[0, 0, z]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[15.5, 0.2]} />
+          <planeGeometry args={[28, 0.22]} />
           <meshBasicMaterial color="#918d85" />
         </mesh>
       ))}
-      {[-3.5, 0.1, 3.65].map((x) => (
+      {[-4.5, 4.5].map((x) => (
         <mesh
           key={x}
           position={[x, 0, 0]}
           rotation={[-Math.PI / 2, 0, Math.PI / 2]}
         >
-          <planeGeometry args={[10.2, 0.18]} />
+          <planeGeometry args={[20, 0.2]} />
           <meshBasicMaterial color="#918d85" />
         </mesh>
       ))}
@@ -232,11 +246,11 @@ function Roads() {
 function WaterBand() {
   return (
     <mesh
-      position={[0, -0.035, 5.25]}
+      position={[0, -0.035, 10.25]}
       rotation={[-Math.PI / 2, 0, 0]}
       receiveShadow
     >
-      <planeGeometry args={[19, 3.8, 1, 1]} />
+      <planeGeometry args={[32, 4.5, 1, 1]} />
       <meshStandardMaterial
         color="#738489"
         roughness={0.35}
@@ -338,7 +352,7 @@ export function CotonouScene({
   return (
     <>
       <color attach="background" args={["#d8d2c6"]} />
-      <fog attach="fog" args={["#d8d2c6", 12, 27]} />
+      <fog attach="fog" args={["#d8d2c6", 20, 46]} />
 
       <ambientLight intensity={1.25} />
       <hemisphereLight args={["#e8e3d9", "#77736c", 1.35]} />
@@ -352,7 +366,7 @@ export function CotonouScene({
       />
 
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[18, 14]} />
+        <planeGeometry args={[32, 25]} />
         <meshStandardMaterial color="#c9c0b1" roughness={1} />
       </mesh>
 
