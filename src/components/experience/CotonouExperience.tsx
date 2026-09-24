@@ -32,6 +32,7 @@ export function CotonouExperience() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [transition, setTransition] = useState<TransitionState | null>(null);
   const [soundOn, setSoundOn] = useState(true);
+  const [mobileMode, setMobileMode] = useState(false);
 
   useEffect(() => {
     if (!introRef.current) return;
@@ -55,6 +56,23 @@ export function CotonouExperience() {
       if (introExitTimerRef.current !== null) {
         window.clearTimeout(introExitTimerRef.current);
       }
+    };
+  }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 720px), (pointer: coarse)");
+
+    const syncMobileMode = () => {
+      setMobileMode(media.matches || window.innerWidth <= 720);
+    };
+
+    syncMobileMode();
+    media.addEventListener?.("change", syncMobileMode);
+    window.addEventListener("resize", syncMobileMode, { passive: true });
+
+    return () => {
+      media.removeEventListener?.("change", syncMobileMode);
+      window.removeEventListener("resize", syncMobileMode);
     };
   }, []);
 
@@ -205,15 +223,20 @@ export function CotonouExperience() {
 
       <div className="scene-layer" aria-hidden={!entered}>
         <Canvas
-          shadows
-          dpr={[1, 1.5]}
+          shadows={!mobileMode}
+          dpr={mobileMode ? 1 : [1, 1.5]}
           camera={{ position: [18, 16, -23], fov: 34 }}
-          gl={{ antialias: true, alpha: false }}
+          gl={{
+            antialias: !mobileMode,
+            alpha: false,
+            powerPreference: "high-performance",
+          }}
         >
           <CotonouScene
             activeHotelId={activeHotel?.id}
             focusHotelId={focusHotelId}
             onSelectHotel={selectHotel}
+            lowDetail={mobileMode}
           />
         </Canvas>
       </div>
