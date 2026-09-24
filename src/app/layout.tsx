@@ -10,12 +10,12 @@ const geist = Geist({
 export const metadata: Metadata = {
   title: "COTONOU / 3D",
   description:
-    "An independent interactive 3D study of six hospitality spaces in Cotonou, Benin.",
+    "Une étude 3D interactive et indépendante de six espaces hôteliers à Cotonou, Bénin.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={geist.variable}>
+    <html lang="fr" className={geist.variable}>
       <body>{children}</body>
     </html>
   );
