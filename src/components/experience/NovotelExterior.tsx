@@ -178,7 +178,8 @@ function HotelBlock() {
 
       <Text
         position={[0, 0.68, -0.86]}
-        rotation={[0, Math.PI, 0]}\n        fontSize={0.17}
+        rotation={[0, Math.PI, 0]}
+        fontSize={0.17}
         letterSpacing={0.1}
         color="#363735"
         anchorX="center"
