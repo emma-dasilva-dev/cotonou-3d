@@ -25,7 +25,7 @@ export const hotelStudies: HotelStudy[] = [
     name: "Sofitel Cotonou Marina",
     shortName: "Sofitel",
     descriptor: "Étude Marina",
-    position: [-4.7, 0, -2.2],
+    position: [-5.4, 0, -1.0],
     location: "Boulevard de la Marina · Cotonou",
     summary:
       "Un hôtel cinq étoiles contemporain face au golfe de Guinée, pensé autour de la lumière côtière, des jardins paysagers et du dialogue entre sable, océan et végétation.",
@@ -63,7 +63,7 @@ export const hotelStudies: HotelStudy[] = [
     name: "Novotel Cotonou Orisha",
     shortName: "Novotel",
     descriptor: "Étude Jardin",
-    position: [1.7, 0, -2.1],
+    position: [3.0, 0, -3.4],
     location: "Boulevard de la Marina · Cotonou",
     summary:
       "Un hôtel quatre étoiles rénové au cœur d'un jardin arboré de sept hectares, avec un design contemporain, une piscine et une atmosphère plus calme proche du littoral.",
