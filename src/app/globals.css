@@ -1,26 +1,403 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ivory: #e8e3d9;
+  --sand: #c9c0b1;
+  --stone: #9a968e;
+  --graphite: #292927;
+  --charcoal: #171716;
+  --water: #71858a;
+  --vegetation: #667064;
+  --metal: #ad956d;
+  --line: rgba(41, 41, 39, 0.28);
+  --paper: rgba(232, 227, 217, 0.9);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  width: 100%;
+  min-height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  overflow: hidden;
+  background: var(--ivory);
+  color: var(--graphite);
+  font-family: var(--font-geist), Arial, Helvetica, sans-serif;
+}
+
+button {
+  font: inherit;
+}
+
+.experience {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--ivory);
+}
+
+.scene-layer {
+  position: absolute;
+  inset: 0;
+  transform: scale(1.04);
+  filter: saturate(0.72) contrast(0.96) blur(5px);
+  transition:
+    filter 1.4s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.experience--entered .scene-layer {
+  transform: scale(1);
+  filter: saturate(0.9) contrast(1);
+}
+
+.intro {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 28px 34px 30px;
+  background:
+    linear-gradient(90deg, rgba(23, 23, 22, 0.2), transparent 46%),
+    rgba(232, 227, 217, 0.32);
+  backdrop-filter: blur(2px);
+}
+
+.intro__topline,
+.intro__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+}
+
+.intro__main {
+  align-self: end;
+  width: min(830px, 90vw);
+  padding-bottom: clamp(36px, 9vh, 104px);
+}
+
+.eyebrow {
+  margin: 0 0 20px;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+}
+
+.intro h1 {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  margin: 0;
+  font-size: clamp(64px, 10vw, 154px);
+  font-weight: 520;
+  line-height: 0.82;
+  letter-spacing: -0.075em;
+}
+
+.intro h1 span {
+  font-size: 0.34em;
+  font-weight: 450;
+  letter-spacing: -0.04em;
+}
+
+.intro__description {
+  width: min(460px, 82vw);
+  margin: 30px 0 36px;
+  font-size: clamp(14px, 1.15vw, 18px);
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+}
+
+.enter-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 158px;
+  min-height: 50px;
+  padding: 0 17px;
+  border: 1px solid var(--graphite);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--graphite);
+  cursor: pointer;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  transition:
+    background 220ms ease,
+    color 220ms ease,
+    transform 220ms ease;
+}
+
+.enter-button:hover {
+  background: var(--graphite);
+  color: var(--ivory);
+  transform: translateY(-2px);
+}
+
+.interface {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  padding: 26px 32px 28px;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.13em;
+}
+
+.interface--visible {
+  opacity: 1;
+}
+
+.interface__header {
+  position: absolute;
+  top: 26px;
+  right: 32px;
+  left: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  font-size: 13px;
+  font-weight: 620;
+  letter-spacing: -0.01em;
+}
+
+.brand span {
+  color: rgba(41, 41, 39, 0.48);
+}
+
+.interface nav {
+  display: flex;
+  gap: 24px;
+}
+
+.interface nav button {
+  border: 0;
+  background: transparent;
+  color: var(--graphite);
+  cursor: pointer;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  pointer-events: auto;
+}
+
+.study-label {
+  position: absolute;
+  top: 92px;
+  left: 32px;
+  display: grid;
+  gap: 5px;
+}
+
+.study-label span:last-child {
+  color: rgba(41, 41, 39, 0.58);
+}
+
+.interaction-hint {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.interaction-hint__line {
+  width: 34px;
+  height: 1px;
+  background: var(--graphite);
+}
+
+.coordinates {
+  position: absolute;
+  bottom: 28px;
+  left: 32px;
+  display: grid;
+  gap: 5px;
+}
+
+.counter {
+  position: absolute;
+  right: 32px;
+  bottom: 28px;
+  display: flex;
+  gap: 5px;
+}
+
+.hotel-selection {
+  position: absolute;
+  right: 32px;
+  bottom: 74px;
+  width: min(330px, calc(100vw - 64px));
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  pointer-events: auto;
+}
+
+.hotel-selection > span {
+  display: block;
+  margin-bottom: 12px;
+  color: rgba(41, 41, 39, 0.56);
+}
+
+.hotel-selection h2 {
+  margin: 0;
+  max-width: 290px;
+  text-transform: none;
+  font-size: clamp(24px, 2.7vw, 42px);
+  font-weight: 490;
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+}
+
+.hotel-selection p {
+  margin: 13px 0 18px;
+  text-transform: uppercase;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.hotel-selection button {
+  border: 0;
+  border-bottom: 1px solid var(--graphite);
+  padding: 0 0 6px;
+  background: transparent;
+  color: rgba(41, 41, 39, 0.48);
+  text-transform: uppercase;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+
+.hotel-marker {
+  display: grid;
+  min-width: 108px;
+  gap: 3px;
+  border: 1px solid rgba(41, 41, 39, 0.32);
+  border-radius: 999px;
+  padding: 7px 11px;
+  background: rgba(232, 227, 217, 0.84);
+  color: var(--graphite);
+  cursor: pointer;
+  text-align: left;
+  box-shadow: none;
+  backdrop-filter: blur(8px);
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.hotel-marker:hover,
+.hotel-marker--active {
+  background: var(--graphite);
+  color: var(--ivory);
+  transform: translateY(-2px);
+}
+
+.hotel-marker__index {
+  font-size: 7px;
+  letter-spacing: 0.14em;
+  opacity: 0.68;
+}
+
+.hotel-marker__name {
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 720px) {
+  .intro {
+    padding: 20px;
+  }
+
+  .intro__topline span:last-child,
+  .intro__footer span:first-child {
+    display: none;
+  }
+
+  .intro h1 {
+    display: grid;
+    gap: 10px;
+    font-size: clamp(58px, 19vw, 96px);
+  }
+
+  .intro h1 span {
+    font-size: 0.3em;
+  }
+
+  .interface {
+    padding: 20px;
+  }
+
+  .interface__header {
+    top: 20px;
+    right: 20px;
+    left: 20px;
+  }
+
+  .interface nav {
+    gap: 14px;
+  }
+
+  .interface nav button:first-child {
+    display: none;
+  }
+
+  .study-label,
+  .coordinates {
+    left: 20px;
+  }
+
+  .counter {
+    right: 20px;
+  }
+
+  .hotel-selection {
+    right: 20px;
+    bottom: 78px;
+    width: calc(100vw - 40px);
+  }
+
+  .interaction-hint {
+    display: none;
+  }
+
+  .hotel-marker {
+    min-width: 92px;
+    padding: 6px 9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
