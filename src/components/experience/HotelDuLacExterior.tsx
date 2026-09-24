@@ -1,7 +1,11 @@
 "use client";
 
 import { RoundedBox, Text } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
+import { useRef } from "react";
 import { DoubleSide } from "three";
+import type { Group } from "three";
+import { AnimatedWaterSurface } from "./AnimatedWaterSurface";
 
 const CREAM = "#ded6c7";
 const CREAM_DARK = "#c9c0b1";
@@ -33,14 +37,32 @@ function Palm({
   position: [number, number, number];
   scale?: number;
 }) {
+  const palmRef = useRef<Group>(null);
+  const crownRef = useRef<Group>(null);
+  const phase = position[0] * 0.7 + position[2] * 0.45;
+
+  useFrame(({ clock }) => {
+    const time = clock.elapsedTime;
+
+    if (palmRef.current) {
+      palmRef.current.rotation.z = Math.sin(time * 0.42 + phase) * 0.018;
+      palmRef.current.rotation.x = Math.cos(time * 0.34 + phase) * 0.008;
+    }
+
+    if (crownRef.current) {
+      crownRef.current.rotation.z = Math.sin(time * 0.7 + phase) * 0.035;
+      crownRef.current.rotation.y = Math.cos(time * 0.5 + phase) * 0.025;
+    }
+  });
+
   return (
-    <group position={position} scale={scale}>
+    <group ref={palmRef} position={position} scale={scale}>
       <mesh position={[0, 0.52, 0]} rotation={[0, 0, -0.08]} castShadow>
         <cylinderGeometry args={[0.055, 0.085, 1.05, 9]} />
         <meshStandardMaterial color={TRUNK} roughness={0.92} />
       </mesh>
 
-      <group position={[0, 1.08, 0]}>
+      <group ref={crownRef} position={[0, 1.08, 0]}>
         {Array.from({ length: 7 }).map((_, index) => {
           const angle = (index / 7) * Math.PI * 2;
           return (
@@ -121,16 +143,16 @@ function PoolDeck() {
         />
       </mesh>
 
-      <mesh position={[0.35, 0.103, 0]}>
-        <boxGeometry args={[2.28, 0.015, 0.87]} />
-        <meshStandardMaterial
-          color="#7e9aa0"
-          roughness={0.18}
-          metalness={0.12}
-          transparent
-          opacity={0.88}
-        />
-      </mesh>
+      <AnimatedWaterSurface
+        position={[0.35, 0.108, 0]}
+        size={[2.28, 0.87]}
+        color="#6f8e95"
+        lightColor="#a6bbc0"
+        amplitude={0.018}
+        speed={0.95}
+        opacity={0.9}
+        segments={[48, 18]}
+      />
 
       {[-1.55, -0.95, 1.52].map((x, index) => (
         <group key={x} position={[x, 0.1, -0.66]}>
