@@ -36,8 +36,8 @@ export function HotelInfoPanel({
         y: 18,
         opacity: 0,
         duration: 0.7,
-        stagger: 0.07,
-        delay: delay + 0.32,
+        stagger: 0.06,
+        delay: delay + 0.28,
         ease: "power2.out",
       });
     }, panelRef);
@@ -65,8 +65,22 @@ export function HotelInfoPanel({
       className="hotel-info-panel"
       aria-label={`À propos de ${hotel.name}`}
     >
-      <div className="hotel-info-panel__top" data-panel-reveal>
-        <span>{hotel.index} / 06</span>
+      <header className="hotel-paper__header" data-panel-reveal>
+        <div className="hotel-paper__kicker">
+          <span>Cotonou / 3D</span>
+          <span>Édition {hotel.index}</span>
+        </div>
+
+        <div className="hotel-paper__masthead">
+          <span>Le Journal de</span>
+          <strong>Cotonou</strong>
+        </div>
+
+        <div className="hotel-paper__meta">
+          <span>Architecture & hospitalité</span>
+          <span>2026 · Bénin</span>
+        </div>
+
         <button
           type="button"
           className="hotel-info-panel__close"
@@ -76,41 +90,52 @@ export function HotelInfoPanel({
           <span>Fermer</span>
           <span aria-hidden="true">×</span>
         </button>
-      </div>
+      </header>
 
-      <div className="hotel-info-panel__body">
-        <div data-panel-reveal>
-          <p className="hotel-info-panel__eyebrow">Étude hôtelière</p>
+      <div className="hotel-paper__article">
+        <div className="hotel-paper__headline" data-panel-reveal>
+          <p>{hotel.descriptor}</p>
           <h2>{hotel.name}</h2>
-          <p className="hotel-info-panel__location">{hotel.location}</p>
+          <span>{hotel.location}</span>
         </div>
 
-        <p className="hotel-info-panel__summary" data-panel-reveal>
-          {hotel.summary}
-        </p>
+        <div className="hotel-paper__rule" data-panel-reveal>
+          <span>{hotel.index}</span>
+          <span>Une adresse de Cotonou</span>
+        </div>
 
-        <dl className="hotel-info-panel__facts" data-panel-reveal>
-          {hotel.facts.map((fact) => (
-            <div key={fact.label}>
-              <dt>{fact.label}</dt>
-              <dd>{fact.value}</dd>
+        <div className="hotel-paper__content" data-panel-reveal>
+          <p className="hotel-paper__summary">{hotel.summary}</p>
+
+          <section className="hotel-paper__facts" aria-label="En bref">
+            <div className="hotel-paper__facts-title">
+              <span>En bref</span>
+              <span>—</span>
             </div>
-          ))}
-        </dl>
+
+            <dl>
+              {hotel.facts.map((fact) => (
+                <div key={fact.label}>
+                  <dt>{fact.label}</dt>
+                  <dd>{fact.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        </div>
       </div>
 
-      <div className="hotel-info-panel__footer" data-panel-reveal>
+      <footer className="hotel-paper__footer" data-panel-reveal>
+        <div>
+          <span>Étude visuelle indépendante</span>
+          <span>Sources publiques · Cotonou / 3D</span>
+        </div>
+
         <a href={hotel.website} target="_blank" rel="noreferrer">
-          <span>Site officiel</span>
+          <span>Visiter le site officiel</span>
           <span aria-hidden="true">↗</span>
         </a>
-
-        <p>
-          Étude visuelle indépendante.
-          <br />
-          Informations issues de sources publiques des hôtels.
-        </p>
-      </div>
+      </footer>
     </aside>
   );
 }
