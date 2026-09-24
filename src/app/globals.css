@@ -1389,87 +1389,6 @@ button {
 }
 
 
-.hotel-paper__navigation {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  margin-top: 14px;
-  border-top: 3px double var(--charcoal);
-  border-bottom: 1px solid var(--charcoal);
-}
-
-.hotel-paper__nav-button {
-  display: flex;
-  min-height: 62px;
-  align-items: center;
-  gap: 12px;
-  border: 0;
-  padding: 10px 0;
-  background: transparent;
-  color: var(--charcoal);
-  cursor: pointer;
-  text-align: left;
-}
-
-.hotel-paper__nav-button--previous {
-  border-right: 1px solid rgba(23, 23, 22, 0.35);
-  padding-right: 16px;
-}
-
-.hotel-paper__nav-button--next {
-  justify-content: flex-end;
-  padding-left: 16px;
-  text-align: right;
-}
-
-.hotel-paper__nav-button > span:first-child,
-.hotel-paper__nav-button > span:last-child {
-  font-size: 15px;
-  transition: transform 180ms ease;
-}
-
-.hotel-paper__nav-button--previous:hover > span:first-child {
-  transform: translateX(-4px);
-}
-
-.hotel-paper__nav-button--next:hover > span:last-child {
-  transform: translateX(4px);
-}
-
-.hotel-paper__nav-button span {
-  display: grid;
-  gap: 3px;
-}
-
-.hotel-paper__nav-button small {
-  text-transform: uppercase;
-  font-size: 6px;
-  font-weight: 650;
-  letter-spacing: 0.14em;
-}
-
-.hotel-paper__nav-button strong {
-  font-family: var(--font-editorial), Georgia, serif;
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.035em;
-}
-
-@media (max-width: 720px) {
-  .hotel-paper__navigation {
-    margin-top: 10px;
-  }
-
-  .hotel-paper__nav-button {
-    min-height: 54px;
-  }
-
-  .hotel-paper__nav-button strong {
-    font-size: 15px;
-  }
-}
-
 
 /* Responsive experience pass */
 html,
@@ -1506,7 +1425,6 @@ body {
   .back-to-city,
   .hotel-marker,
   .hotel-info-panel__close,
-  .hotel-paper__nav-button,
   .archives-panel__close,
   .archive-card__footer button {
     min-height: 44px;
@@ -1624,14 +1542,6 @@ body {
 
   .hotel-paper__masthead strong {
     font-size: clamp(34px, 6vw, 50px);
-  }
-
-  .hotel-paper__navigation {
-    margin-top: 10px;
-  }
-
-  .hotel-paper__nav-button strong {
-    overflow-wrap: anywhere;
   }
 
   .archives-panel__masthead h2 {
@@ -1872,22 +1782,6 @@ body {
     font-size: 15px;
   }
 
-  .hotel-paper__navigation {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-
-  .hotel-paper__nav-button {
-    min-width: 0;
-    min-height: 52px;
-    padding-top: 8px;
-    padding-bottom: 8px;
-  }
-
-  .hotel-paper__nav-button strong {
-    max-width: 110px;
-    font-size: 14px;
-    overflow-wrap: anywhere;
-  }
 
   .hotel-paper__footer {
     grid-template-columns: 1fr;
@@ -2042,11 +1936,6 @@ body {
 
   .hotel-paper__headline h2 {
     font-size: clamp(36px, 11.5vw, 50px);
-  }
-
-  .hotel-paper__nav-button strong {
-    max-width: 86px;
-    font-size: 13px;
   }
 
   .archive-card {
