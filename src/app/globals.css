@@ -2097,6 +2097,9 @@ body {
 
 .intro__title-city {
   display: inline-block;
+  font-size: 1em;
+  font-weight: 560;
+  letter-spacing: inherit;
 }
 
 .intro__title-slash {
