@@ -16,10 +16,10 @@ const SHIRT_COLORS = ["#464f5d", "#8d5146", "#66705e", "#b39b78", "#353534"];
 const CAR_COLORS = ["#3e4447", "#8f4c41", "#d8d4cb", "#626e70", "#b39668", "#242424"];
 
 const MAIN_LOOP: Point2[] = [
-  [-13.2, -8.75],
-  [13.2, -8.75],
-  [13.2, 0.15],
-  [-13.2, 0.15],
+  [-13.2, -10.3],
+  [13.2, -10.3],
+  [13.2, 0.35],
+  [-13.2, 0.35],
 ];
 
 const WATERFRONT_LOOP: Point2[] = [
@@ -90,7 +90,7 @@ function DashedLane({
 
 function VerticalDashes({ x }: { x: number }) {
   const dashes = [];
-  for (let z = -8.1; z < 7.5; z += 1.35) {
+  for (let z = -9.7; z < 7.5; z += 1.35) {
     dashes.push(
       <mesh
         key={z}
@@ -109,10 +109,10 @@ function VerticalDashes({ x }: { x: number }) {
 export function CityRoads() {
   return (
     <group>
-      <RoadStrip position={[0, 0.018, -8.75]} size={[28.5, 1.1]} />
-      <SidewalkStrip position={[0, 0.028, -7.98]} size={[28.5, 0.34]} />
-      <SidewalkStrip position={[0, 0.028, -9.52]} size={[28.5, 0.34]} />
-      <DashedLane z={-8.75} />
+      <RoadStrip position={[0, 0.018, -10.3]} size={[28.5, 1.1]} />
+      <SidewalkStrip position={[0, 0.028, -9.48]} size={[28.5, 0.34]} />
+      <SidewalkStrip position={[0, 0.028, -11.12]} size={[28.5, 0.34]} />
+      <DashedLane z={-10.3} />
 
       <RoadStrip position={[0, 0.018, 0.35]} size={[28.5, 1.15]} />
       <SidewalkStrip position={[0, 0.028, -0.45]} size={[28.5, 0.34]} />
@@ -125,19 +125,13 @@ export function CityRoads() {
 
       {[-13.2, -4.5, 4.5, 13.2].map((x) => (
         <group key={x}>
-          <RoadStrip position={[x, 0.019, -0.4]} size={[1.0, 17.8]} />
-          <SidewalkStrip position={[x - 0.68, 0.028, -0.4]} size={[0.3, 17.8]} />
-          <SidewalkStrip position={[x + 0.68, 0.028, -0.4]} size={[0.3, 17.8]} />
+          <RoadStrip position={[x, 0.019, -1.15]} size={[1.0, 19.3]} />
+          <SidewalkStrip position={[x - 0.68, 0.028, -1.15]} size={[0.3, 19.3]} />
+          <SidewalkStrip position={[x + 0.68, 0.028, -1.15]} size={[0.3, 19.3]} />
           <VerticalDashes x={x} />
         </group>
       ))}
 
-      {[-9, 0, 9].map((x) => (
-        <group key={x}>
-          <SidewalkStrip position={[x, 0.03, -7.15]} size={[0.5, 1.7]} />
-          <SidewalkStrip position={[x, 0.03, 2.75]} size={[0.5, 3.1]} />
-        </group>
-      ))}
     </group>
   );
 }
@@ -315,18 +309,15 @@ function Walker({
 
 export function CityLife() {
   const walkers = [
-    { start: [-12.0, -7.78] as Point2, end: [-6.2, -7.78] as Point2, speed: 0.055, offset: 0.15 },
-    { start: [-3.3, -7.78] as Point2, end: [3.2, -7.78] as Point2, speed: 0.048, offset: 0.72 },
-    { start: [5.8, -7.78] as Point2, end: [12.0, -7.78] as Point2, speed: 0.052, offset: 1.18 },
-    { start: [-12.0, 1.35] as Point2, end: [-6.0, 1.35] as Point2, speed: 0.05, offset: 0.42 },
-    { start: [-3.1, 1.35] as Point2, end: [3.2, 1.35] as Point2, speed: 0.047, offset: 1.32 },
-    { start: [5.7, 1.35] as Point2, end: [12.0, 1.35] as Point2, speed: 0.054, offset: 0.88 },
-    { start: [-9.0, -7.7] as Point2, end: [-9.0, -6.3] as Point2, speed: 0.084, offset: 0.31 },
-    { start: [0.0, -7.7] as Point2, end: [0.0, -6.55] as Point2, speed: 0.088, offset: 1.11 },
-    { start: [9.0, -7.7] as Point2, end: [9.0, -6.3] as Point2, speed: 0.082, offset: 0.56 },
-    { start: [-8.8, 1.55] as Point2, end: [-8.8, 3.0] as Point2, speed: 0.085, offset: 0.21 },
-    { start: [0.5, 1.55] as Point2, end: [0.5, 3.3] as Point2, speed: 0.078, offset: 1.42 },
-    { start: [8.7, 1.55] as Point2, end: [8.7, 3.0] as Point2, speed: 0.082, offset: 0.63 },
+    { start: [-12.0, -9.48] as Point2, end: [-6.0, -9.48] as Point2, speed: 0.052, offset: 0.15 },
+    { start: [-3.2, -9.48] as Point2, end: [3.2, -9.48] as Point2, speed: 0.048, offset: 0.72 },
+    { start: [5.8, -9.48] as Point2, end: [12.0, -9.48] as Point2, speed: 0.05, offset: 1.18 },
+    { start: [-12.0, -0.45] as Point2, end: [-6.0, -0.45] as Point2, speed: 0.049, offset: 0.42 },
+    { start: [-3.0, -0.45] as Point2, end: [3.0, -0.45] as Point2, speed: 0.046, offset: 1.32 },
+    { start: [5.8, -0.45] as Point2, end: [12.0, -0.45] as Point2, speed: 0.052, offset: 0.88 },
+    { start: [-12.0, 1.15] as Point2, end: [-6.0, 1.15] as Point2, speed: 0.047, offset: 0.31 },
+    { start: [-3.0, 1.15] as Point2, end: [3.0, 1.15] as Point2, speed: 0.045, offset: 1.11 },
+    { start: [5.8, 1.15] as Point2, end: [12.0, 1.15] as Point2, speed: 0.049, offset: 0.56 },
   ];
 
   return (
