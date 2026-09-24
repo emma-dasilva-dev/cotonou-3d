@@ -100,10 +100,7 @@ export function CotonouExperience() {
   }
 
   function closeHotelPanel() {
-    if (!activeHotel || transition) return;
-
     setPanelOpen(false);
-    setTransition({ hotel: activeHotel, mode: "close" });
   }
 
   function returnToCotonou() {
