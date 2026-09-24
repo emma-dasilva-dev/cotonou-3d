@@ -19,8 +19,11 @@ export function CotonouExperience() {
   const introRef = useRef<HTMLDivElement>(null);
   const interfaceRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const enteringRef = useRef(false);
+  const introExitTimerRef = useRef<number | null>(null);
 
   const [entered, setEntered] = useState(false);
+  const [introVisible, setIntroVisible] = useState(true);
   const [activeHotel, setActiveHotel] = useState<HotelStudy | null>(null);
   const [focusHotelId, setFocusHotelId] = useState<string | undefined>();
   const [panelOpen, setPanelOpen] = useState(false);
@@ -45,8 +48,19 @@ export function CotonouExperience() {
     return () => context.revert();
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (introExitTimerRef.current !== null) {
+        window.clearTimeout(introExitTimerRef.current);
+      }
+    };
+  }, []);
+
   function enterExperience() {
-    if (!introRef.current) return;
+    if (enteringRef.current || entered) return;
+
+    enteringRef.current = true;
+    setEntered(true);
 
     const audio = audioRef.current;
     if (audio) {
@@ -57,18 +71,30 @@ export function CotonouExperience() {
       });
     }
 
-    gsap.to(introRef.current, {
-      opacity: 0,
-      duration: 0.8,
-      ease: "power2.inOut",
-      onComplete: () => setEntered(true),
-    });
+    const intro = introRef.current;
+
+    if (intro) {
+      intro.style.pointerEvents = "none";
+
+      gsap.to(intro, {
+        opacity: 0,
+        duration: 0.65,
+        ease: "power2.inOut",
+        onComplete: () => setIntroVisible(false),
+      });
+
+      introExitTimerRef.current = window.setTimeout(() => {
+        setIntroVisible(false);
+      }, 800);
+    } else {
+      setIntroVisible(false);
+    }
 
     if (interfaceRef.current) {
       gsap.fromTo(
         interfaceRef.current,
         { opacity: 0 },
-        { opacity: 1, duration: 1.1, delay: 0.55, ease: "power2.out" },
+        { opacity: 1, duration: 0.9, delay: 0.18, ease: "power2.out" },
       );
     }
   }
@@ -163,8 +189,11 @@ export function CotonouExperience() {
         </Canvas>
       </div>
 
-      {!entered && (
-        <div ref={introRef} className="intro">
+      {introVisible && (
+        <div
+          ref={introRef}
+          className={`intro${entered ? " intro--leaving" : ""}`}
+        >
           <div className="intro__topline" data-intro-line>
             <span>Étude interactive indépendante</span>
             <span>Cotonou · Bénin</span>
@@ -186,6 +215,11 @@ export function CotonouExperience() {
               type="button"
               className="enter-button"
               data-intro-line
+              onPointerUp={(event) => {
+                if (event.pointerType !== "mouse") {
+                  enterExperience();
+                }
+              }}
               onClick={enterExperience}
             >
               <span>Entrer</span>
