@@ -73,6 +73,8 @@ export const hotelStudies: HotelStudy[] = [
       { label: "Capacité", value: "110 chambres" },
     ],
     website: "https://all.accor.com/hotel/1826/index.fr.shtml",
+    exteriorReady: true,
+    studyContext: "Jardin arboré · Piscine",
   },
   {
     id: "hotel-du-lac",
