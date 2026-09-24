@@ -235,7 +235,8 @@ function EntranceCanopy() {
 
       <Text
         position={[0, 0.87, -0.02]}
-        rotation={[0, Math.PI, 0]}\n        fontSize={0.14}
+        rotation={[0, Math.PI, 0]}
+        fontSize={0.14}
         letterSpacing={0.13}
         color="#3a3937"
         anchorX="center"
@@ -286,7 +287,8 @@ export function SofitelExterior({
 
       <Text
         position={[0.25, 3.66, -0.86]}
-        rotation={[0, Math.PI, 0]}\n        fontSize={0.24}
+        rotation={[0, Math.PI, 0]}
+        fontSize={0.24}
         letterSpacing={0.17}
         color="#383735"
         anchorX="center"
