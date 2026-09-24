@@ -7,6 +7,8 @@ import { ArchivePanel } from "./ArchivePanel";
 import { CotonouScene } from "./CotonouScene";
 import { HotelInfoPanel } from "./HotelInfoPanel";
 import { NewspaperTransition } from "./NewspaperTransition";
+import { getHotelDuLacHotspot } from "./hotelHotspots";
+import type { HotelHotspot } from "./hotelHotspots";
 import type { HotelStudy } from "./hotels";
 
 type TransitionState = {
@@ -25,6 +27,7 @@ export function CotonouExperience() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [transition, setTransition] = useState<TransitionState | null>(null);
+  const [activeHotspotId, setActiveHotspotId] = useState<string | undefined>();
   const [soundOn, setSoundOn] = useState(true);
 
   useEffect(() => {
@@ -77,6 +80,7 @@ export function CotonouExperience() {
 
     setArchiveOpen(false);
     setPanelOpen(false);
+    setActiveHotspotId(undefined);
     setActiveHotel(hotel);
     setTransition({ hotel, mode: "open" });
 
@@ -105,9 +109,18 @@ export function CotonouExperience() {
     setTransition({ hotel: activeHotel, mode: "close" });
   }
 
+  function selectHotspot(hotspot: HotelHotspot) {
+    setActiveHotspotId(hotspot.id);
+  }
+
+  function returnToHotelOverview() {
+    setActiveHotspotId(undefined);
+  }
+
   function returnToCotonou() {
     setPanelOpen(false);
     setTransition(null);
+    setActiveHotspotId(undefined);
     setFocusHotelId(undefined);
     setActiveHotel(null);
   }
@@ -115,6 +128,7 @@ export function CotonouExperience() {
   function openArchives() {
     setPanelOpen(false);
     setTransition(null);
+    setActiveHotspotId(undefined);
     setArchiveOpen(true);
   }
 
@@ -136,6 +150,9 @@ export function CotonouExperience() {
   }
 
   const inHotelStudy = focusHotelId === "hotel-du-lac";
+  const activeHotspot = getHotelDuLacHotspot(activeHotspotId);
+  const showHotspots =
+    inHotelStudy && !panelOpen && !transition && !archiveOpen;
 
   return (
     <main className={`experience${entered ? " experience--entered" : ""}`}>
@@ -157,7 +174,10 @@ export function CotonouExperience() {
           <CotonouScene
             activeHotelId={activeHotel?.id}
             focusHotelId={focusHotelId}
+            activeHotspotId={activeHotspotId}
+            showHotspots={showHotspots}
             onSelectHotel={selectHotel}
+            onSelectHotspot={selectHotspot}
           />
         </Canvas>
       </div>
@@ -263,10 +283,27 @@ export function CotonouExperience() {
               <span>Glisser pour tourner · Faire défiler pour zoomer</span>
             </div>
 
-            <div className="study-note">
-              <span>Étude indépendante</span>
-              <span>Interprétation stylisée à partir de références publiques</span>
-            </div>
+            {!activeHotspot && showHotspots && (
+              <div className="hotspot-guide">
+                <span>Points interactifs</span>
+                <strong>Explorez les détails de l’hôtel</strong>
+              </div>
+            )}
+
+            {activeHotspot && showHotspots && (
+              <aside className="hotspot-caption">
+                <div className="hotspot-caption__topline">
+                  <span>{activeHotspot.eyebrow}</span>
+                  <span>Hôtel du Lac</span>
+                </div>
+                <h3>{activeHotspot.label}</h3>
+                <p>{activeHotspot.description}</p>
+                <button type="button" onClick={returnToHotelOverview}>
+                  <span aria-hidden="true">←</span>
+                  <span>Vue générale</span>
+                </button>
+              </aside>
+            )}
           </>
         )}
 
