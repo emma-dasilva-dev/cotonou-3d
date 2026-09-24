@@ -139,6 +139,24 @@ export function CotonouExperience() {
     setActiveHotel(null);
   }
 
+  function returnToEntry() {
+    setPanelOpen(false);
+    setArchiveOpen(false);
+    setAboutOpen(false);
+    setTransition(null);
+    setFocusHotelId(undefined);
+    setActiveHotel(null);
+    setIntroVisible(true);
+    setEntered(false);
+    enteringRef.current = false;
+
+    const audio = audioRef.current;
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+  }
+
   function openArchives() {
     setPanelOpen(false);
     setAboutOpen(false);
@@ -260,8 +278,29 @@ export function CotonouExperience() {
           </div>
 
           <div className="intro__footer" data-intro-line>
-            <span>Expérience WebGL indépendante</span>
-            <span>Glisser · Zoomer · Explorer</span>
+            <span className="intro__copyright">© 2026 Emma Da Silva</span>
+
+            <div className="intro__socials" aria-label="Liens sociaux">
+              <a href="mailto:emma.dasilva.dev@gmail.com">
+                Email <span aria-hidden="true">↗</span>
+              </a>
+              <a
+                href="https://github.com/emma-dasilva-dev"
+                target="_blank"
+                rel="noreferrer"
+              >
+                GitHub <span aria-hidden="true">↗</span>
+              </a>
+              <a
+                href="https://www.instagram.com/emmadev.bj"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Instagram <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+
+            <span className="intro__explore">Glisser · Zoomer · Explorer</span>
           </div>
         </div>
       )}
@@ -271,9 +310,19 @@ export function CotonouExperience() {
         className={`interface${entered ? " interface--visible" : ""}${inHotelStudy ? " interface--study" : ""}`}
       >
         <header className="interface__header">
-          <div className="brand">
-            COTONOU <span>/ 3D</span>
-          </div>
+          <button
+            type="button"
+            className="brand brand--home"
+            onClick={returnToEntry}
+            aria-label="Retourner à la page d’accueil"
+          >
+            <span className="brand__title">
+              COTONOU <span>/ 3D</span>
+            </span>
+            <span className="brand__home-hint" aria-hidden="true">
+              Accueil ↖
+            </span>
+          </button>
 
           <nav aria-label="Contrôles de l'expérience">
             <button type="button" onClick={openArchives}>
@@ -314,34 +363,6 @@ export function CotonouExperience() {
               <span>Cotonou, Bénin</span>
             </div>
 
-            <div className="homepage-signature" aria-label="Liens sociaux">
-              <span className="homepage-signature__copyright">
-                © 2026 Emma Da Silva
-              </span>
-
-              <div className="homepage-signature__links">
-                <a href="mailto:emma.dasilva.dev@gmail.com">
-                  Email
-                  <span aria-hidden="true">↗</span>
-                </a>
-                <a
-                  href="https://github.com/emma-dasilva-dev"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  GitHub
-                  <span aria-hidden="true">↗</span>
-                </a>
-                <a
-                  href="https://www.instagram.com/emmadev.bj"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Instagram
-                  <span aria-hidden="true">↗</span>
-                </a>
-              </div>
-            </div>
           </>
         )}
 
