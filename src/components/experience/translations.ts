@@ -206,7 +206,7 @@ export const panelText = {
   en: {
     aboutHotel: "About",
     specialEdition: "Special edition",
-    journalPrefix: "The Cotonou",
+    journalPrefix: "The Journal of",
     architectureHospitality: "Architecture & hospitality",
     countryYear: "2026 · Benin",
     closeHotel: "Close hotel information",
