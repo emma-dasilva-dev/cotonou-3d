@@ -67,11 +67,22 @@ export function CotonouExperience() {
     };
 
     syncMobileMode();
-    media.addEventListener?.("change", syncMobileMode);
+
+    if (typeof media.addEventListener === "function") {
+      media.addEventListener("change", syncMobileMode);
+    } else {
+      media.addListener(syncMobileMode);
+    }
+
     window.addEventListener("resize", syncMobileMode, { passive: true });
 
     return () => {
-      media.removeEventListener?.("change", syncMobileMode);
+      if (typeof media.removeEventListener === "function") {
+        media.removeEventListener("change", syncMobileMode);
+      } else {
+        media.removeListener(syncMobileMode);
+      }
+
       window.removeEventListener("resize", syncMobileMode);
     };
   }, []);
