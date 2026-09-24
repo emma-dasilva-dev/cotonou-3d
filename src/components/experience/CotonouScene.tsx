@@ -21,6 +21,7 @@ type CotonouSceneProps = {
   onSelectHotel: (hotel: HotelStudy) => void;
   activeHotelId?: string;
   focusHotelId?: string;
+  lowDetail?: boolean;
 };
 
 type Block = {
@@ -169,13 +170,14 @@ function CameraRig({ focusHotelId }: { focusHotelId?: string }) {
   );
 }
 
-function CityBlocks() {
+function CityBlocks({ lowDetail = false }: { lowDetail?: boolean }) {
   const blocks = useMemo<Block[]>(() => {
     const result: Block[] = [];
 
     for (let row = 0; row < 8; row += 1) {
       for (let column = 0; column < 11; column += 1) {
         if ((row + column) % 5 === 0 || column === 5) continue;
+        if (lowDetail && (row + column) % 2 === 0) continue;
 
         const x = -10 + column * 2;
         const z = -7 + row * 2;
@@ -202,7 +204,7 @@ function CityBlocks() {
     }
 
     return result;
-  }, []);
+  }, [lowDetail]);
 
   return (
     <group>
@@ -327,6 +329,7 @@ export function CotonouScene({
   onSelectHotel,
   activeHotelId,
   focusHotelId,
+  lowDetail = false,
 }: CotonouSceneProps) {
   return (
     <>
@@ -339,9 +342,9 @@ export function CotonouScene({
         position={[-5, 11, 7]}
         intensity={2.4}
         color="#fff4dc"
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
+        castShadow={!lowDetail}
+        shadow-mapSize-width={lowDetail ? 512 : 1024}
+        shadow-mapSize-height={lowDetail ? 512 : 1024}
       />
 
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
@@ -351,9 +354,9 @@ export function CotonouScene({
 
       <WaterBand />
       <CityRoads />
-      <CityBlocks />
+      <CityBlocks lowDetail={lowDetail} />
       <CotonouLandmarks />
-      <CityLife />
+      <CityLife lowDetail={lowDetail} />
 
       <HotelDuLacExterior position={HOTEL_DU_LAC_POSITION} />
       <SofitelExterior position={SOFITEL_POSITION} />
