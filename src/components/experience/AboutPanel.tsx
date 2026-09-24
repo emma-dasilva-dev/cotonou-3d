@@ -2,13 +2,17 @@
 
 import gsap from "gsap";
 import { useLayoutEffect, useRef } from "react";
+import { aboutText } from "./translations";
+import type { Language } from "./translations";
 
 type AboutPanelProps = {
+  language: Language;
   onClose: () => void;
 };
 
-export function AboutPanel({ onClose }: AboutPanelProps) {
+export function AboutPanel({ language, onClose }: AboutPanelProps) {
   const panelRef = useRef<HTMLElement>(null);
+  const t = aboutText[language];
 
   useLayoutEffect(() => {
     if (!panelRef.current) return;
@@ -43,69 +47,53 @@ export function AboutPanel({ onClose }: AboutPanelProps) {
     <section
       ref={panelRef}
       className="about-panel"
-      aria-label="À propos de Cotonou 3D"
+      aria-label={t.aria}
     >
       <header className="about-panel__header" data-about-reveal>
         <div>
           <span>COTONOU / 3D</span>
-          <span>Étude interactive indépendante</span>
+          <span>{t.subtitle}</span>
         </div>
 
         <button
           type="button"
           className="about-panel__close"
           onClick={onClose}
-          aria-label="Fermer à propos"
+          aria-label={t.close}
         >
           ×
         </button>
       </header>
 
       <div className="about-panel__hero" data-about-reveal>
-        <span>Le projet</span>
-        <h2>Explorer Cotonou à travers ses lieux d’hospitalité.</h2>
-        <p>
-          COTONOU / 3D est une étude interactive de six hôtels de la ville.
-          L’expérience observe comment architecture, paysage, eau, végétation,
-          rues et mouvement donnent à chaque adresse une présence différente.
-        </p>
+        <span>{t.project}</span>
+        <h2>{t.title}</h2>
+        <p>{t.intro}</p>
       </div>
 
       <div className="about-panel__grid">
         <article data-about-reveal>
-          <span>01 · Observer</span>
-          <h3>Une ville, pas six objets isolés.</h3>
-          <p>
-            Les bâtiments prennent sens avec leurs routes, leurs jardins, leurs
-            piscines, les passants, la circulation et les paysages qui les
-            entourent.
-          </p>
+          <span>{t.observeLabel}</span>
+          <h3>{t.observeTitle}</h3>
+          <p>{t.observeBody}</p>
         </article>
 
         <article data-about-reveal>
-          <span>02 · Comparer</span>
-          <h3>Six façons d’habiter Cotonou.</h3>
-          <p>
-            Grand hôtel côtier, adresse urbaine, jardin-hôtel, bord de lac ou
-            maison boutique : chaque étude met en évidence une relation
-            différente entre hospitalité et ville.
-          </p>
+          <span>{t.compareLabel}</span>
+          <h3>{t.compareTitle}</h3>
+          <p>{t.compareBody}</p>
         </article>
 
         <article data-about-reveal>
-          <span>03 · Comprendre</span>
-          <h3>L’architecture comme récit.</h3>
-          <p>
-            Les articles ne se limitent pas aux services proposés. Ils donnent
-            une lecture de la façade, du paysage et du rapport de chaque lieu à
-            son environnement.
-          </p>
+          <span>{t.understandLabel}</span>
+          <h3>{t.understandTitle}</h3>
+          <p>{t.understandBody}</p>
         </article>
       </div>
 
       <footer className="about-panel__footer" data-about-reveal>
-        <span>Observer → Explorer → Découvrir → Comprendre → Revenir</span>
-        <strong>Cotonou · Bénin · 2026</strong>
+        <span>{t.journey}</span>
+        <strong>{t.placeYear}</strong>
       </footer>
     </section>
   );
