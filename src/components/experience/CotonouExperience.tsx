@@ -115,7 +115,6 @@ export function CotonouExperience() {
   function openArchives() {
     setPanelOpen(false);
     setTransition(null);
-    setActiveHotspotId(undefined);
     setArchiveOpen(true);
   }
 
