@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Geist, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const geist = Geist({
   variable: "--font-geist",
+  subsets: ["latin"],
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-editorial",
   subsets: ["latin"],
 });
 
@@ -15,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="fr" className={geist.variable}>
+    <html lang="fr" className={`${geist.variable} ${playfair.variable}`}>
       <body>{children}</body>
     </html>
   );
