@@ -101,7 +101,7 @@ export const hotelStudies: HotelStudy[] = [
     name: "Azalaï Hôtel Cotonou",
     shortName: "Azalaï",
     descriptor: "Étude Littoral",
-    position: [1.6, 0, 2.9],
+    position: [0.2, 0, 2.5],
     location: "Front de mer · Cotonou",
     summary:
       "Un hôtel emblématique du front de mer de Cotonou, avec 120 chambres dont des suites, des hébergements tournés vers la piscine ainsi que des espaces de restauration et d'événement.",
@@ -111,6 +111,8 @@ export const hotelStudies: HotelStudy[] = [
       { label: "Cadre", value: "Front de mer" },
     ],
     website: "https://www.azalai.com/azalai-hotel-cotonou",
+    exteriorReady: true,
+    studyContext: "Océan Atlantique · Piscine",
   },
   {
     id: "maison-rouge",
