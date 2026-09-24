@@ -155,7 +155,7 @@ function MainBlock() {
 
       <Text
         position={[-1.06, 3.07, -0.84]}
-        fontSize={0.15}
+        rotation={[0, Math.PI, 0]}\n        fontSize={0.15}
         letterSpacing={0.08}
         color={DARK}
         anchorX="center"
@@ -166,7 +166,7 @@ function MainBlock() {
 
       <Text
         position={[0.7, 3.07, -0.84]}
-        fontSize={0.085}
+        rotation={[0, Math.PI, 0]}\n        fontSize={0.085}
         letterSpacing={0.08}
         color={DARK}
         anchorX="center"
