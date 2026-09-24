@@ -313,6 +313,35 @@ export function CotonouExperience() {
               <span>06°21&apos;N</span>
               <span>Cotonou, Bénin</span>
             </div>
+
+            <div className="homepage-signature" aria-label="Liens sociaux">
+              <span className="homepage-signature__copyright">
+                © 2026 Emma Da Silva
+              </span>
+
+              <div className="homepage-signature__links">
+                <a href="mailto:emma.dasilva.dev@gmail.com">
+                  Email
+                  <span aria-hidden="true">↗</span>
+                </a>
+                <a
+                  href="https://github.com/emma-dasilva-dev"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  GitHub
+                  <span aria-hidden="true">↗</span>
+                </a>
+                <a
+                  href="https://www.instagram.com/emmadev.bj"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Instagram
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+            </div>
           </>
         )}
 
