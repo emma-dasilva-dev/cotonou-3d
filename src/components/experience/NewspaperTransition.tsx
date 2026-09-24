@@ -3,19 +3,25 @@
 import gsap from "gsap";
 import { useLayoutEffect, useRef } from "react";
 import type { HotelStudy } from "./hotels";
+import { localizeHotel, transitionText } from "./translations";
+import type { Language } from "./translations";
 
 type NewspaperTransitionProps = {
   hotel: HotelStudy;
+  language: Language;
   mode: "open" | "close";
   onComplete: () => void;
 };
 
 export function NewspaperTransition({
   hotel,
+  language,
   mode,
   onComplete,
 }: NewspaperTransitionProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const displayHotel = localizeHotel(hotel, language);
+  const t = transitionText[language];
 
   useLayoutEffect(() => {
     if (!rootRef.current) return;
@@ -162,16 +168,16 @@ export function NewspaperTransition({
       <div className="newspaper-transition__strip">
         <div className="newspaper-transition__strip-inner">
           <span data-transition-line>COTONOU / 3D</span>
-          <strong data-transition-line>{hotel.name}</strong>
-          <span data-transition-line>{hotel.descriptor}</span>
+          <strong data-transition-line>{displayHotel.name}</strong>
+          <span data-transition-line>{displayHotel.descriptor}</span>
         </div>
       </div>
 
       <div className="newspaper-transition__sheet">
         <div>
-          <span>Le Journal de Cotonou</span>
+          <span>{t.journal}</span>
           <strong>{hotel.name}</strong>
-          <small>{hotel.location}</small>
+          <small>{displayHotel.location}</small>
         </div>
       </div>
     </div>
