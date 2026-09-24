@@ -178,7 +178,7 @@ export function CotonouExperience() {
         <Canvas
           shadows
           dpr={[1, 1.5]}
-          camera={{ position: [10.5, 9.5, 13.5], fov: 34 }}
+          camera={{ position: [18, 16, 23], fov: 34 }}
           gl={{ antialias: true, alpha: false }}
         >
           <CotonouScene
