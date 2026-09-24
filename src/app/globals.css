@@ -289,16 +289,17 @@ button {
 }
 
 .hotel-marker {
-  display: grid;
-  min-width: 108px;
-  gap: 3px;
+  display: inline-flex;
+  min-width: 104px;
+  align-items: center;
+  justify-content: center;
   border: 1px solid rgba(41, 41, 39, 0.32);
   border-radius: 999px;
   padding: 7px 11px;
   background: rgba(232, 227, 217, 0.84);
   color: var(--graphite);
   cursor: pointer;
-  text-align: left;
+  text-align: center;
   box-shadow: none;
   backdrop-filter: blur(8px);
   transition:
@@ -314,11 +315,6 @@ button {
   transform: translateY(-2px);
 }
 
-.hotel-marker__index {
-  font-size: 7px;
-  letter-spacing: 0.14em;
-  opacity: 0.68;
-}
 
 .hotel-marker__name {
   white-space: nowrap;
@@ -1651,13 +1647,9 @@ body {
   }
 
   .hotel-marker {
-    min-width: 96px;
+    min-width: 88px;
     min-height: 42px;
     padding: 7px 10px;
-  }
-
-  .hotel-marker__index {
-    font-size: 6px;
   }
 
   .hotel-marker__name {
