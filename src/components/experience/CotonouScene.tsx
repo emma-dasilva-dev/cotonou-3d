@@ -13,6 +13,7 @@ import { NovotelExterior } from "./NovotelExterior";
 import { AzalaiExterior } from "./AzalaiExterior";
 import { MaisonRougeExterior } from "./MaisonRougeExterior";
 import { CityLife, CityRoads } from "./CityLife";
+import { CotonouLandmarks, LANDMARK_CLEARINGS } from "./CotonouLandmarks";
 import { hotelStudies } from "./hotels";
 import type { HotelStudy } from "./hotels";
 
@@ -180,7 +181,7 @@ function CityBlocks() {
         const z = -7 + row * 2;
 
         if (
-          HOTEL_CLEARINGS.some(
+          [...HOTEL_CLEARINGS, ...LANDMARK_CLEARINGS].some(
             ({ position, radius }) =>
               Math.hypot(x - position[0], z - position[2]) < radius,
           )
@@ -351,6 +352,7 @@ export function CotonouScene({
       <WaterBand />
       <CityRoads />
       <CityBlocks />
+      <CotonouLandmarks />
       <CityLife />
 
       <HotelDuLacExterior position={HOTEL_DU_LAC_POSITION} />
