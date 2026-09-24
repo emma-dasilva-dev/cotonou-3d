@@ -23,10 +23,10 @@ const MAIN_LOOP: Point2[] = [
 ];
 
 const WATERFRONT_LOOP: Point2[] = [
-  [-12.5, 0.55],
-  [12.5, 0.55],
-  [12.5, 8.0],
-  [-12.5, 8.0],
+  [-13.2, 0.35],
+  [13.2, 0.35],
+  [13.2, 8.0],
+  [-13.2, 8.0],
 ];
 
 function RoadStrip({
@@ -123,15 +123,14 @@ export function CityRoads() {
       <SidewalkStrip position={[0, 0.028, 7.35]} size={[27.0, 0.3]} />
       <DashedLane z={8.0} xStart={-12.5} xEnd={12.5} />
 
-      <RoadStrip position={[-4.5, 0.019, -0.4]} size={[1.0, 17.8]} />
-      <SidewalkStrip position={[-5.18, 0.028, -0.4]} size={[0.3, 17.8]} />
-      <SidewalkStrip position={[-3.82, 0.028, -0.4]} size={[0.3, 17.8]} />
-      <VerticalDashes x={-4.5} />
-
-      <RoadStrip position={[4.5, 0.019, -0.4]} size={[1.0, 17.8]} />
-      <SidewalkStrip position={[3.82, 0.028, -0.4]} size={[0.3, 17.8]} />
-      <SidewalkStrip position={[5.18, 0.028, -0.4]} size={[0.3, 17.8]} />
-      <VerticalDashes x={4.5} />
+      {[-13.2, -4.5, 4.5, 13.2].map((x) => (
+        <group key={x}>
+          <RoadStrip position={[x, 0.019, -0.4]} size={[1.0, 17.8]} />
+          <SidewalkStrip position={[x - 0.68, 0.028, -0.4]} size={[0.3, 17.8]} />
+          <SidewalkStrip position={[x + 0.68, 0.028, -0.4]} size={[0.3, 17.8]} />
+          <VerticalDashes x={x} />
+        </group>
+      ))}
 
       {[-9, 0, 9].map((x) => (
         <group key={x}>
