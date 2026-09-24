@@ -7,10 +7,11 @@ import {
   RoundedBox,
   Text,
 } from "@react-three/drei";
-import { useThree } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import gsap from "gsap";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ElementRef } from "react";
+import type { Group } from "three";
 import { HotelDuLacExterior } from "./HotelDuLacExterior";
 import {
   getHotelDuLacHotspot,
@@ -289,6 +290,7 @@ function HotspotMarker({
   onSelect: () => void;
 }) {
   const [hovered, setHovered] = useState(false);
+  const pulseRef = useRef<Group>(null);
 
   useEffect(() => {
     if (!hovered) return;
@@ -299,57 +301,109 @@ function HotspotMarker({
     };
   }, [hovered]);
 
-  const width = hotspot.label.length > 7 ? 1.15 : 0.95;
+  useFrame(({ clock }) => {
+    if (!pulseRef.current) return;
+
+    const pulse = 1 + Math.sin(clock.elapsedTime * 3.2) * 0.12;
+    pulseRef.current.scale.setScalar(pulse);
+  });
+
+  const width = hotspot.label.length > 7 ? 1.55 : 1.3;
+  const accent = active ? "#a84936" : "#b44c39";
 
   return (
-    <Billboard position={hotspot.position} follow>
-      <group
-        scale={hovered || active ? 1.08 : 1}
-        onClick={(event) => {
-          event.stopPropagation();
-          onSelect();
-        }}
-        onPointerOver={(event) => {
-          event.stopPropagation();
-          setHovered(true);
-        }}
-        onPointerOut={() => setHovered(false)}
-      >
-        <mesh position={[-width / 2 - 0.17, 0, 0.015]}>
-          <ringGeometry args={[0.055, 0.09, 28]} />
-          <meshBasicMaterial color={active ? "#a84936" : "#292927"} />
-        </mesh>
+    <group position={hotspot.position}>
+      <mesh position={[0, 0.36, 0]} renderOrder={98}>
+        <cylinderGeometry args={[0.012, 0.012, 0.72, 12]} />
+        <meshBasicMaterial
+          color={accent}
+          depthTest={false}
+          depthWrite={false}
+          transparent
+          opacity={0.9}
+        />
+      </mesh>
 
-        <mesh position={[-width / 2 - 0.17, 0, 0.01]}>
-          <circleGeometry args={[0.026, 24]} />
-          <meshBasicMaterial color="#eee9de" />
-        </mesh>
-
-        <RoundedBox
-          args={[width, 0.25, 0.035]}
-          radius={0.08}
-          smoothness={5}
-          position={[0.13, 0, 0]}
+      <Billboard position={[0, 0.82, 0]} follow>
+        <group
+          scale={hovered || active ? 1.1 : 1}
+          onClick={(event) => {
+            event.stopPropagation();
+            onSelect();
+          }}
+          onPointerOver={(event) => {
+            event.stopPropagation();
+            setHovered(true);
+          }}
+          onPointerOut={() => setHovered(false)}
         >
-          <meshBasicMaterial
-            color={active ? "#292927" : "#eee9de"}
-            transparent
-            opacity={0.96}
-          />
-        </RoundedBox>
+          <mesh position={[0.18, 0, -0.02]} renderOrder={97}>
+            <planeGeometry args={[width + 0.72, 0.58]} />
+            <meshBasicMaterial
+              transparent
+              opacity={0.001}
+              depthTest={false}
+              depthWrite={false}
+            />
+          </mesh>
 
-        <Text
-          position={[0.13, 0, 0.025]}
-          fontSize={0.075}
-          letterSpacing={0.06}
-          color={active ? "#eee9de" : "#292927"}
-          anchorX="center"
-          anchorY="middle"
-        >
-          {hotspot.label.toUpperCase()}
-        </Text>
-      </group>
-    </Billboard>
+          <group
+            ref={pulseRef}
+            position={[-width / 2 - 0.22, 0, 0.04]}
+          >
+            <mesh renderOrder={102}>
+              <ringGeometry args={[0.11, 0.15, 36]} />
+              <meshBasicMaterial
+                color={accent}
+                transparent
+                opacity={0.95}
+                depthTest={false}
+                depthWrite={false}
+              />
+            </mesh>
+
+            <mesh position={[0, 0, 0.008]} renderOrder={103}>
+              <circleGeometry args={[0.045, 28]} />
+              <meshBasicMaterial
+                color="#eee9de"
+                depthTest={false}
+                depthWrite={false}
+              />
+            </mesh>
+          </group>
+
+          <RoundedBox
+            args={[width, 0.34, 0.045]}
+            radius={0.1}
+            smoothness={5}
+            position={[0.18, 0, 0]}
+            renderOrder={100}
+          >
+            <meshBasicMaterial
+              color={active ? "#292927" : "#eee9de"}
+              transparent
+              opacity={0.98}
+              depthTest={false}
+              depthWrite={false}
+            />
+          </RoundedBox>
+
+          <Text
+            position={[0.18, 0, 0.04]}
+            fontSize={0.105}
+            letterSpacing={0.055}
+            color={active ? "#eee9de" : "#292927"}
+            anchorX="center"
+            anchorY="middle"
+            renderOrder={104}
+            material-depthTest={false}
+            material-depthWrite={false}
+          >
+            {hotspot.label.toUpperCase()}
+          </Text>
+        </group>
+      </Billboard>
+    </group>
   );
 }
 
