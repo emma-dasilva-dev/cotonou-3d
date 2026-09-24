@@ -16,12 +16,15 @@ import { CityLife, CityRoads } from "./CityLife";
 import { CotonouLandmarks, LANDMARK_CLEARINGS } from "./CotonouLandmarks";
 import { hotelStudies } from "./hotels";
 import type { HotelStudy } from "./hotels";
+import { experienceText } from "./translations";
+import type { Language } from "./translations";
 
 type CotonouSceneProps = {
   onSelectHotel: (hotel: HotelStudy) => void;
   activeHotelId?: string;
   focusHotelId?: string;
   lowDetail?: boolean;
+  language: Language;
 };
 
 type Block = {
@@ -246,11 +249,13 @@ function HotelMarker({
   active,
   focused,
   onSelect,
+  language,
 }: {
   hotel: HotelStudy;
   active: boolean;
   focused: boolean;
   onSelect: () => void;
+  language: Language;
 }) {
   const isHotelDuLac = hotel.id === "hotel-du-lac";
   const isSofitel = hotel.id === "sofitel";
@@ -314,7 +319,7 @@ function HotelMarker({
             event.stopPropagation();
             onSelect();
           }}
-          aria-label={`Sélectionner ${hotel.name}`}
+          aria-label={`${experienceText[language].selectHotel} ${hotel.name}`}
           tabIndex={focused ? -1 : 0}
           aria-hidden={focused}
         >
@@ -330,6 +335,7 @@ export function CotonouScene({
   activeHotelId,
   focusHotelId,
   lowDetail = false,
+  language,
 }: CotonouSceneProps) {
   return (
     <>
@@ -355,7 +361,7 @@ export function CotonouScene({
       <WaterBand />
       <CityRoads />
       <CityBlocks lowDetail={lowDetail} />
-      <CotonouLandmarks />
+      <CotonouLandmarks language={language} />
       <CityLife lowDetail={lowDetail} />
 
       <HotelDuLacExterior position={HOTEL_DU_LAC_POSITION} />
@@ -372,6 +378,7 @@ export function CotonouScene({
           active={activeHotelId === hotel.id}
           focused={focusHotelId === hotel.id}
           onSelect={() => onSelectHotel(hotel)}
+          language={language}
         />
       ))}
 
