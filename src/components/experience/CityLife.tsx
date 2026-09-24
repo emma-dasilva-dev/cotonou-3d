@@ -307,7 +307,7 @@ function Walker({
   );
 }
 
-export function CityLife() {
+export function CityLife({ lowDetail = false }: { lowDetail?: boolean }) {
   const walkers = [
     { start: [-12.0, -9.48] as Point2, end: [-6.0, -9.48] as Point2, speed: 0.052, offset: 0.15 },
     { start: [-3.2, -9.48] as Point2, end: [3.2, -9.48] as Point2, speed: 0.048, offset: 0.72 },
@@ -320,20 +320,23 @@ export function CityLife() {
     { start: [5.8, 1.15] as Point2, end: [12.0, 1.15] as Point2, speed: 0.049, offset: 0.56 },
   ];
 
+  const visibleCars = lowDetail ? CAR_COLORS.slice(0, 3) : CAR_COLORS;
+  const visibleWalkers = lowDetail ? walkers.slice(0, 5) : walkers;
+
   return (
     <group>
-      {CAR_COLORS.map((color, index) => (
+      {visibleCars.map((color, index) => (
         <MovingCar
           key={`main-${index}`}
-          path={index < 4 ? MAIN_LOOP : WATERFRONT_LOOP}
-          speed={index < 4 ? 0.018 + index * 0.002 : 0.015 + (index - 4) * 0.002}
-          offset={index / CAR_COLORS.length}
+          path={index < 2 ? MAIN_LOOP : WATERFRONT_LOOP}
+          speed={index < 2 ? 0.018 + index * 0.002 : 0.015}
+          offset={index / Math.max(visibleCars.length, 1)}
           color={color}
           scale={index % 2 === 0 ? 0.95 : 1.05}
         />
       ))}
 
-      {walkers.map((walker, index) => (
+      {visibleWalkers.map((walker, index) => (
         <Walker
           key={index}
           {...walker}
