@@ -10,11 +10,47 @@ import { HotelInfoPanel } from "./HotelInfoPanel";
 import { NewspaperTransition } from "./NewspaperTransition";
 import { hotelStudies } from "./hotels";
 import type { HotelStudy } from "./hotels";
+import { experienceText, localizeHotel } from "./translations";
+import type { Language } from "./translations";
 
 type TransitionState = {
   hotel: HotelStudy;
   mode: "open" | "close";
 };
+
+function LanguageToggle({
+  language,
+  onChange,
+}: {
+  language: Language;
+  onChange: (language: Language) => void;
+}) {
+  return (
+    <div
+      className="language-toggle"
+      role="group"
+      aria-label={language === "fr" ? "Langue" : "Language"}
+    >
+      <button
+        type="button"
+        className={language === "fr" ? "language-toggle__active" : ""}
+        onClick={() => onChange("fr")}
+        aria-pressed={language === "fr"}
+      >
+        FR
+      </button>
+      <span aria-hidden="true">/</span>
+      <button
+        type="button"
+        className={language === "en" ? "language-toggle__active" : ""}
+        onClick={() => onChange("en")}
+        aria-pressed={language === "en"}
+      >
+        EN
+      </button>
+    </div>
+  );
+}
 
 export function CotonouExperience() {
   const introRef = useRef<HTMLDivElement>(null);
@@ -33,6 +69,7 @@ export function CotonouExperience() {
   const [transition, setTransition] = useState<TransitionState | null>(null);
   const [soundOn, setSoundOn] = useState(true);
   const [mobileMode, setMobileMode] = useState(false);
+  const [language, setLanguage] = useState<Language>("fr");
 
   useEffect(() => {
     if (!introRef.current) return;
@@ -86,6 +123,10 @@ export function CotonouExperience() {
       window.removeEventListener("resize", syncMobileMode);
     };
   }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   function enterExperience() {
     if (enteringRef.current || entered) return;
@@ -217,9 +258,16 @@ export function CotonouExperience() {
     }
   }
 
+  const t = experienceText[language];
   const focusedHotel = focusHotelId
     ? hotelStudies.find((hotel) => hotel.id === focusHotelId)
     : undefined;
+  const displayFocusedHotel = focusedHotel
+    ? localizeHotel(focusedHotel, language)
+    : undefined;
+  const displayActiveHotel = activeHotel
+    ? localizeHotel(activeHotel, language)
+    : null;
   const inHotelStudy = Boolean(focusedHotel);
 
   return (
@@ -249,6 +297,7 @@ export function CotonouExperience() {
             focusHotelId={focusHotelId}
             onSelectHotel={selectHotel}
             lowDetail={mobileMode}
+            language={language}
           />
         </Canvas>
       </div>
@@ -261,15 +310,19 @@ export function CotonouExperience() {
           <div className="intro__topline" data-intro-line>
             <div className="intro__edition">
               <span className="intro__status-dot" aria-hidden="true" />
-              <span>Collection interactive · 2026</span>
+              <span>{t.interactiveCollection}</span>
             </div>
-            <span>06°21′ N · 02°26′ E</span>
+
+            <div className="intro__top-actions">
+              <span>06°21′ N · 02°26′ E</span>
+              <LanguageToggle language={language} onChange={setLanguage} />
+            </div>
           </div>
 
           <div className="intro__main">
             <div className="intro__title-meta" data-intro-line>
-              <span>Cotonou, Bénin</span>
-              <span>Architecture · Hôtellerie · WebGL</span>
+              <span>{t.cotonouBenin}</span>
+              <span>{t.architectureHospitality}</span>
             </div>
 
             <div className="intro__title-lockup" data-intro-line>
@@ -280,21 +333,18 @@ export function CotonouExperience() {
               </h1>
 
               <span className="intro__edition-mark" aria-hidden="true">
-                Édition
+                {t.edition}
                 <strong>2026</strong>
               </span>
             </div>
 
             <div className="intro__rule" data-intro-line>
               <span aria-hidden="true" />
-              <small>Six lieux · Une ville</small>
+              <small>{t.sixPlaces}</small>
             </div>
 
             <div className="intro__lower" data-intro-line>
-              <p className="intro__description">
-                Une étude interactive de six lieux d’hospitalité à Cotonou,
-                entre architecture, paysage et vie urbaine.
-              </p>
+              <p className="intro__description">{t.introDescription}</p>
 
               <button
                 type="button"
@@ -306,7 +356,7 @@ export function CotonouExperience() {
                 }}
                 onClick={enterExperience}
               >
-                <span className="enter-button__label">Entrer</span>
+                <span className="enter-button__label">{t.enter}</span>
                 <span className="enter-button__icon" aria-hidden="true">↗</span>
               </button>
             </div>
@@ -315,7 +365,7 @@ export function CotonouExperience() {
           <div className="intro__footer" data-intro-line>
             <span className="intro__copyright">© 2026 Emma Da Silva</span>
 
-            <div className="intro__socials" aria-label="Liens sociaux">
+            <div className="intro__socials" aria-label={t.socialLinks}>
               <a href="mailto:emma.dasilva.dev@gmail.com">
                 Email <span aria-hidden="true">↗</span>
               </a>
@@ -335,7 +385,7 @@ export function CotonouExperience() {
               </a>
             </div>
 
-            <span className="intro__explore">Glisser · Zoomer · Explorer</span>
+            <span className="intro__explore">{t.explore}</span>
           </div>
         </div>
       )}
@@ -349,53 +399,54 @@ export function CotonouExperience() {
             type="button"
             className="brand brand--home"
             onClick={returnToEntry}
-            aria-label="Retourner à la page d’accueil"
+            aria-label={t.returnHome}
           >
             <span className="brand__title">
               COTONOU <span>/ 3D</span>
             </span>
             <span className="brand__home-hint" aria-hidden="true">
-              Accueil ↖
+              {t.home} ↖
             </span>
           </button>
 
-          <nav aria-label="Contrôles de l'expérience">
+          <nav aria-label={t.controls}>
             <button type="button" onClick={openArchives}>
-              Archives
+              {t.archives}
             </button>
             <button type="button" onClick={openAbout}>
-              À propos
+              {t.about}
             </button>
             <button
               type="button"
               onClick={toggleSound}
               aria-pressed={soundOn}
-              aria-label={soundOn ? "Couper le son" : "Activer le son"}
+              aria-label={soundOn ? t.soundOff : t.soundOn}
             >
-              Son {soundOn ? "●" : "○"}
+              {t.sound} {soundOn ? "●" : "○"}
             </button>
+            <LanguageToggle language={language} onChange={setLanguage} />
           </nav>
         </header>
 
         {!inHotelStudy && (
           <>
             <div className="study-label">
-              <span>Architecture · Paysage · Ville</span>
+              <span>{t.studyLabel}</span>
             </div>
 
             <div className="interaction-hint">
               <span className="interaction-hint__line" />
               <span className="interaction-copy interaction-copy--desktop">
-                Glisser pour explorer · Faire défiler pour zoomer
+                {t.exploreDesktop}
               </span>
               <span className="interaction-copy interaction-copy--touch">
-                Glisser pour explorer · Pincer pour zoomer
+                {t.exploreTouch}
               </span>
             </div>
 
             <div className="coordinates">
               <span>06°21&apos;N</span>
-              <span>Cotonou, Bénin</span>
+              <span>{t.cotonouBenin}</span>
             </div>
 
           </>
@@ -404,11 +455,11 @@ export function CotonouExperience() {
         {inHotelStudy && (
           <>
             <div className="hotel-study-heading">
-              <h2>{focusedHotel?.name}</h2>
+              <h2>{displayFocusedHotel?.name}</h2>
               <p>
-                Étude extérieure
-                {focusedHotel?.studyContext
-                  ? ` · ${focusedHotel.studyContext}`
+                {t.outdoorStudy}
+                {displayFocusedHotel?.studyContext
+                  ? ` · ${displayFocusedHotel.studyContext}`
                   : ""}
               </p>
             </div>
@@ -419,26 +470,27 @@ export function CotonouExperience() {
               onClick={returnToCotonou}
             >
               <span aria-hidden="true">←</span>
-              <span>Retour à Cotonou</span>
+              <span>{t.returnToCotonou}</span>
             </button>
 
             <div className="study-interaction">
               <span className="interaction-hint__line" />
               <span className="interaction-copy interaction-copy--desktop">
-                Glisser pour tourner · Faire défiler pour zoomer
+                {t.rotateDesktop}
               </span>
               <span className="interaction-copy interaction-copy--touch">
-                Glisser pour tourner · Pincer pour zoomer
+                {t.rotateTouch}
               </span>
             </div>
 
           </>
         )}
 
-        {activeHotel && panelOpen && (
+        {displayActiveHotel && panelOpen && (
           <HotelInfoPanel
-            key={activeHotel.id}
-            hotel={activeHotel}
+            key={displayActiveHotel.id}
+            hotel={displayActiveHotel}
+            language={language}
             delay={0}
             onClose={closeHotelPanel}
           />
@@ -446,17 +498,24 @@ export function CotonouExperience() {
 
         {archiveOpen && (
           <ArchivePanel
+            language={language}
             onClose={() => setArchiveOpen(false)}
             onOpenHotel={selectHotel}
           />
         )}
 
-        {aboutOpen && <AboutPanel onClose={() => setAboutOpen(false)} />}
+        {aboutOpen && (
+          <AboutPanel
+            language={language}
+            onClose={() => setAboutOpen(false)}
+          />
+        )}
 
         {transition && (
           <NewspaperTransition
             key={`${transition.hotel.id}-${transition.mode}`}
             hotel={transition.hotel}
+            language={language}
             mode={transition.mode}
             onComplete={finishTransition}
           />
