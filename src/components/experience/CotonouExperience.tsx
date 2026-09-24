@@ -195,40 +195,61 @@ export function CotonouExperience() {
           className={`intro${entered ? " intro--leaving" : ""}`}
         >
           <div className="intro__topline" data-intro-line>
-            <span>Étude interactive indépendante</span>
-            <span>Cotonou · Bénin</span>
+            <div className="intro__edition">
+              <span className="intro__status-dot" aria-hidden="true" />
+              <span>Collection interactive · 2026</span>
+            </div>
+            <span>06°21′ N · 02°26′ E</span>
           </div>
 
           <div className="intro__main">
-            <p className="eyebrow" data-intro-line>
-              Six lieux. Une ville.
-            </p>
-            <h1 data-intro-line>
-              COTONOU
-              <span>/ 3D</span>
-            </h1>
-            <p className="intro__description" data-intro-line>
-              Une étude architecturale en temps réel de six espaces hôteliers à
-              Cotonou.
-            </p>
-            <button
-              type="button"
-              className="enter-button"
-              data-intro-line
-              onPointerUp={(event) => {
-                if (event.pointerType !== "mouse") {
-                  enterExperience();
-                }
-              }}
-              onClick={enterExperience}
-            >
-              <span>Entrer</span>
-              <span aria-hidden="true">↗</span>
-            </button>
+            <div className="intro__title-meta" data-intro-line>
+              <span>Cotonou, Bénin</span>
+              <span>Architecture · Hôtellerie · WebGL</span>
+            </div>
+
+            <div className="intro__title-lockup" data-intro-line>
+              <h1 aria-label="Cotonou 3D">
+                <span className="intro__title-city">COTONOU</span>
+                <span className="intro__title-slash" aria-hidden="true">/</span>
+                <span className="intro__title-3d">3D</span>
+              </h1>
+
+              <span className="intro__edition-mark" aria-hidden="true">
+                Édition
+                <strong>2026</strong>
+              </span>
+            </div>
+
+            <div className="intro__rule" data-intro-line>
+              <span aria-hidden="true" />
+              <small>Six lieux · Une ville</small>
+            </div>
+
+            <div className="intro__lower" data-intro-line>
+              <p className="intro__description">
+                Une étude architecturale en temps réel de six espaces hôteliers
+                à Cotonou.
+              </p>
+
+              <button
+                type="button"
+                className="enter-button enter-button--premium"
+                onPointerUp={(event) => {
+                  if (event.pointerType !== "mouse") {
+                    enterExperience();
+                  }
+                }}
+                onClick={enterExperience}
+              >
+                <span className="enter-button__label">Entrer</span>
+                <span className="enter-button__icon" aria-hidden="true">↗</span>
+              </button>
+            </div>
           </div>
 
           <div className="intro__footer" data-intro-line>
-            <span>WebGL / 2026</span>
+            <span>Expérience WebGL indépendante</span>
             <span>Glisser · Zoomer · Explorer</span>
           </div>
         </div>
