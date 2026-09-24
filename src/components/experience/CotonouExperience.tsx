@@ -4,6 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
 import { CotonouScene } from "./CotonouScene";
+import { HotelInfoPanel } from "./HotelInfoPanel";
 import type { HotelStudy } from "./hotels";
 
 export function CotonouExperience() {
@@ -12,6 +13,7 @@ export function CotonouExperience() {
   const [entered, setEntered] = useState(false);
   const [activeHotel, setActiveHotel] = useState<HotelStudy | null>(null);
   const [focusHotelId, setFocusHotelId] = useState<string | undefined>();
+  const [panelOpen, setPanelOpen] = useState(false);
 
   useEffect(() => {
     if (!introRef.current) return;
@@ -51,8 +53,9 @@ export function CotonouExperience() {
 
   function selectHotel(hotel: HotelStudy) {
     setActiveHotel(hotel);
+    setPanelOpen(true);
 
-    if (hotel.id === "hotel-du-lac") {
+    if (hotel.exteriorReady) {
       setFocusHotelId(hotel.id);
       return;
     }
@@ -61,6 +64,7 @@ export function CotonouExperience() {
   }
 
   function returnToCotonou() {
+    setPanelOpen(false);
     setFocusHotelId(undefined);
     setActiveHotel(null);
   }
@@ -189,15 +193,13 @@ export function CotonouExperience() {
           </>
         )}
 
-        {activeHotel && !inHotelStudy && (
-          <aside className="hotel-selection" aria-live="polite">
-            <span>{activeHotel.index} / 06</span>
-            <h2>{activeHotel.name}</h2>
-            <p>{activeHotel.descriptor}</p>
-            <button type="button" disabled>
-              Study not built yet
-            </button>
-          </aside>
+        {activeHotel && panelOpen && (
+          <HotelInfoPanel
+            key={activeHotel.id}
+            hotel={activeHotel}
+            delay={activeHotel.exteriorReady ? 0.45 : 0}
+            onClose={() => setPanelOpen(false)}
+          />
         )}
       </div>
     </main>
