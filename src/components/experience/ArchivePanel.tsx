@@ -6,19 +6,15 @@ import { hotelStudies } from "./hotels";
 import type { HotelStudy } from "./hotels";
 
 type ArchivePanelProps = {
-  discoveredIds: string[];
   onClose: () => void;
   onOpenHotel: (hotel: HotelStudy) => void;
 };
 
 export function ArchivePanel({
-  discoveredIds,
   onClose,
   onOpenHotel,
 }: ArchivePanelProps) {
   const panelRef = useRef<HTMLElement>(null);
-  const discovered = new Set(discoveredIds);
-  const complete = discoveredIds.length === hotelStudies.length;
 
   useLayoutEffect(() => {
     if (!panelRef.current) return;
@@ -77,65 +73,41 @@ export function ArchivePanel({
       </header>
 
       <div className="archives-panel__status" data-archive-reveal>
-        <span>{String(discoveredIds.length).padStart(2, "0")} / 06 découverts</span>
-        <span>
-          {complete
-            ? "Édition complète débloquée"
-            : "Explorez la ville pour compléter l’édition"}
-        </span>
+        <span>Six études architecturales</span>
+        <span>Choisissez librement une adresse</span>
       </div>
 
       <div className="archives-grid">
-        {hotelStudies.map((hotel) => {
-          const isDiscovered = discovered.has(hotel.id);
+        {hotelStudies.map((hotel) => (
+          <article
+            key={hotel.id}
+            className="archive-card archive-card--discovered"
+            data-archive-reveal
+          >
+            <div className="archive-card__topline">
+              <span>Cotonou</span>
+              <span>{hotel.descriptor}</span>
+            </div>
 
-          return (
-            <article
-              key={hotel.id}
-              className={`archive-card${isDiscovered ? " archive-card--discovered" : ""}`}
-              data-archive-reveal
-            >
-              <div className="archive-card__topline">
-                <span>{hotel.index}</span>
-                <span>{isDiscovered ? "Archivé" : "À découvrir"}</span>
-              </div>
+            <div className="archive-card__body">
+              <p>Architecture & hospitalité</p>
+              <h3>{hotel.name}</h3>
+              <span>{hotel.location}</span>
+            </div>
 
-              <div className="archive-card__body">
-                {isDiscovered ? (
-                  <>
-                    <p>{hotel.descriptor}</p>
-                    <h3>{hotel.name}</h3>
-                    <span>{hotel.location}</span>
-                  </>
-                ) : (
-                  <>
-                    <p>Étude verrouillée</p>
-                    <h3>••••••••</h3>
-                    <span>Explorez Cotonou</span>
-                  </>
-                )}
-              </div>
-
-              <div className="archive-card__footer">
-                {isDiscovered ? (
-                  <button type="button" onClick={() => onOpenHotel(hotel)}>
-                    <span>Revoir l’étude</span>
-                    <span aria-hidden="true">↗</span>
-                  </button>
-                ) : (
-                  <span className="archive-card__lock">Non classé</span>
-                )}
-              </div>
-            </article>
-          );
-        })}
+            <div className="archive-card__footer">
+              <button type="button" onClick={() => onOpenHotel(hotel)}>
+                <span>Ouvrir l’étude</span>
+                <span aria-hidden="true">↗</span>
+              </button>
+            </div>
+          </article>
+        ))}
       </div>
 
       <footer className="archives-panel__footer" data-archive-reveal>
         <span>Une publication interactive indépendante</span>
-        <strong>
-          {complete ? "COTONOU / 3D — ÉDITION COMPLÈTE" : "COTONOU / 3D — EN COURS"}
-        </strong>
+        <strong>COTONOU / 3D — COLLECTION 2026</strong>
       </footer>
     </section>
   );
