@@ -25,7 +25,7 @@ export const hotelStudies: HotelStudy[] = [
     name: "Sofitel Cotonou Marina",
     shortName: "Sofitel",
     descriptor: "Étude Marina",
-    position: [-5.4, 0, -1.0],
+    position: [-9.0, 0, -5.0],
     location: "Boulevard de la Marina · Cotonou",
     summary:
       "Un hôtel cinq étoiles contemporain face au golfe de Guinée, pensé autour de la lumière côtière, des jardins paysagers et du dialogue entre sable, océan et végétation.",
@@ -44,7 +44,7 @@ export const hotelStudies: HotelStudy[] = [
     name: "Golden Tulip Le Diplomate",
     shortName: "Golden Tulip",
     descriptor: "Étude Boulevard",
-    position: [-1.7, 0, -3.1],
+    position: [0.0, 0, -6.0],
     location: "Boulevard de la Marina · Cotonou",
     summary:
       "Un hôtel quatre étoiles urbain sur le boulevard de la Marina, mêlant hébergement d'affaires, piscine extérieure, restauration, espaces événementiels et proximité avec l'Atlantique.",
@@ -63,7 +63,7 @@ export const hotelStudies: HotelStudy[] = [
     name: "Novotel Cotonou Orisha",
     shortName: "Novotel",
     descriptor: "Étude Jardin",
-    position: [3.0, 0, -3.4],
+    position: [9.0, 0, -5.0],
     location: "Boulevard de la Marina · Cotonou",
     summary:
       "Un hôtel quatre étoiles rénové au cœur d'un jardin arboré de sept hectares, avec un design contemporain, une piscine et une atmosphère plus calme proche du littoral.",
@@ -82,7 +82,7 @@ export const hotelStudies: HotelStudy[] = [
     name: "Hôtel du Lac",
     shortName: "Hôtel du Lac",
     descriptor: "Étude Lagune",
-    position: [4.6, 0, 1.7],
+    position: [8.5, 0, 4.2],
     location: "Lac Nokoué · Cotonou",
     summary:
       "Un hôtel trois étoiles installé sur les rives du lac Nokoué, connu pour son cadre paisible au bord de l'eau, ses vues sur le lac et ses espaces extérieurs autour de la piscine.",
@@ -101,7 +101,7 @@ export const hotelStudies: HotelStudy[] = [
     name: "Azalaï Hôtel Cotonou",
     shortName: "Azalaï",
     descriptor: "Étude Littoral",
-    position: [0.2, 0, 2.5],
+    position: [0.5, 0, 5.0],
     location: "Front de mer · Cotonou",
     summary:
       "Un hôtel emblématique du front de mer de Cotonou, avec 120 chambres dont des suites, des hébergements tournés vers la piscine ainsi que des espaces de restauration et d'événement.",
@@ -120,7 +120,7 @@ export const hotelStudies: HotelStudy[] = [
     name: "Maison Rouge Cotonou",
     shortName: "Maison Rouge",
     descriptor: "Étude Boutique",
-    position: [-3.2, 0, 2.5],
+    position: [-8.5, 0, 4.3],
     location: "Boulevard de la Marina · Cotonou",
     summary:
       "Un hôtel boutique quatre étoiles à l'échelle plus intime, mêlant design soigné, art africain contemporain, jardins, deux piscines et terrasse panoramique face à la mer.",
