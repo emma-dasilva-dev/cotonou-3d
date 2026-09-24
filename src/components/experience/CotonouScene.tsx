@@ -1,33 +1,18 @@
 "use client";
 
-import {
-  Billboard,
-  Html,
-  OrbitControls,
-  RoundedBox,
-  Text,
-} from "@react-three/drei";
-import { useFrame, useThree } from "@react-three/fiber";
+import { Html, OrbitControls } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
 import gsap from "gsap";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { ElementRef } from "react";
-import type { Group } from "three";
 import { HotelDuLacExterior } from "./HotelDuLacExterior";
-import {
-  getHotelDuLacHotspot,
-  hotelDuLacHotspots,
-} from "./hotelHotspots";
 import { hotelStudies } from "./hotels";
-import type { HotelHotspot } from "./hotelHotspots";
 import type { HotelStudy } from "./hotels";
 
 type CotonouSceneProps = {
   onSelectHotel: (hotel: HotelStudy) => void;
-  onSelectHotspot: (hotspot: HotelHotspot) => void;
   activeHotelId?: string;
   focusHotelId?: string;
-  activeHotspotId?: string;
-  showHotspots?: boolean;
 };
 
 type Block = {
@@ -38,13 +23,7 @@ type Block = {
 
 const HOTEL_DU_LAC_POSITION: [number, number, number] = [4.6, 0, 1.7];
 
-function CameraRig({
-  focusHotelId,
-  activeHotspotId,
-}: {
-  focusHotelId?: string;
-  activeHotspotId?: string;
-}) {
+function CameraRig({ focusHotelId }: { focusHotelId?: string }) {
   const { camera } = useThree();
   const controlsRef = useRef<ElementRef<typeof OrbitControls>>(null);
 
@@ -53,33 +32,15 @@ function CameraRig({
     if (!controls) return;
 
     const focused = focusHotelId === "hotel-du-lac";
-    const hotspot = focused ? getHotelDuLacHotspot(activeHotspotId) : undefined;
-
-    const cameraTarget = hotspot
-      ? {
-          x: hotspot.cameraPosition[0],
-          y: hotspot.cameraPosition[1],
-          z: hotspot.cameraPosition[2],
-        }
-      : focused
-        ? { x: 8.25, y: 3.25, z: -3.65 }
-        : { x: 10.5, y: 9.5, z: 13.5 };
-
-    const orbitTarget = hotspot
-      ? {
-          x: hotspot.cameraTarget[0],
-          y: hotspot.cameraTarget[1],
-          z: hotspot.cameraTarget[2],
-        }
-      : focused
-        ? { x: 4.6, y: 1.0, z: 1.35 }
-        : { x: 0, y: 0, z: 0.2 };
+    const cameraTarget = focused
+      ? { x: 8.25, y: 3.25, z: -3.65 }
+      : { x: 10.5, y: 9.5, z: 13.5 };
+    const orbitTarget = focused
+      ? { x: 4.6, y: 1.0, z: 1.35 }
+      : { x: 0, y: 0, z: 0.2 };
 
     const timeline = gsap.timeline({
-      defaults: {
-        duration: hotspot ? 1.45 : focused ? 2.35 : 2.0,
-        ease: "power3.inOut",
-      },
+      defaults: { duration: focused ? 2.35 : 2.0, ease: "power3.inOut" },
     });
 
     timeline.to(
@@ -103,12 +64,9 @@ function CameraRig({
     return () => {
       timeline.kill();
     };
-  }, [camera, focusHotelId, activeHotspotId]);
+  }, [camera, focusHotelId]);
 
   const focused = focusHotelId === "hotel-du-lac";
-  const hotspot = focused ? getHotelDuLacHotspot(activeHotspotId) : undefined;
-  const target: [number, number, number] = hotspot?.cameraTarget ??
-    (focused ? [4.6, 1, 1.35] : [0, 0, 0.2]);
 
   return (
     <OrbitControls
@@ -117,11 +75,11 @@ function CameraRig({
       enablePan={false}
       enableDamping
       dampingFactor={0.055}
-      minDistance={focused ? 2.8 : 8.5}
+      minDistance={focused ? 3.4 : 8.5}
       maxDistance={focused ? 9.5 : 20}
-      minPolarAngle={focused ? 0.58 : 0.55}
-      maxPolarAngle={focused ? 1.46 : 1.18}
-      target={target}
+      minPolarAngle={focused ? 0.65 : 0.55}
+      maxPolarAngle={focused ? 1.42 : 1.18}
+      target={focused ? [4.6, 1, 1.35] : [0, 0, 0.2]}
     />
   );
 }
@@ -280,161 +238,10 @@ function HotelMarker({
   );
 }
 
-function HotspotMarker({
-  hotspot,
-  active,
-  onSelect,
-}: {
-  hotspot: HotelHotspot;
-  active: boolean;
-  onSelect: () => void;
-}) {
-  const [hovered, setHovered] = useState(false);
-  const pulseRef = useRef<Group>(null);
-
-  useEffect(() => {
-    if (!hovered) return;
-
-    document.body.style.cursor = "pointer";
-    return () => {
-      document.body.style.cursor = "";
-    };
-  }, [hovered]);
-
-  useFrame(({ clock }) => {
-    if (!pulseRef.current) return;
-
-    const pulse = 1 + Math.sin(clock.elapsedTime * 3.2) * 0.12;
-    pulseRef.current.scale.setScalar(pulse);
-  });
-
-  const width = hotspot.label.length > 7 ? 1.55 : 1.3;
-  const accent = active ? "#a84936" : "#b44c39";
-
-  return (
-    <group position={hotspot.position}>
-      <mesh position={[0, 0.36, 0]} renderOrder={98}>
-        <cylinderGeometry args={[0.012, 0.012, 0.72, 12]} />
-        <meshBasicMaterial
-          color={accent}
-          depthTest={false}
-          depthWrite={false}
-          transparent
-          opacity={0.9}
-        />
-      </mesh>
-
-      <Billboard position={[0, 0.82, 0]} follow>
-        <group
-          scale={hovered || active ? 1.1 : 1}
-          onClick={(event) => {
-            event.stopPropagation();
-            onSelect();
-          }}
-          onPointerOver={(event) => {
-            event.stopPropagation();
-            setHovered(true);
-          }}
-          onPointerOut={() => setHovered(false)}
-        >
-          <mesh position={[0.18, 0, -0.02]} renderOrder={97}>
-            <planeGeometry args={[width + 0.72, 0.58]} />
-            <meshBasicMaterial
-              transparent
-              opacity={0.001}
-              depthTest={false}
-              depthWrite={false}
-            />
-          </mesh>
-
-          <group
-            ref={pulseRef}
-            position={[-width / 2 - 0.22, 0, 0.04]}
-          >
-            <mesh renderOrder={102}>
-              <ringGeometry args={[0.11, 0.15, 36]} />
-              <meshBasicMaterial
-                color={accent}
-                transparent
-                opacity={0.95}
-                depthTest={false}
-                depthWrite={false}
-              />
-            </mesh>
-
-            <mesh position={[0, 0, 0.008]} renderOrder={103}>
-              <circleGeometry args={[0.045, 28]} />
-              <meshBasicMaterial
-                color="#eee9de"
-                depthTest={false}
-                depthWrite={false}
-              />
-            </mesh>
-          </group>
-
-          <RoundedBox
-            args={[width, 0.34, 0.045]}
-            radius={0.1}
-            smoothness={5}
-            position={[0.18, 0, 0]}
-            renderOrder={100}
-          >
-            <meshBasicMaterial
-              color={active ? "#292927" : "#eee9de"}
-              transparent
-              opacity={0.98}
-              depthTest={false}
-              depthWrite={false}
-            />
-          </RoundedBox>
-
-          <Text
-            position={[0.18, 0, 0.04]}
-            fontSize={0.105}
-            letterSpacing={0.055}
-            color={active ? "#eee9de" : "#292927"}
-            anchorX="center"
-            anchorY="middle"
-            renderOrder={104}
-            material-depthTest={false}
-            material-depthWrite={false}
-          >
-            {hotspot.label.toUpperCase()}
-          </Text>
-        </group>
-      </Billboard>
-    </group>
-  );
-}
-
-function HotelDuLacHotspots({
-  activeHotspotId,
-  onSelectHotspot,
-}: {
-  activeHotspotId?: string;
-  onSelectHotspot: (hotspot: HotelHotspot) => void;
-}) {
-  return (
-    <group>
-      {hotelDuLacHotspots.map((hotspot) => (
-        <HotspotMarker
-          key={hotspot.id}
-          hotspot={hotspot}
-          active={activeHotspotId === hotspot.id}
-          onSelect={() => onSelectHotspot(hotspot)}
-        />
-      ))}
-    </group>
-  );
-}
-
 export function CotonouScene({
   onSelectHotel,
-  onSelectHotspot,
   activeHotelId,
   focusHotelId,
-  activeHotspotId,
-  showHotspots = false,
 }: CotonouSceneProps) {
   return (
     <>
@@ -473,17 +280,7 @@ export function CotonouScene({
         />
       ))}
 
-      {showHotspots && focusHotelId === "hotel-du-lac" && (
-        <HotelDuLacHotspots
-          activeHotspotId={activeHotspotId}
-          onSelectHotspot={onSelectHotspot}
-        />
-      )}
-
-      <CameraRig
-        focusHotelId={focusHotelId}
-        activeHotspotId={activeHotspotId}
-      />
+      <CameraRig focusHotelId={focusHotelId} />
     </>
   );
 }
