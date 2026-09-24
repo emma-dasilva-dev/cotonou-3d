@@ -125,6 +125,18 @@ export function HotelInfoPanel({
             </dl>
           </section>
         </div>
+
+        <div className="hotel-paper__analysis" data-panel-reveal>
+          <section>
+            <span>Lecture architecturale</span>
+            <p>{hotel.architecturalReading}</p>
+          </section>
+
+          <section>
+            <span>Rapport à la ville</span>
+            <p>{hotel.cityRelationship}</p>
+          </section>
+        </div>
       </div>
 
       <footer className="hotel-paper__footer" data-panel-reveal>
