@@ -113,10 +113,10 @@ function CameraRig({ focusHotelId }: { focusHotelId?: string }) {
     const view = focusHotelId ? FOCUS_VIEWS[focusHotelId] : undefined;
     const overviewCamera =
       size.width <= 720
-        ? { x: 24.0, y: 20.0, z: 31.0 }
+        ? { x: 24.0, y: 20.0, z: -31.0 }
         : size.width <= 1024
-          ? { x: 21.0, y: 18.0, z: 27.0 }
-          : { x: 18.0, y: 16.0, z: 23.0 };
+          ? { x: 21.0, y: 18.0, z: -27.0 }
+          : { x: 18.0, y: 16.0, z: -23.0 };
     const cameraTarget = view
       ? { x: view.camera[0], y: view.camera[1], z: view.camera[2] }
       : overviewCamera;
