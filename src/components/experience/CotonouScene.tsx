@@ -26,9 +26,9 @@ type Block = {
 };
 
 const HOTEL_DU_LAC_POSITION: [number, number, number] = [4.6, 0, 1.7];
-const SOFITEL_POSITION: [number, number, number] = [-4.7, 0, -2.2];
+const SOFITEL_POSITION: [number, number, number] = [-5.4, 0, -1.0];
 const GOLDEN_TULIP_POSITION: [number, number, number] = [-1.7, 0, -3.1];
-const NOVOTEL_POSITION: [number, number, number] = [1.7, 0, -2.1];
+const NOVOTEL_POSITION: [number, number, number] = [3.0, 0, -3.4];
 
 const FOCUS_VIEWS: Record<
   string,
@@ -46,8 +46,8 @@ const FOCUS_VIEWS: Record<
     maxDistance: 9.5,
   },
   sofitel: {
-    camera: [-9.85, 4.35, -7.9],
-    target: [-4.62, 1.72, -2.35],
+    camera: [-10.55, 4.35, -6.7],
+    target: [-5.32, 1.72, -1.15],
     minDistance: 4.8,
     maxDistance: 12.5,
   },
@@ -58,8 +58,8 @@ const FOCUS_VIEWS: Record<
     maxDistance: 11.5,
   },
   novotel: {
-    camera: [6.2, 3.45, -6.55],
-    target: [1.75, 1.2, -2.35],
+    camera: [7.55, 3.55, -7.9],
+    target: [3.05, 1.2, -3.65],
     minDistance: 4.0,
     maxDistance: 11.0,
   },
@@ -81,9 +81,15 @@ function CameraRig({ focusHotelId }: { focusHotelId?: string }) {
     if (!controls) return;
 
     const view = focusHotelId ? FOCUS_VIEWS[focusHotelId] : undefined;
+    const overviewCamera =
+      size.width <= 720
+        ? { x: 13.2, y: 11.4, z: 17.2 }
+        : size.width <= 1024
+          ? { x: 11.8, y: 10.4, z: 15.3 }
+          : { x: 10.5, y: 9.5, z: 13.5 };
     const cameraTarget = view
       ? { x: view.camera[0], y: view.camera[1], z: view.camera[2] }
-      : { x: 10.5, y: 9.5, z: 13.5 };
+      : overviewCamera;
     const orbitTarget = view
       ? { x: view.target[0], y: view.target[1], z: view.target[2] }
       : { x: 0, y: 0, z: 0.2 };
@@ -113,7 +119,7 @@ function CameraRig({ focusHotelId }: { focusHotelId?: string }) {
     return () => {
       timeline.kill();
     };
-  }, [camera, focusHotelId]);
+  }, [camera, focusHotelId, size.width]);
 
   const view = focusHotelId ? FOCUS_VIEWS[focusHotelId] : undefined;
 
@@ -145,9 +151,9 @@ function CityBlocks() {
         const z = -4.1 + row * 1.35;
 
         if (Math.hypot(x - 4.6, z - 1.7) < 2.35) continue;
-        if (Math.hypot(x + 4.7, z + 2.2) < 3.25) continue;
+        if (Math.hypot(x + 5.4, z + 1.0) < 3.35) continue;
         if (Math.hypot(x + 1.7, z + 3.1) < 2.7) continue;
-        if (Math.hypot(x - 1.7, z + 2.1) < 2.85) continue;
+        if (Math.hypot(x - 3.0, z + 3.4) < 3.0) continue;
 
         const width = 0.52 + ((column * 3 + row) % 4) * 0.08;
         const depth = 0.48 + ((row * 5 + column) % 3) * 0.09;
@@ -293,8 +299,7 @@ function HotelMarker({
           tabIndex={focused ? -1 : 0}
           aria-hidden={focused}
         >
-          <span className="hotel-marker__index">{hotel.index}</span>
-          <span className="hotel-marker__name">{hotel.shortName}</span>
+<span className="hotel-marker__name">{hotel.shortName}</span>
         </button>
       </Html>
     </group>
