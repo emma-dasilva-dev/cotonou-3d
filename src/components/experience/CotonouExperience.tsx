@@ -3,18 +3,27 @@
 import { Canvas } from "@react-three/fiber";
 import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
+import { ArchivePanel } from "./ArchivePanel";
 import { CotonouScene } from "./CotonouScene";
 import { HotelInfoPanel } from "./HotelInfoPanel";
+import { hotelStudies } from "./hotels";
 import type { HotelStudy } from "./hotels";
+
+const ARCHIVE_STORAGE_KEY = "cotonou-3d:archives";
 
 export function CotonouExperience() {
   const introRef = useRef<HTMLDivElement>(null);
   const interfaceRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const archiveTimerRef = useRef<number | null>(null);
+
   const [entered, setEntered] = useState(false);
   const [activeHotel, setActiveHotel] = useState<HotelStudy | null>(null);
   const [focusHotelId, setFocusHotelId] = useState<string | undefined>();
   const [panelOpen, setPanelOpen] = useState(false);
+  const [archiveOpen, setArchiveOpen] = useState(false);
+  const [archiveNotice, setArchiveNotice] = useState<string | null>(null);
+  const [discoveredIds, setDiscoveredIds] = useState<string[]>([]);
   const [soundOn, setSoundOn] = useState(true);
 
   useEffect(() => {
@@ -32,6 +41,31 @@ export function CotonouExperience() {
     }, introRef);
 
     return () => context.revert();
+  }, []);
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(
+        window.localStorage.getItem(ARCHIVE_STORAGE_KEY) ?? "[]",
+      );
+
+      if (Array.isArray(saved)) {
+        const validIds = new Set(hotelStudies.map((hotel) => hotel.id));
+        setDiscoveredIds(
+          saved.filter(
+            (id): id is string => typeof id === "string" && validIds.has(id),
+          ),
+        );
+      }
+    } catch {
+      window.localStorage.removeItem(ARCHIVE_STORAGE_KEY);
+    }
+
+    return () => {
+      if (archiveTimerRef.current !== null) {
+        window.clearTimeout(archiveTimerRef.current);
+      }
+    };
   }, []);
 
   function enterExperience() {
@@ -62,7 +96,30 @@ export function CotonouExperience() {
     }
   }
 
+  function archiveHotel(hotel: HotelStudy) {
+    setDiscoveredIds((currentIds) => {
+      if (currentIds.includes(hotel.id)) return currentIds;
+
+      const nextIds = [...currentIds, hotel.id];
+      window.localStorage.setItem(ARCHIVE_STORAGE_KEY, JSON.stringify(nextIds));
+
+      setArchiveNotice(hotel.name);
+
+      if (archiveTimerRef.current !== null) {
+        window.clearTimeout(archiveTimerRef.current);
+      }
+
+      archiveTimerRef.current = window.setTimeout(() => {
+        setArchiveNotice(null);
+      }, 2600);
+
+      return nextIds;
+    });
+  }
+
   function selectHotel(hotel: HotelStudy) {
+    archiveHotel(hotel);
+    setArchiveOpen(false);
     setActiveHotel(hotel);
     setPanelOpen(true);
 
@@ -78,6 +135,11 @@ export function CotonouExperience() {
     setPanelOpen(false);
     setFocusHotelId(undefined);
     setActiveHotel(null);
+  }
+
+  function openArchives() {
+    setPanelOpen(false);
+    setArchiveOpen(true);
   }
 
   function toggleSound() {
@@ -108,6 +170,7 @@ export function CotonouExperience() {
         preload="auto"
         playsInline
       />
+
       <div className="scene-layer" aria-hidden={!entered}>
         <Canvas
           shadows
@@ -168,7 +231,11 @@ export function CotonouExperience() {
           <div className="brand">
             COTONOU <span>/ 3D</span>
           </div>
+
           <nav aria-label="Contrôles de l'expérience">
+            <button type="button" onClick={openArchives}>
+              Archives {String(discoveredIds.length).padStart(2, "0")}/06
+            </button>
             <button type="button">À propos</button>
             <button
               type="button"
@@ -234,12 +301,30 @@ export function CotonouExperience() {
           </>
         )}
 
+        {archiveNotice && !archiveOpen && (
+          <div className="archive-notice" role="status">
+            <span>Ajouté aux archives</span>
+            <strong>{archiveNotice}</strong>
+            <small>
+              {String(discoveredIds.length).padStart(2, "0")} / 06
+            </small>
+          </div>
+        )}
+
         {activeHotel && panelOpen && (
           <HotelInfoPanel
             key={activeHotel.id}
             hotel={activeHotel}
             delay={activeHotel.exteriorReady ? 0.45 : 0}
             onClose={() => setPanelOpen(false)}
+          />
+        )}
+
+        {archiveOpen && (
+          <ArchivePanel
+            discoveredIds={discoveredIds}
+            onClose={() => setArchiveOpen(false)}
+            onOpenHotel={selectHotel}
           />
         )}
       </div>
