@@ -54,6 +54,8 @@ export const hotelStudies: HotelStudy[] = [
       { label: "Cadre", value: "Boulevard de la Marina" },
     ],
     website: "https://diplomate-cotonou.goldentulip.com/en-us/",
+    exteriorReady: true,
+    studyContext: "Boulevard de la Marina",
   },
   {
     id: "novotel",
