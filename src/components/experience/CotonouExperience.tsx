@@ -108,7 +108,6 @@ export function CotonouExperience() {
   function returnToCotonou() {
     setPanelOpen(false);
     setTransition(null);
-    setActiveHotspotId(undefined);
     setFocusHotelId(undefined);
     setActiveHotel(null);
   }
