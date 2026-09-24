@@ -5,6 +5,7 @@ import { useThree } from "@react-three/fiber";
 import gsap from "gsap";
 import { useEffect, useMemo, useRef } from "react";
 import type { ElementRef } from "react";
+import type { PerspectiveCamera } from "three";
 import { HotelDuLacExterior } from "./HotelDuLacExterior";
 import { hotelStudies } from "./hotels";
 import type { HotelStudy } from "./hotels";
@@ -24,8 +25,15 @@ type Block = {
 const HOTEL_DU_LAC_POSITION: [number, number, number] = [4.6, 0, 1.7];
 
 function CameraRig({ focusHotelId }: { focusHotelId?: string }) {
-  const { camera } = useThree();
+  const { camera, size } = useThree();
   const controlsRef = useRef<ElementRef<typeof OrbitControls>>(null);
+
+  useEffect(() => {
+    const perspectiveCamera = camera as PerspectiveCamera;
+    perspectiveCamera.fov =
+      size.width <= 720 ? 46 : size.width <= 1024 ? 40 : 34;
+    perspectiveCamera.updateProjectionMatrix();
+  }, [camera, size.width]);
 
   useEffect(() => {
     const controls = controlsRef.current;
