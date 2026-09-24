@@ -6,19 +6,13 @@ import type { HotelStudy } from "./hotels";
 
 type HotelInfoPanelProps = {
   hotel: HotelStudy;
-  previousHotel: HotelStudy;
-  nextHotel: HotelStudy;
   onClose: () => void;
-  onNavigate: (hotel: HotelStudy) => void;
   delay?: number;
 };
 
 export function HotelInfoPanel({
   hotel,
-  previousHotel,
-  nextHotel,
   onClose,
-  onNavigate,
   delay = 0,
 }: HotelInfoPanelProps) {
   const panelRef = useRef<HTMLElement>(null);
@@ -65,20 +59,7 @@ export function HotelInfoPanel({
     });
   }
 
-  function navigateTo(target: HotelStudy, direction: "previous" | "next") {
-    if (!panelRef.current) {
-      onNavigate(target);
-      return;
-    }
 
-    gsap.to(panelRef.current, {
-      xPercent: direction === "next" ? -12 : 12,
-      opacity: 0,
-      duration: 0.28,
-      ease: "power2.in",
-      onComplete: () => onNavigate(target),
-    });
-  }
 
   return (
     <aside
@@ -144,34 +125,6 @@ export function HotelInfoPanel({
             </dl>
           </section>
         </div>
-      </div>
-
-      <div className="hotel-paper__navigation" data-panel-reveal>
-        <button
-          type="button"
-          className="hotel-paper__nav-button hotel-paper__nav-button--previous"
-          onClick={() => navigateTo(previousHotel, "previous")}
-          aria-label={`Voir ${previousHotel.name}`}
-        >
-          <span aria-hidden="true">←</span>
-          <span>
-            <small>Précédent</small>
-            <strong>{previousHotel.shortName}</strong>
-          </span>
-        </button>
-
-        <button
-          type="button"
-          className="hotel-paper__nav-button hotel-paper__nav-button--next"
-          onClick={() => navigateTo(nextHotel, "next")}
-          aria-label={`Voir ${nextHotel.name}`}
-        >
-          <span>
-            <small>Suivant</small>
-            <strong>{nextHotel.shortName}</strong>
-          </span>
-          <span aria-hidden="true">→</span>
-        </button>
       </div>
 
       <footer className="hotel-paper__footer" data-panel-reveal>
