@@ -5,6 +5,7 @@ import { useThree } from "@react-three/fiber";
 import gsap from "gsap";
 import { useEffect, useMemo, useRef } from "react";
 import type { ElementRef } from "react";
+import { AnimatedWaterSurface } from "./AnimatedWaterSurface";
 import { HotelDuLacExterior } from "./HotelDuLacExterior";
 import { hotelStudies } from "./hotels";
 import type { HotelStudy } from "./hotels";
@@ -155,18 +156,16 @@ function Roads() {
 
 function WaterBand() {
   return (
-    <mesh
-      position={[0, -0.035, 5.25]}
-      rotation={[-Math.PI / 2, 0, 0]}
-      receiveShadow
-    >
-      <planeGeometry args={[19, 3.8, 1, 1]} />
-      <meshStandardMaterial
-        color="#738489"
-        roughness={0.35}
-        metalness={0.08}
-      />
-    </mesh>
+    <AnimatedWaterSurface
+      position={[0, -0.02, 5.25]}
+      size={[19, 3.8]}
+      color="#677d83"
+      lightColor="#9aaeb2"
+      amplitude={0.045}
+      speed={0.62}
+      opacity={0.96}
+      segments={[96, 28]}
+    />
   );
 }
 
