@@ -3498,3 +3498,123 @@ a {
     font-size: clamp(26px, 8vh, 40px);
   }
 }
+
+
+/* FR / EN language selector */
+.intro__top-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.language-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: rgba(41, 41, 39, 0.5);
+  pointer-events: auto;
+  white-space: nowrap;
+}
+
+.language-toggle > span {
+  color: rgba(41, 41, 39, 0.28);
+  font-size: 7px;
+}
+
+.language-toggle button {
+  min-width: 0;
+  min-height: 28px;
+  border: 0;
+  padding: 0 2px;
+  background: transparent;
+  color: rgba(41, 41, 39, 0.46);
+  cursor: pointer;
+  text-transform: uppercase;
+  font-size: 7px;
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: 0.11em;
+  transition:
+    color 160ms ease,
+    opacity 160ms ease;
+}
+
+.language-toggle button:hover,
+.language-toggle button:focus-visible,
+.language-toggle button.language-toggle__active {
+  color: var(--graphite);
+}
+
+.language-toggle button.language-toggle__active {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.interface nav > .language-toggle {
+  min-height: 36px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(41, 41, 39, 0.18);
+}
+
+.interface nav > .language-toggle button {
+  min-height: 36px;
+  padding: 0 1px;
+  font-size: 8px;
+}
+
+@media (max-width: 720px) {
+  .intro__top-actions {
+    gap: 9px;
+  }
+
+  .intro__top-actions > span {
+    display: block;
+    color: rgba(41, 41, 39, 0.52);
+    font-size: 5.5px;
+  }
+
+  .intro__top-actions .language-toggle {
+    gap: 3px;
+  }
+
+  .intro__top-actions .language-toggle button {
+    min-height: 30px;
+    font-size: 6px;
+  }
+
+  .interface nav {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .interface nav > .language-toggle {
+    width: 100%;
+    min-width: 0;
+    min-height: 36px;
+    justify-content: center;
+    gap: 3px;
+    border-left: 1px solid rgba(41, 41, 39, 0.14);
+    padding: 0 3px;
+  }
+
+  .interface nav > .language-toggle button {
+    min-width: 0;
+    min-height: 36px;
+    padding: 0;
+    font-size: 6px;
+    letter-spacing: 0.05em;
+  }
+
+  .interface nav > .language-toggle > span {
+    font-size: 5px;
+  }
+}
+
+@media (max-width: 420px) {
+  .intro__top-actions > span {
+    display: none;
+  }
+
+  .intro__top-actions {
+    gap: 0;
+  }
+}
