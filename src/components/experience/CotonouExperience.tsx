@@ -91,20 +91,20 @@ export function CotonouExperience() {
       {!entered && (
         <div ref={introRef} className="intro">
           <div className="intro__topline" data-intro-line>
-            <span>Independent interactive study</span>
-            <span>Cotonou · Benin</span>
+            <span>Étude interactive indépendante</span>
+            <span>Cotonou · Bénin</span>
           </div>
 
           <div className="intro__main">
             <p className="eyebrow" data-intro-line>
-              Six spaces. One city.
+              Six lieux. Une ville.
             </p>
             <h1 data-intro-line>
               COTONOU
               <span>/ 3D</span>
             </h1>
             <p className="intro__description" data-intro-line>
-              A real-time architectural study of six hospitality spaces across
+              Une étude architecturale en temps réel de six espaces hôteliers à
               Cotonou.
             </p>
             <button
@@ -113,14 +113,14 @@ export function CotonouExperience() {
               data-intro-line
               onClick={enterExperience}
             >
-              <span>Enter</span>
+              <span>Entrer</span>
               <span aria-hidden="true">↗</span>
             </button>
           </div>
 
           <div className="intro__footer" data-intro-line>
             <span>WebGL / 2026</span>
-            <span>Drag · Zoom · Explore</span>
+            <span>Glisser · Zoomer · Explorer</span>
           </div>
         </div>
       )}
@@ -133,10 +133,9 @@ export function CotonouExperience() {
           <div className="brand">
             COTONOU <span>/ 3D</span>
           </div>
-          <nav aria-label="Experience controls">
-            <button type="button">About</button>
-            <button type="button">Sound ○</button>
-            <button type="button">FR</button>
+          <nav aria-label="Contrôles de l'expérience">
+            <button type="button">À propos</button>
+            <button type="button">Son ○</button>
           </nav>
         </header>
 
@@ -144,17 +143,17 @@ export function CotonouExperience() {
           <>
             <div className="study-label">
               <span>01 — 06</span>
-              <span>Architectural studies</span>
+              <span>Études architecturales</span>
             </div>
 
             <div className="interaction-hint">
               <span className="interaction-hint__line" />
-              <span>Drag to explore · Scroll to zoom</span>
+              <span>Glisser pour explorer · Faire défiler pour zoomer</span>
             </div>
 
             <div className="coordinates">
               <span>06°21&apos;N</span>
-              <span>Cotonou, Benin</span>
+              <span>Cotonou, Bénin</span>
             </div>
 
             <div className="counter">
@@ -169,7 +168,7 @@ export function CotonouExperience() {
             <div className="hotel-study-heading">
               <span>04 / 06</span>
               <h2>Hôtel du Lac</h2>
-              <p>Exterior study · Lake Nokoué</p>
+              <p>Étude extérieure · Lac Nokoué</p>
             </div>
 
             <button
@@ -178,17 +177,17 @@ export function CotonouExperience() {
               onClick={returnToCotonou}
             >
               <span aria-hidden="true">←</span>
-              <span>Back to Cotonou</span>
+              <span>Retour à Cotonou</span>
             </button>
 
             <div className="study-interaction">
               <span className="interaction-hint__line" />
-              <span>Drag to orbit · Scroll to zoom</span>
+              <span>Glisser pour tourner · Faire défiler pour zoomer</span>
             </div>
 
             <div className="study-note">
-              <span>Independent study</span>
-              <span>Stylized from public exterior references</span>
+              <span>Étude indépendante</span>
+              <span>Interprétation stylisée à partir de références publiques</span>
             </div>
           </>
         )}
