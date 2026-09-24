@@ -3,6 +3,8 @@
 import { Html } from "@react-three/drei";
 import { useMemo } from "react";
 import { DoubleSide, Shape } from "three";
+import { landmarkText } from "./translations";
+import type { Language } from "./translations";
 
 type Position3 = [number, number, number];
 
@@ -43,7 +45,13 @@ function LandmarkLabel({
   );
 }
 
-function AmazoneMonument({ position }: { position: Position3 }) {
+function AmazoneMonument({
+  position,
+  label,
+}: {
+  position: Position3;
+  label: string;
+}) {
   return (
     <group position={position} rotation={[0, 0.18, 0]}>
       <mesh position={[0, 0.12, 0]} receiveShadow>
@@ -107,14 +115,18 @@ function AmazoneMonument({ position }: { position: Position3 }) {
         </mesh>
       </group>
 
-      <LandmarkLabel position={[0, 3.05, 0]}>
-        Monument de l’Amazone
-      </LandmarkLabel>
+      <LandmarkLabel position={[0, 3.05, 0]}>{label}</LandmarkLabel>
     </group>
   );
 }
 
-function EtoileRouge({ position }: { position: Position3 }) {
+function EtoileRouge({
+  position,
+  label,
+}: {
+  position: Position3;
+  label: string;
+}) {
   const star = useMemo(() => {
     const shape = new Shape();
     const points = 10;
@@ -177,14 +189,18 @@ function EtoileRouge({ position }: { position: Position3 }) {
         </mesh>
       </group>
 
-      <LandmarkLabel position={[0, 2.72, 0]}>
-        Étoile Rouge
-      </LandmarkLabel>
+      <LandmarkLabel position={[0, 2.72, 0]}>{label}</LandmarkLabel>
     </group>
   );
 }
 
-function BioGueraMonument({ position }: { position: Position3 }) {
+function BioGueraMonument({
+  position,
+  label,
+}: {
+  position: Position3;
+  label: string;
+}) {
   return (
     <group position={position} rotation={[0, -0.22, 0]}>
       <mesh position={[0, 0.13, 0]} receiveShadow>
@@ -239,9 +255,7 @@ function BioGueraMonument({ position }: { position: Position3 }) {
         </mesh>
       </group>
 
-      <LandmarkLabel position={[0, 2.75, 0]}>
-        Monument Bio Guera
-      </LandmarkLabel>
+      <LandmarkLabel position={[0, 2.75, 0]}>{label}</LandmarkLabel>
     </group>
   );
 }
@@ -268,15 +282,21 @@ function LandmarkGarden({
   );
 }
 
-export function CotonouLandmarks() {
+export function CotonouLandmarks({
+  language,
+}: {
+  language: Language;
+}) {
+  const t = landmarkText[language];
+
   return (
     <group>
-      <AmazoneMonument position={[-7.0, 0, -2.1]} />
+      <AmazoneMonument position={[-7.0, 0, -2.1]} label={t.amazone} />
       <LandmarkGarden position={[-7.0, 0, -2.1]} />
 
-      <EtoileRouge position={[0.0, 0, -2.0]} />
+      <EtoileRouge position={[0.0, 0, -2.0]} label={t.redStar} />
 
-      <BioGueraMonument position={[7.0, 0, -2.1]} />
+      <BioGueraMonument position={[7.0, 0, -2.1]} label={t.bioGuera} />
       <LandmarkGarden position={[7.0, 0, -2.1]} />
     </group>
   );
