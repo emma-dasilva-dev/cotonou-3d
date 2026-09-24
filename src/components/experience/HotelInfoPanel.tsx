@@ -63,7 +63,7 @@ export function HotelInfoPanel({
     <aside
       ref={panelRef}
       className="hotel-info-panel"
-      aria-label={`About ${hotel.name}`}
+      aria-label={`À propos de ${hotel.name}`}
     >
       <div className="hotel-info-panel__top" data-panel-reveal>
         <span>{hotel.index} / 06</span>
@@ -71,16 +71,16 @@ export function HotelInfoPanel({
           type="button"
           className="hotel-info-panel__close"
           onClick={closePanel}
-          aria-label="Close hotel information"
+          aria-label="Fermer les informations sur l'hôtel"
         >
-          <span>Close</span>
+          <span>Fermer</span>
           <span aria-hidden="true">×</span>
         </button>
       </div>
 
       <div className="hotel-info-panel__body">
         <div data-panel-reveal>
-          <p className="hotel-info-panel__eyebrow">Hospitality study</p>
+          <p className="hotel-info-panel__eyebrow">Étude hôtelière</p>
           <h2>{hotel.name}</h2>
           <p className="hotel-info-panel__location">{hotel.location}</p>
         </div>
@@ -101,14 +101,14 @@ export function HotelInfoPanel({
 
       <div className="hotel-info-panel__footer" data-panel-reveal>
         <a href={hotel.website} target="_blank" rel="noreferrer">
-          <span>Official website</span>
+          <span>Site officiel</span>
           <span aria-hidden="true">↗</span>
         </a>
 
         <p>
-          Independent visual study.
+          Étude visuelle indépendante.
           <br />
-          Information sourced from public hotel materials.
+          Informations issues de sources publiques des hôtels.
         </p>
       </div>
     </aside>
