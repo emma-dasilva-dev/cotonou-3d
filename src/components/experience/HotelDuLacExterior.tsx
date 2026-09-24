@@ -5,7 +5,6 @@ import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import { DoubleSide } from "three";
 import type { Group } from "three";
-import { AnimatedWaterSurface } from "./AnimatedWaterSurface";
 
 const CREAM = "#ded6c7";
 const CREAM_DARK = "#c9c0b1";
@@ -143,16 +142,16 @@ function PoolDeck() {
         />
       </mesh>
 
-      <AnimatedWaterSurface
-        position={[0.35, 0.108, 0]}
-        size={[2.28, 0.87]}
-        color="#6f8e95"
-        lightColor="#a6bbc0"
-        amplitude={0.018}
-        speed={0.95}
-        opacity={0.9}
-        segments={[48, 18]}
-      />
+      <mesh position={[0.35, 0.103, 0]}>
+        <boxGeometry args={[2.28, 0.015, 0.87]} />
+        <meshStandardMaterial
+          color="#7e9aa0"
+          roughness={0.18}
+          metalness={0.12}
+          transparent
+          opacity={0.88}
+        />
+      </mesh>
 
       {[-1.55, -0.95, 1.52].map((x, index) => (
         <group key={x} position={[x, 0.1, -0.66]}>
