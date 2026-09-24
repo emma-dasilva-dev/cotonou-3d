@@ -3,19 +3,24 @@
 import gsap from "gsap";
 import { useLayoutEffect, useRef } from "react";
 import type { HotelStudy } from "./hotels";
+import { panelText } from "./translations";
+import type { Language } from "./translations";
 
 type HotelInfoPanelProps = {
   hotel: HotelStudy;
+  language: Language;
   onClose: () => void;
   delay?: number;
 };
 
 export function HotelInfoPanel({
   hotel,
+  language,
   onClose,
   delay = 0,
 }: HotelInfoPanelProps) {
   const panelRef = useRef<HTMLElement>(null);
+  const t = panelText[language];
 
   useLayoutEffect(() => {
     if (!panelRef.current) return;
@@ -65,31 +70,31 @@ export function HotelInfoPanel({
     <aside
       ref={panelRef}
       className="hotel-info-panel"
-      aria-label={`À propos de ${hotel.name}`}
+      aria-label={`${t.aboutHotel} ${hotel.name}`}
     >
       <header className="hotel-paper__header" data-panel-reveal>
         <div className="hotel-paper__kicker">
           <span>Cotonou / 3D</span>
-          <span>Édition spéciale</span>
+          <span>{t.specialEdition}</span>
         </div>
 
         <div className="hotel-paper__masthead">
-          <span>Le Journal de</span>
+          <span>{t.journalPrefix}</span>
           <strong>Cotonou</strong>
         </div>
 
         <div className="hotel-paper__meta">
-          <span>Architecture & hospitalité</span>
-          <span>2026 · Bénin</span>
+          <span>{t.architectureHospitality}</span>
+          <span>{t.countryYear}</span>
         </div>
 
         <button
           type="button"
           className="hotel-info-panel__close"
           onClick={closePanel}
-          aria-label="Fermer les informations sur l'hôtel"
+          aria-label={t.closeHotel}
         >
-          <span>Fermer</span>
+          <span>{t.close}</span>
           <span aria-hidden="true">×</span>
         </button>
       </header>
@@ -102,16 +107,16 @@ export function HotelInfoPanel({
         </div>
 
         <div className="hotel-paper__rule" data-panel-reveal>
-          <span>Chronique</span>
-          <span>Une adresse de Cotonou</span>
+          <span>{t.chronicle}</span>
+          <span>{t.address}</span>
         </div>
 
         <div className="hotel-paper__content" data-panel-reveal>
           <p className="hotel-paper__summary">{hotel.summary}</p>
 
-          <section className="hotel-paper__facts" aria-label="En bref">
+          <section className="hotel-paper__facts" aria-label={t.inBrief}>
             <div className="hotel-paper__facts-title">
-              <span>En bref</span>
+              <span>{t.inBrief}</span>
               <span>—</span>
             </div>
 
@@ -128,12 +133,12 @@ export function HotelInfoPanel({
 
         <div className="hotel-paper__analysis" data-panel-reveal>
           <section>
-            <span>Lecture architecturale</span>
+            <span>{t.architecturalReading}</span>
             <p>{hotel.architecturalReading}</p>
           </section>
 
           <section>
-            <span>Rapport à la ville</span>
+            <span>{t.cityRelationship}</span>
             <p>{hotel.cityRelationship}</p>
           </section>
         </div>
@@ -141,12 +146,12 @@ export function HotelInfoPanel({
 
       <footer className="hotel-paper__footer" data-panel-reveal>
         <div>
-          <span>Étude visuelle indépendante</span>
-          <span>Sources publiques · Cotonou / 3D</span>
+          <span>{t.independentStudy}</span>
+          <span>{t.publicSources}</span>
         </div>
 
         <a href={hotel.website} target="_blank" rel="noreferrer">
-          <span>Visiter le site officiel</span>
+          <span>{t.officialSite}</span>
           <span aria-hidden="true">↗</span>
         </a>
       </footer>
