@@ -2,7 +2,8 @@
 
 import { Html, OrbitControls } from "@react-three/drei";
 import { useMemo } from "react";
-import { HotelStudy, hotelStudies } from "./hotels";
+import { hotelStudies } from "./hotels";
+import type { HotelStudy } from "./hotels";
 
 type CotonouSceneProps = {
   onSelectHotel: (hotel: HotelStudy) => void;
