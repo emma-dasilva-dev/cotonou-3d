@@ -4,7 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
 import { CotonouScene } from "./CotonouScene";
-import { HotelStudy } from "./hotels";
+import type { HotelStudy } from "./hotels";
 
 export function CotonouExperience() {
   const introRef = useRef<HTMLDivElement>(null);
