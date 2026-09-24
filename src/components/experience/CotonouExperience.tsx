@@ -10,10 +10,12 @@ import type { HotelStudy } from "./hotels";
 export function CotonouExperience() {
   const introRef = useRef<HTMLDivElement>(null);
   const interfaceRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const [entered, setEntered] = useState(false);
   const [activeHotel, setActiveHotel] = useState<HotelStudy | null>(null);
   const [focusHotelId, setFocusHotelId] = useState<string | undefined>();
   const [panelOpen, setPanelOpen] = useState(false);
+  const [soundOn, setSoundOn] = useState(true);
 
   useEffect(() => {
     if (!introRef.current) return;
@@ -34,6 +36,15 @@ export function CotonouExperience() {
 
   function enterExperience() {
     if (!introRef.current) return;
+
+    const audio = audioRef.current;
+    if (audio) {
+      audio.volume = 0.32;
+      audio.muted = !soundOn;
+      void audio.play().catch(() => {
+        setSoundOn(false);
+      });
+    }
 
     gsap.to(introRef.current, {
       opacity: 0,
@@ -69,10 +80,34 @@ export function CotonouExperience() {
     setActiveHotel(null);
   }
 
+  function toggleSound() {
+    const audio = audioRef.current;
+    const nextSoundOn = !soundOn;
+
+    setSoundOn(nextSoundOn);
+
+    if (!audio) return;
+
+    audio.muted = !nextSoundOn;
+
+    if (nextSoundOn && audio.paused) {
+      void audio.play().catch(() => {
+        setSoundOn(false);
+      });
+    }
+  }
+
   const inHotelStudy = focusHotelId === "hotel-du-lac";
 
   return (
     <main className={`experience${entered ? " experience--entered" : ""}`}>
+      <audio
+        ref={audioRef}
+        src="/audio/cotonou-ambient.mp3"
+        loop
+        preload="auto"
+        playsInline
+      />
       <div className="scene-layer" aria-hidden={!entered}>
         <Canvas
           shadows
@@ -135,7 +170,14 @@ export function CotonouExperience() {
           </div>
           <nav aria-label="Contrôles de l'expérience">
             <button type="button">À propos</button>
-            <button type="button">Son ○</button>
+            <button
+              type="button"
+              onClick={toggleSound}
+              aria-pressed={soundOn}
+              aria-label={soundOn ? "Couper le son" : "Activer le son"}
+            >
+              Son {soundOn ? "●" : "○"}
+            </button>
           </nav>
         </header>
 
