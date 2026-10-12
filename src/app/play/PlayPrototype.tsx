@@ -9,6 +9,7 @@ import { PlayerAvatar } from "./PlayerAvatar";
 import { CharacterPreview } from "./CharacterPreview";
 import { StreetAtmosphere, TIMES } from "./StreetAtmosphere";
 import { LivingMarket } from "./LivingMarket";
+import { ZemidjanTraffic } from "./ZemidjanTraffic";
 import type { TimeOfDay } from "./StreetAtmosphere";
 import { APPEARANCE_KEY, DEFAULT_APPEARANCE, HAIR_COLORS, HAIRSTYLES, OUTFIT_COLORS, SKIN_COLORS, validateAppearance } from "./appearance";
 import type { Appearance } from "./appearance";
@@ -211,6 +212,7 @@ function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopPr
       </mesh>
     </group>
     <LivingMarket time={time} />
+    <ZemidjanTraffic time={time} />
     {/* Landmark details: shaded market awnings, benches and planter boxes. */
     {[-1,1].map(side => <group key={side} position={[side * 7.9,0,0]}>
       <mesh position={[0,0.35,0]} castShadow><boxGeometry args={[1.8,0.16,0.65]} /><meshStandardMaterial color="#8c6445" /></mesh>
