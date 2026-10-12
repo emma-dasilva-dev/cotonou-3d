@@ -26,6 +26,16 @@ const NPC_POSITION = new Vector3(0, 0, -5.5);
 const TALK_RADIUS = 1.8;
 const DELIVERY_POSITION = new Vector3(0, 0, 6);
 const DELIVERY_RADIUS = 1.5;
+const SHOP_POSITION = new Vector3(5, 0, -1.2);
+const SHOP_RADIUS = 1.8;
+const ITEMS = [
+  { id: "water", name: "Eau fraîche", price: 250, description: "Une bouteille d’eau pour la route." },
+  { id: "snack", name: "Petit goûter", price: 500, description: "Une pause gourmande dans le quartier." },
+  { id: "shirt", name: "T-shirt coton", price: 1200, description: "Un vêtement simple pour votre collection." },
+] as const;
+type ItemId = (typeof ITEMS)[number]["id"];
+type Inventory = Record<ItemId, number>;
+const EMPTY_INVENTORY: Inventory = { water: 0, snack: 0, shirt: 0 };
 type Mission = "available" | "active" | "completed";
 const SAVE_KEY = "cotonou-life-prototype03";
 function canWalk(x: number, z: number) {
@@ -37,7 +47,7 @@ function canWalk(x: number, z: number) {
   );
 }
 
-function Character({ keys, locked, onProximity, onDeliveryProximity }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void }) {
+function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProximity }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void }) {
   const group = useRef<Group>(null);
   const { camera } = useThree();
   const position = useRef(START.clone());
@@ -45,6 +55,7 @@ function Character({ keys, locked, onProximity, onDeliveryProximity }: { keys: R
   const desiredCamera = useRef(new Vector3());
   const wasNear = useRef(false);
   const wasNearDelivery = useRef(false);
+  const wasNearShop = useRef(false);
   useFrame((_, dt) => {
     if (!group.current) return;
     const input = locked.current ? EMPTY : keys.current;
@@ -73,6 +84,11 @@ function Character({ keys, locked, onProximity, onDeliveryProximity }: { keys: R
     if (nearDelivery !== wasNearDelivery.current) {
       wasNearDelivery.current = nearDelivery;
       onDeliveryProximity(nearDelivery);
+    }
+    const nearShop = position.current.distanceTo(SHOP_POSITION) <= SHOP_RADIUS;
+    if (nearShop !== wasNearShop.current) {
+      wasNearShop.current = nearShop;
+      onShopProximity(nearShop);
     }
     group.current.position.copy(position.current);
     // Fixed-angle follow camera; the character stays fully visible.
@@ -121,7 +137,7 @@ function Resident() {
   );
 }
 
-function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, mission }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; mission: Mission }) {
+function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, mission }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; mission: Mission }) {
   return <>
     <color attach="background" args={["#c9d9d5"]} />
     <fog attach="fog" args={["#c9d9d5", 17, 42]} />
@@ -163,13 +179,27 @@ function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, mission 
         </mesh>
       </group>
     )))}
+    <group position={[SHOP_POSITION.x,0,SHOP_POSITION.z]}>
+      <mesh position={[0,0.75,0]} castShadow>
+        <boxGeometry args={[1.45,1.5,0.65]} />
+        <meshStandardMaterial color="#c59869" />
+      </mesh>
+      <mesh position={[0,1.64,0]} castShadow>
+        <boxGeometry args={[1.85,0.18,0.92]} />
+        <meshStandardMaterial color="#375c51" />
+      </mesh>
+      <mesh position={[0,2.25,0]}>
+        <boxGeometry args={[1.5,0.42,0.12]} />
+        <meshStandardMaterial color="#f1e7d3" />
+      </mesh>
+    </group>
     <Resident />
     {mission === "active" && <group position={[DELIVERY_POSITION.x,0,DELIVERY_POSITION.z]}>
       <mesh position={[0,0.12,0]}><cylinderGeometry args={[0.8,0.8,0.05,32]} /><meshStandardMaterial color="#d4b269" emissive="#826329" emissiveIntensity={0.2} /></mesh>
       <mesh position={[0,1.25,0]}><boxGeometry args={[0.75,0.9,0.6]} /><meshStandardMaterial color="#5c7667" /></mesh>
       <mesh position={[0,2.3,0]}><octahedronGeometry args={[0.4]} /><meshBasicMaterial color="#f4d482" /></mesh>
     </group>}
-    <Character keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} />
+    <Character keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} />
   </>;
 }
 
@@ -178,6 +208,15 @@ export default function PlayPrototype() {
   const [isPaused, setPaused] = useState(false);
   const [mission, setMission] = useState<Mission>("available");
   const [wallet, setWallet] = useState(0);
+  const [inventory, setInventory] = useState<Inventory>({ ...EMPTY_INVENTORY });
+  const inventoryRef = useRef<Inventory>({ ...EMPTY_INVENTORY });
+  const walletRef = useRef(0);
+  const [shopOpen, setShopOpen] = useState(false);
+  const shopOpenRef = useRef(false);
+  const [nearShop, setNearShop] = useState(false);
+  const shopRef = useRef(false);
+  const [shopMessage, setShopMessage] = useState("");
+  const [bagOpen, setBagOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const missionRef = useRef<Mission>("available");
   const [nearDelivery, setNearDelivery] = useState(false);
@@ -192,7 +231,16 @@ export default function PlayPrototype() {
           if (state.mission === "available" || state.mission === "active" || state.mission === "completed") {
             missionRef.current = state.mission;
             setMission(state.mission);
-            if (typeof state.wallet === "number" && Number.isFinite(state.wallet) && state.wallet >= 0) setWallet(Math.floor(state.wallet));
+            if (typeof state.wallet === "number" && Number.isSafeInteger(state.wallet) && state.wallet >= 0) {
+              walletRef.current = state.wallet; setWallet(state.wallet);
+            }
+            if ("inventory" in data && data.inventory && typeof data.inventory === "object") {
+              const values = data.inventory as Record<string, unknown>;
+              const valid = Object.fromEntries(ITEMS.map(item => [item.id,
+                typeof values[item.id] === "number" && Number.isSafeInteger(values[item.id]) && values[item.id] >= 0 && values[item.id] <= 10000 ? values[item.id] : 0
+              ])) as Inventory;
+              inventoryRef.current = valid; setInventory(valid);
+            }
           }
         }
       }
@@ -200,8 +248,8 @@ export default function PlayPrototype() {
     setLoaded(true);
   }, []);
   useEffect(() => {
-    if (loaded) localStorage.setItem(SAVE_KEY, JSON.stringify({ mission, wallet }));
-  }, [loaded, mission, wallet]);
+    if (loaded) localStorage.setItem(SAVE_KEY, JSON.stringify({ mission, wallet, inventory }));
+  }, [loaded, mission, wallet, inventory]);
   function acceptMission() {
     if (!loaded || missionRef.current !== "available") return;
     missionRef.current = "active"; setMission("active"); closeDialogue();
@@ -210,8 +258,39 @@ export default function PlayPrototype() {
     if (!loaded || !deliveryRef.current || missionRef.current !== "active" || pausedRef.current || dialogueRef.current) return;
     missionRef.current = "completed";
     setMission("completed");
-    setWallet(value => value + 1500);
+    walletRef.current += 1500;
+    setWallet(walletRef.current);
   }
+  function openShop() {
+    if (!loaded || !shopRef.current || pausedRef.current || dialogueRef.current || shopOpenRef.current) return;
+    keys.current = { ...EMPTY }; shopOpenRef.current = true; locked.current = true;
+    setBagOpen(false); setShopMessage(""); setShopOpen(true);
+  }
+  function closeShop() {
+    shopOpenRef.current = false; setShopOpen(false); setShopMessage("");
+    locked.current = pausedRef.current || dialogueRef.current;
+  }
+  function purchase(id: ItemId) {
+    if (!loaded || !shopOpenRef.current || !shopRef.current) return;
+    const item = ITEMS.find(product => product.id === id);
+    if (!item || walletRef.current < item.price) {
+      setShopMessage("Solde insuffisant."); return;
+    }
+    if (inventoryRef.current[id] >= 10000) {
+      setShopMessage("Limite de stockage atteinte."); return;
+    }
+    walletRef.current -= item.price;
+    inventoryRef.current = { ...inventoryRef.current, [id]: inventoryRef.current[id] + 1 };
+    setWallet(walletRef.current);
+    setInventory(inventoryRef.current);
+    setShopMessage(`${item.name} ajouté à votre inventaire.`);
+  }
+  function toggleBag() {
+    if (!loaded || pausedRef.current || shopOpenRef.current || dialogueRef.current) return;
+    keys.current = { ...EMPTY };
+    setBagOpen(value => { locked.current = !value; return !value; });
+  }
+  const onShopProximity = (near: boolean) => { shopRef.current = near; setNearShop(near); };
   const [nearResident, setNearResident] = useState(false);
   const nearRef = useRef(false);
   const [dialogue, setDialogue] = useState(false);
@@ -231,9 +310,13 @@ export default function PlayPrototype() {
   useEffect(() => {
     const down = (event: KeyboardEvent) => {
       if (event.code === "KeyE" && !event.repeat) {
+        if (shopRef.current && !shopOpenRef.current && !dialogueRef.current && !pausedRef.current && !locked.current) {
+          event.preventDefault(); keys.current = { ...EMPTY }; shopOpenRef.current = true; locked.current = true;
+          setShopMessage(""); setShopOpen(true); return;
+        }
         if (deliveryRef.current && missionRef.current === "active" && !pausedRef.current && !dialogueRef.current) {
           event.preventDefault();
-          missionRef.current = "completed"; setMission("completed"); setWallet(value => value + 1500);
+          missionRef.current = "completed"; setMission("completed"); walletRef.current += 1500; setWallet(walletRef.current);
           return;
         }
         if (nearRef.current && !dialogueRef.current && !pausedRef.current) {
@@ -244,6 +327,10 @@ export default function PlayPrototype() {
           setDialogue(true);
         }
         return;
+      }
+      if (event.code === "Escape" && shopOpenRef.current) {
+        shopOpenRef.current = false; setShopOpen(false); setShopMessage("");
+        locked.current = pausedRef.current; return;
       }
       if (event.code === "Escape" && dialogueRef.current) {
         dialogueRef.current = false; setDialogue(false); locked.current = pausedRef.current;
@@ -275,16 +362,36 @@ export default function PlayPrototype() {
   return (
     <main className={styles.root}>
       <Canvas shadows dpr={[1,1.75]} camera={{ position:[6,5.5,8], fov:55, near:0.1, far:90 }} frameloop={isPaused ? "never" : "always"}>
-        <Neighborhood keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} mission={mission} />
+        <Neighborhood keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} mission={mission} />
       </Canvas>
       <header className={styles.header}>
-        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 03</span></div>
+        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 04</span></div>
         <a href="/">Retour à l’exposition ↗</a>
       </header>
       <aside className={styles.missionHud} aria-live="polite"><strong>{wallet.toLocaleString("fr-FR")} FCFA</strong><span>{mission === "available" ? "Nouvelle mission : parlez à Aïcha" : mission === "active" ? "Première course · Livrez au marqueur jaune" : "Première course terminée · +1 500 FCFA"}</span></aside>
+      <button type="button" className={styles.bagButton} onClick={toggleBag} disabled={shopOpen || dialogue || isPaused} aria-expanded={bagOpen}>Inventaire ({Object.values(inventory).reduce((a,b)=>a+b,0)})</button>
+      {bagOpen && <aside className={styles.bag} aria-label="Inventaire">
+        <h2>Mon inventaire</h2>
+        {ITEMS.map(item => <div key={item.id}><span>{item.name}</span><strong>× {inventory[item.id]}</strong></div>)}
+        <button type="button" onClick={toggleBag}>Fermer</button>
+      </aside>}
       <div className={styles.help}><strong>Explorer le quartier</strong><span>W A S D / flèches pour se déplacer</span><span>Approchez-vous du résident en orange, puis appuyez sur E.</span></div>
-      {nearResident && !dialogue && !isPaused && <button type="button" className={styles.interact} onClick={startDialogue}>E · Parler à Aïcha</button>}
-      {nearDelivery && mission === "active" && !dialogue && !isPaused && <button type="button" className={styles.deliver} onClick={deliver}>E · Livrer le colis</button>}
+      {nearShop && !dialogue && !shopOpen && !bagOpen && !isPaused && <button type="button" className={styles.shopPrompt} onClick={openShop}>E · Ouvrir la boutique</button>}
+      {shopOpen && <section className={styles.shopPanel} role="dialog" aria-modal="true" aria-labelledby="shop-heading">
+        <span className={styles.shopKicker}>COMMERCE DE QUARTIER</span>
+        <h2 id="shop-heading">La petite boutique</h2>
+        <p>Votre solde : <strong>{wallet.toLocaleString("fr-FR")} FCFA</strong></p>
+        <div className={styles.shopItems}>{ITEMS.map(item => <div className={styles.shopItem} key={item.id}>
+          <div><strong>{item.name}</strong><span>{item.description}</span></div>
+          <button type="button" disabled={!loaded || wallet < item.price} onClick={() => purchase(item.id)}>
+            {item.price.toLocaleString("fr-FR")} FCFA · Acheter
+          </button>
+        </div>)}</div>
+        <p aria-live="polite" className={styles.shopMessage}>{shopMessage}</p>
+        <button type="button" className={styles.closeShop} onClick={closeShop}>Quitter la boutique</button>
+      </section>}
+      {nearResident && !dialogue && !shopOpen && !bagOpen && !isPaused && <button type="button" className={styles.interact} onClick={startDialogue}>E · Parler à Aïcha</button>}
+      {nearDelivery && mission === "active" && !dialogue && !shopOpen && !bagOpen && !isPaused && <button type="button" className={styles.deliver} onClick={deliver}>E · Livrer le colis</button>}
       {dialogue && <section role="dialog" aria-modal="true" aria-labelledby="resident-name" className={styles.dialogue}>
         <span className={styles.dialogueEyebrow}>RENCONTRE · HABITANTE DU QUARTIER</span>
         <h2 id="resident-name">Aïcha</h2>
