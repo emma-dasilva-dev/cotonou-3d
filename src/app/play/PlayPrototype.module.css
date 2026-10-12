@@ -97,3 +97,14 @@
 .jumpButton{position:absolute;right:28px;bottom:36px;z-index:7;background:#e4c78b;color:#27332e;border:1px solid #8a764f;padding:12px 16px;font-weight:700;font-size:12px;cursor:pointer;touch-action:manipulation}
 .jumpButton:focus-visible{outline:3px solid #fff;outline-offset:3px}
 @media(max-width:640px){.jumpButton{right:12px;bottom:35px;padding:12px;font-size:11px}}
+
+
+/* Accessible night HUD: do not let the dark scene swallow the header text. */
+.nightMode .header{color:#fff9ed;text-shadow:0 2px 7px #081521,0 1px 2px #081521}
+.nightMode .header a{color:#fff9ed;background:#12263dcf;padding:8px 10px;text-decoration-thickness:1px}
+.nightMode .help,.nightMode .missionHud,.nightMode .timeSelector{background:#f7f0e7f5;color:#1b2a2a;border-color:#7c847d;box-shadow:0 5px 22px #09132066}
+.nightMode .help span,.nightMode .missionHud span{color:#293734}
+.nightMode .creatorButton,.nightMode .bagButton,.nightMode .travelButton{background:#f7f0e7;color:#172929;border-color:#7b827e;box-shadow:0 3px 15px #07132366}
+.nightMode .timeSelector span{color:#374842}
+.nightMode .shopPrompt,.nightMode .interact,.nightMode .deliver{box-shadow:0 5px 25px #07132399}
+.nightMode .jumpButton{background:#f1cc7f;color:#172929;border-color:#a2803c;box-shadow:0 3px 15px #07132366}
