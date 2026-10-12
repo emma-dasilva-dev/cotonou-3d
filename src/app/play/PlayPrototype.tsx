@@ -26,6 +26,7 @@ const NPC_POSITION = new Vector3(0, 0, -5.5);
 const TALK_RADIUS = 1.8;
 function canWalk(x: number, z: number) {
   if (Math.abs(x) > 10.8 || Math.abs(z) > 10.8) return false;
+  if (Math.hypot(x - NPC_POSITION.x, z - NPC_POSITION.z) < 0.56) return false;
   return !BUILDINGS.some(b =>
     Math.abs(x - b.x) < b.width / 2 + 0.34 &&
     Math.abs(z - b.z) < b.depth / 2 + 0.34
