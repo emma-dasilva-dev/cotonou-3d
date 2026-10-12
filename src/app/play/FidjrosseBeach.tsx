@@ -2,23 +2,27 @@
 
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
-import type { Mesh } from "three";
+import type { Group, Mesh } from "three";
 import type { TimeOfDay } from "./StreetAtmosphere";
 
 function Atlantic() {
+  const foam = useRef<Group>(null);
   const water = useRef<Mesh>(null);
   useFrame(({ clock }) => {
     if (water.current) water.current.position.y = -0.12 + Math.sin(clock.elapsedTime * 1.15) * 0.055;
+    if (foam.current) foam.current.position.z = Math.sin(clock.elapsedTime * 0.7) * 0.45;
   });
   return <group>
     <mesh ref={water} position={[0, -0.12, -23]} receiveShadow>
       <boxGeometry args={[60, 0.18, 37]} />
       <meshStandardMaterial color="#317d91" roughness={0.44} metalness={0.08} />
     </mesh>
+    <group ref={foam}>
     {[-5.5, -7.5, -10].map((z, i) => <mesh key={z} position={[0, 0.025, z]}>
       <boxGeometry args={[34 - i * 2, 0.018, 0.14]} />
       <meshBasicMaterial color="#e2efe2" transparent opacity={0.65 - i * 0.12} />
     </mesh>)}
+    </group>
   </group>;
 }
 
@@ -61,6 +65,26 @@ function BeachHut({ x, z, color }: { x: number; z: number; color: string }) {
   </group>;
 }
 
+
+function Beachgoer({ x, z, shirt, walking, phase }: { x: number; z: number; shirt: string; walking: boolean; phase: number }) {
+  const root = useRef<Group>(null);
+  useFrame(({ clock }) => {
+    if (!root.current || !walking) return;
+    const t = clock.elapsedTime * 0.35 + phase;
+    root.current.position.x = x + Math.sin(t) * 2;
+    root.current.position.z = z + Math.cos(t) * 0.65;
+    root.current.rotation.y = Math.cos(t) > 0 ? Math.PI / 2 : -Math.PI / 2;
+  });
+  return <group ref={root} position={[x, 0, z]}>
+    <mesh position={[0, 0.95, 0]} castShadow><capsuleGeometry args={[0.23, 0.83, 6, 10]} /><meshStandardMaterial color={shirt} /></mesh>
+    <mesh position={[0, 1.75, 0]} castShadow><sphereGeometry args={[0.23, 12, 10]} /><meshStandardMaterial color="#966747" /></mesh>
+    <mesh position={[0, 1.95, 0]}><sphereGeometry args={[0.2, 12, 8]} /><meshStandardMaterial color="#29231f" /></mesh>
+    {[-0.13,0.13].map(side => <mesh key={side} position={[side,0.28,0]} castShadow>
+      <capsuleGeometry args={[0.085,0.36,4,8]} /><meshStandardMaterial color="#404c53" />
+    </mesh>)}
+  </group>;
+}
+
 export function FidjrosseBeach({ time }: { time: TimeOfDay }) {
   const night = time === "night";
   const sky = night ? "#1d3047" : time === "sunset" ? "#e5a18b" : "#a8d8df";
@@ -74,6 +98,10 @@ export function FidjrosseBeach({ time }: { time: TimeOfDay }) {
       <meshStandardMaterial color="#cfb287" roughness={1} />
     </mesh>
     <Atlantic />
+    {/* Naturalistic shoreline layers remain on the sand side of the walk boundary. */}
+    {[-3,-2,-1].map((z,i) => <mesh key={z} position={[0,0.024+i*0.002,z]} rotation={[-Math.PI/2,0,0]}>
+      <planeGeometry args={[34-i*1.5,0.17]} /><meshBasicMaterial color="#efe0bd" transparent opacity={0.4+i*0.12} />
+    </mesh>)}
     <mesh position={[0, 0.035, 13]} rotation={[-Math.PI / 2, 0, 0]}>
       <planeGeometry args={[38, 3.2]} />
       <meshStandardMaterial color="#b49b76" />
@@ -101,6 +129,10 @@ export function FidjrosseBeach({ time }: { time: TimeOfDay }) {
         <meshStandardMaterial color="#785b44" />
       </mesh>
     </group>
+    <Beachgoer x={-5} z={5} shirt="#cf795a" walking={false} phase={0} />
+    {!night && <Beachgoer x={2} z={4} shirt="#3a8695" walking phase={0} />}
+    {!night && <Beachgoer x={-3} z={9} shirt="#d1aa4b" walking phase={2} />}
+    {time === "afternoon" && <Beachgoer x={9} z={9} shirt="#6d6c94" walking phase={4} />}
     {night && <pointLight position={[9,3,3]} intensity={6} color="#ffcb84" distance={10} />}
   </>;
 }
