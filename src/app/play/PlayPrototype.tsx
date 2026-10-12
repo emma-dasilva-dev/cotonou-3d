@@ -16,8 +16,8 @@ import { APPEARANCE_KEY, DEFAULT_APPEARANCE, HAIR_COLORS, HAIRSTYLES, OUTFIT_COL
 import type { Appearance } from "./appearance";
 
 type Key = "forward" | "backward" | "left" | "right";
-type Controls = Record<Key, boolean> & { run: boolean };
-const EMPTY: Controls = { forward: false, backward: false, left: false, right: false, run: false };
+type Controls = Record<Key, boolean> & { run: boolean; jump: boolean };
+const EMPTY: Controls = { forward: false, backward: false, left: false, right: false, run: false, jump: false };
 const KEY_MAP: Record<string, Key> = {
   KeyW: "forward", ArrowUp: "forward",
   KeyS: "backward", ArrowDown: "backward",
@@ -77,6 +77,8 @@ function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProxi
   const desiredCamera = useRef(new Vector3());
   const velocity = useRef(new Vector3());
   const speed = useRef(0);
+  const jumpHeight = useRef(0);
+  const jumpVelocity = useRef(0);
   const wasNear = useRef(false);
   const wasNearDelivery = useRef(false);
   const wasNearShop = useRef(false);
@@ -130,7 +132,15 @@ function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProxi
     if (secondNear !== wasNearSecond.current) { wasNearSecond.current = secondNear; onSecondProximity(secondNear); }
     const nearHelp = zone === "quartier" && position.current.distanceTo(HELP_TARGET) <= HELP_RADIUS;
     if (nearHelp !== wasNearHelp.current) { wasNearHelp.current = nearHelp; onHelpProximity(nearHelp); }
+    if (!locked.current && input.jump && jumpHeight.current <= 0) jumpVelocity.current = 6.6;
+    input.jump = false;
+    if (jumpVelocity.current !== 0 || jumpHeight.current > 0) {
+      jumpHeight.current += jumpVelocity.current * step;
+      jumpVelocity.current -= 17 * step;
+      if (jumpHeight.current <= 0) { jumpHeight.current = 0; jumpVelocity.current = 0; }
+    }
     group.current.position.copy(position.current);
+    group.current.position.y = jumpHeight.current;
     // Fixed-angle follow camera; the character stays fully visible.
     desiredCamera.current.set(position.current.x + 6, 5.5, position.current.z + 8);
     camera.position.lerp(desiredCamera.current, 1 - Math.exp(-5 * dt));
@@ -481,6 +491,7 @@ export default function PlayPrototype() {
         dialogueRef.current = false; setDialogue(false); locked.current = pausedRef.current;
         return;
       }
+      if (event.code === "Space" && !event.repeat) { event.preventDefault(); if (!locked.current) keys.current.jump = true; return; }
       if (event.code === "ShiftLeft" || event.code === "ShiftRight") { keys.current.run = true; return; }
       const key = KEY_MAP[event.code];
       if (key) { event.preventDefault(); if (!event.repeat && !locked.current && !creatorOpenRef.current) keys.current[key] = true; }
@@ -573,7 +584,7 @@ export default function PlayPrototype() {
         {ITEMS.map(item => <div key={item.id}><span>{item.name}</span><strong>× {inventory[item.id]}</strong></div>)}
         <button type="button" onClick={toggleBag}>Fermer</button>
       </aside>}
-      <div className={styles.help}><strong>{zone === "fidjrosse" ? "Plage de Fidjrossè" : "Explorer le quartier"}</strong><span>W A S D / flèches · Maj pour courir</span><span>{zone === "fidjrosse" ? "Explorez la plage · Voyager pour revenir au quartier." : helpStep === "active" ? "Kossi : récupérer les fournitures au marqueur doré à l’ouest." : helpStep === "return" ? "Kossi : lui rapporter les fournitures au sud." : "Parlez à Aïcha au nord ou à Kossi au sud avec E."}</span></div>
+      <div className={styles.help}><strong>{zone === "fidjrosse" ? "Plage de Fidjrossè" : "Explorer le quartier"}</strong><span>W A S D / flèches · Maj courir · Espace sauter</span><span>{zone === "fidjrosse" ? "Explorez la plage · Voyager pour revenir au quartier." : helpStep === "active" ? "Kossi : récupérer les fournitures au marqueur doré à l’ouest." : helpStep === "return" ? "Kossi : lui rapporter les fournitures au sud." : "Parlez à Aïcha au nord ou à Kossi au sud avec E."}</span></div>
       {helpNear && helpStep === "active" && !creatorOpen && !secondOpen && !shopOpen && !dialogue && !bagOpen && !isPaused && <button type="button" className={styles.deliver} onClick={collectSupplies}>E · Récupérer les fournitures</button>}
       {nearSecond && !secondOpen && !shopOpen && !dialogue && !creatorOpen && !bagOpen && !isPaused && <button type="button" className={styles.shopPrompt} onClick={openSecond}>E · Parler à Kossi</button>}
       {secondOpen && <section className={styles.dialogue} role="dialog" aria-modal="true" aria-labelledby="kossi-name">
@@ -608,6 +619,7 @@ export default function PlayPrototype() {
         <button type="button" onClick={closeDialogue} autoFocus={mission !== "available"}>{mission === "available" ? "Pas maintenant" : "Fermer"}</button>
       </section>}
       <button className={styles.pause} type="button" onClick={togglePause} aria-pressed={isPaused}>{isPaused ? "Reprendre" : "Pause"}</button>
+      <button type="button" className={styles.jumpButton} onPointerDown={() => { if (!locked.current) keys.current.jump = true; }}>Sauter ↑</button>
       <div className={styles.pad} aria-label="Commandes tactiles">
         {(["forward","left","backward","right"] as Key[]).map(key => (
           <button type="button" key={key} className={styles[key]} aria-label={key} onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);move(key,true);}} onPointerUp={()=>move(key,false)} onPointerCancel={()=>move(key,false)} onLostPointerCapture={()=>move(key,false)}>
