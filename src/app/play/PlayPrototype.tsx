@@ -214,19 +214,19 @@ export default function PlayPrototype() {
     try {
       const stored = localStorage.getItem(APPEARANCE_KEY);
       if (stored) setAppearance(validateAppearance(JSON.parse(stored)));
-      else { creatorOpenRef.current = true; setCreatorOpen(true); }
+      else { creatorOpenRef.current = true; locked.current = true; setCreatorOpen(true); }
     } catch { creatorOpenRef.current = true; setCreatorOpen(true); }
     setAppearanceLoaded(true);
   }, []);
   useEffect(() => {
     if (appearanceLoaded) localStorage.setItem(APPEARANCE_KEY, JSON.stringify(appearance));
   }, [appearance, appearanceLoaded]);
-  function closeCreator() { creatorOpenRef.current = false; setCreatorOpen(false); }
+  function closeCreator() { creatorOpenRef.current = false; setCreatorOpen(false); locked.current = pausedRef.current; }
   function openCreator() {
     if (!appearanceLoaded || pausedRef.current || shopOpenRef.current || dialogueRef.current) return;
     keys.current = { ...EMPTY };
     setBagOpen(false);
-    creatorOpenRef.current = true; setCreatorOpen(true);
+    creatorOpenRef.current = true; locked.current = true; setCreatorOpen(true);
   }
   function updateAppearance(patch: Partial<Appearance>) {
     setAppearance(value => ({ ...value, ...patch }));
@@ -354,7 +354,7 @@ export default function PlayPrototype() {
         }
         return;
       }
-      if (event.code === "Escape" && creatorOpenRef.current) { setCreatorOpen(false); return; }
+      if (event.code === "Escape" && creatorOpenRef.current) { creatorOpenRef.current = false; setCreatorOpen(false); locked.current = pausedRef.current; return; }
       if (event.code === "Escape" && shopOpenRef.current) {
         shopOpenRef.current = false; setShopOpen(false); setShopMessage("");
         locked.current = pausedRef.current; return;
@@ -364,7 +364,7 @@ export default function PlayPrototype() {
         return;
       }
       const key = KEY_MAP[event.code];
-      if (key) { event.preventDefault(); if (!event.repeat && !locked.current) keys.current[key] = true; }
+      if (key) { event.preventDefault(); if (!event.repeat && !locked.current && !creatorOpenRef.current) keys.current[key] = true; }
     };
     const up = (event: KeyboardEvent) => {
       const key = KEY_MAP[event.code];
