@@ -4,6 +4,8 @@ import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import type { Group, Mesh } from "three";
 import type { TimeOfDay } from "./StreetAtmosphere";
+import { PlayerAvatar } from "./PlayerAvatar";
+import type { Appearance } from "./appearance";
 
 function Atlantic() {
   const foam = useRef<Group>(null);
@@ -68,21 +70,23 @@ function BeachHut({ x, z, color }: { x: number; z: number; color: string }) {
 
 function Beachgoer({ x, z, shirt, walking, phase }: { x: number; z: number; shirt: string; walking: boolean; phase: number }) {
   const root = useRef<Group>(null);
+  const speed = useRef(0);
+  const appearances: Appearance[] = [
+    {body:"feminine",skin:1,hair:0,outfit:2,hairstyle:"afro"},
+    {body:"masculine",skin:2,hair:1,outfit:1,hairstyle:"short"},
+    {body:"feminine",skin:3,hair:0,outfit:3,hairstyle:"bun"},
+    {body:"masculine",skin:0,hair:0,outfit:4,hairstyle:"short"},
+  ];
+  const selected = appearances[shirt === "#cf795a" ? 0 : shirt === "#3a8695" ? 1 : shirt === "#d1aa4b" ? 2 : 3];
   useFrame(({ clock }) => {
     if (!root.current || !walking) return;
     const t = clock.elapsedTime * 0.35 + phase;
     root.current.position.x = x + Math.sin(t) * 2;
     root.current.position.z = z + Math.cos(t) * 0.65;
     root.current.rotation.y = Math.cos(t) > 0 ? Math.PI / 2 : -Math.PI / 2;
+    speed.current = 1.3;
   });
-  return <group ref={root} position={[x, 0, z]}>
-    <mesh position={[0, 0.95, 0]} castShadow><capsuleGeometry args={[0.23, 0.83, 6, 10]} /><meshStandardMaterial color={shirt} /></mesh>
-    <mesh position={[0, 1.75, 0]} castShadow><sphereGeometry args={[0.23, 12, 10]} /><meshStandardMaterial color="#966747" /></mesh>
-    <mesh position={[0, 1.95, 0]}><sphereGeometry args={[0.2, 12, 8]} /><meshStandardMaterial color="#29231f" /></mesh>
-    {[-0.13,0.13].map(side => <mesh key={side} position={[side,0.28,0]} castShadow>
-      <capsuleGeometry args={[0.085,0.36,4,8]} /><meshStandardMaterial color="#404c53" />
-    </mesh>)}
-  </group>;
+  return <group ref={root} position={[x, 0, z]}><PlayerAvatar appearance={selected} speed={speed} /></group>;
 }
 
 export function FidjrosseBeach({ time }: { time: TimeOfDay }) {
@@ -107,6 +111,17 @@ export function FidjrosseBeach({ time }: { time: TimeOfDay }) {
       <meshStandardMaterial color="#b49b76" />
     </mesh>
     {[[-13, 10], [-8, 16], [9, 12], [14, 17]].map(([x,z],i) => <Palm key={i} x={x} z={z} height={3.6+i*0.3} />)}
+    {/* Refreshment kiosks, beach seating and shaded outdoor gathering spaces. */}
+    {[-12,12].map((x,i)=><group key={x} position={[x,0,8]}>
+      <mesh position={[0,0.85,0]} castShadow><boxGeometry args={[2.6,1.7,1.4]}/><meshStandardMaterial color={i?"#a57954":"#c39c6d"}/></mesh>
+      <mesh position={[0,1.85,0]} castShadow><boxGeometry args={[3,0.25,1.8]}/><meshStandardMaterial color={i?"#4f8982":"#b87357"}/></mesh>
+      {[-0.8,0,0.8].map(pos=><mesh key={pos} position={[pos,1.6,0.74]}><boxGeometry args={[0.22,0.26,0.18]}/><meshStandardMaterial color={i?"#d8b74b":"#79a46b"}/></mesh>)}
+    </group>)}
+    {[-7,-3,3,7].map((x,i)=><group key={x} position={[x,0,11]}>
+      <mesh position={[0,0.56,0]} castShadow><cylinderGeometry args={[0.7,0.7,0.12,10]}/><meshStandardMaterial color="#8f7252"/></mesh>
+      <mesh position={[0,0.3,0]}><cylinderGeometry args={[0.075,0.08,0.55,8]}/><meshStandardMaterial color="#695d4a"/></mesh>
+      {[-1,1].map(dir=><mesh key={dir} position={[dir*1.15,0.26,0]} rotation={[0,0,dir*0.08]} castShadow><boxGeometry args={[0.62,0.25,0.7]}/><meshStandardMaterial color={i%2?"#6a9a93":"#c18b59"}/></mesh>)}
+    </group>)}
     <BeachHut x={-9} z={1} color="#ab8051" />
     <BeachHut x={9} z={3} color="#987d55" />
     {[[-2,2,"#cc6b4f"],[4,0,"#dfbc5d"]].map(([x,z,c],i) => <group key={i} position={[Number(x),0,Number(z)]}>
