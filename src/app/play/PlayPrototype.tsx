@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Vector3 } from "three";
 import type { Group } from "three";
 import styles from "./PlayPrototype.module.css";
+import { PlayerAvatar } from "./PlayerAvatar";
 
 type Key = "forward" | "backward" | "left" | "right";
 type Controls = Record<Key, boolean>;
@@ -53,6 +54,8 @@ function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProxi
   const position = useRef(START.clone());
   const direction = useRef(new Vector3());
   const desiredCamera = useRef(new Vector3());
+  const velocity = useRef(new Vector3());
+  const speed = useRef(0);
   const wasNear = useRef(false);
   const wasNearDelivery = useRef(false);
   const wasNearShop = useRef(false);
@@ -62,18 +65,28 @@ function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProxi
     const horizontal = Number(input.right) - Number(input.left);
     const vertical = Number(input.backward) - Number(input.forward);
     direction.current.set(horizontal, 0, vertical);
-    const moving = direction.current.lengthSq() > 0;
-    if (moving) {
-      direction.current.normalize();
-      const step = Math.min(dt, 0.05) * 3.6;
-      const nextX = position.current.x + direction.current.x * step;
-      const nextZ = position.current.z + direction.current.z * step;
-      // Resolve axes separately to slide along walls and corners.
-      if (canWalk(nextX, position.current.z)) position.current.x = nextX;
-      if (canWalk(position.current.x, nextZ)) position.current.z = nextZ;
-      const face = Math.atan2(direction.current.x, direction.current.z);
+    if (direction.current.lengthSq() > 0) direction.current.normalize();
+    const step = Math.min(dt, 0.05);
+    const targetX = direction.current.x * 3.6;
+    const targetZ = direction.current.z * 3.6;
+    const ease = 1 - Math.exp(-(locked.current ? 20 : 11) * step);
+    velocity.current.x += (targetX - velocity.current.x) * ease;
+    velocity.current.z += (targetZ - velocity.current.z) * ease;
+    const oldX = position.current.x;
+    const oldZ = position.current.z;
+    const nextX = oldX + velocity.current.x * step;
+    const nextZ = oldZ + velocity.current.z * step;
+    if (canWalk(nextX, oldZ)) position.current.x = nextX;
+    else velocity.current.x = 0;
+    if (canWalk(position.current.x, nextZ)) position.current.z = nextZ;
+    else velocity.current.z = 0;
+    const deltaX = position.current.x - oldX;
+    const deltaZ = position.current.z - oldZ;
+    speed.current = Math.hypot(deltaX, deltaZ) / Math.max(step, 0.0001);
+    if (speed.current > 0.08) {
+      const face = Math.atan2(deltaX, deltaZ);
       const turn = Math.atan2(Math.sin(face - group.current.rotation.y), Math.cos(face - group.current.rotation.y));
-      group.current.rotation.y += turn * Math.min(1, dt * 12);
+      group.current.rotation.y += turn * (1 - Math.exp(-12 * step));
     }
     const near = position.current.distanceTo(NPC_POSITION) <= TALK_RADIUS;
     if (near !== wasNear.current) {
@@ -96,22 +109,7 @@ function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProxi
     camera.position.lerp(desiredCamera.current, 1 - Math.exp(-5 * dt));
     camera.lookAt(position.current.x, 1.1, position.current.z);
   });
-  return (
-    <group ref={group}>
-      <mesh position={[0, 1.02, 0]} castShadow>
-        <capsuleGeometry args={[0.32, 1.08, 6, 12]} />
-        <meshStandardMaterial color="#263c4c" roughness={0.8} />
-      </mesh>
-      <mesh position={[0, 1.92, 0]} castShadow>
-        <sphereGeometry args={[0.28, 14, 10]} />
-        <meshStandardMaterial color="#9d6e50" />
-      </mesh>
-      <mesh position={[0, 1.25, 0.30]}>
-        <boxGeometry args={[0.22, 0.18, 0.06]} />
-        <meshStandardMaterial color="#e6e1d5" />
-      </mesh>
-    </group>
-  );
+  return <group ref={group}><PlayerAvatar speed={speed} /></group>;
 }
 
 function Resident() {
@@ -365,7 +363,7 @@ export default function PlayPrototype() {
         <Neighborhood keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} mission={mission} />
       </Canvas>
       <header className={styles.header}>
-        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 04</span></div>
+        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 05</span></div>
         <a href="/">Retour à l’exposition ↗</a>
       </header>
       <aside className={styles.missionHud} aria-live="polite"><strong>{wallet.toLocaleString("fr-FR")} FCFA</strong><span>{mission === "available" ? "Nouvelle mission : parlez à Aïcha" : mission === "active" ? "Première course · Livrez au marqueur jaune" : "Première course terminée · +1 500 FCFA"}</span></aside>
