@@ -17,3 +17,26 @@
 .deliver:focus-visible{outline:3px solid white;outline-offset:3px}
 .dialogue button+button{margin-left:10px;background:transparent;color:#303b38;border:1px solid #7a8078}
 @media(max-width:640px){.missionHud{top:91px;left:12px;max-width:225px;padding:10px}.missionHud strong{font-size:16px}.missionHud span{font-size:10px}.deliver{bottom:135px;font-size:12px}.dialogue button+button{margin-left:6px}}
+
+
+.bagButton{position:absolute;top:92px;right:28px;border:1px solid #686b60;background:#efe9dd;color:#28302b;padding:12px 16px;cursor:pointer;font-size:12px}
+.bagButton:disabled{opacity:.55;cursor:not-allowed}
+.bag{position:absolute;right:28px;top:145px;width:265px;padding:18px;background:#efe9dd;border:1px solid #a59c88;box-shadow:0 12px 28px #0002;z-index:8}
+.bag h2{font-size:17px;margin:0 0 16px}
+.bag div{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid #c3b9a5;font-size:12px}
+.bag button,.closeShop{margin-top:16px;background:#303b38;color:white;border:0;padding:11px 15px;cursor:pointer}
+.shopPrompt{position:absolute;left:50%;bottom:155px;transform:translateX(-50%);background:#efe9dd;color:#29312d;border:1px solid #7c806c;padding:12px 17px;cursor:pointer;white-space:nowrap;font-size:13px;font-weight:600}
+.shopPanel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(550px,calc(100% - 28px));max-height:calc(100dvh - 32px);overflow-y:auto;background:#f0e9dc;border:1px solid #a49a87;box-shadow:0 24px 65px #0005;padding:27px 30px;color:#272d29;z-index:14;touch-action:pan-y}
+.shopKicker{font-size:10px;letter-spacing:.17em;color:#757063}
+.shopPanel h2{font-size:28px;letter-spacing:-.045em;margin:9px 0 8px;font-weight:650}
+.shopPanel>p{font-size:13px;margin:0 0 16px}
+.shopItems{border-top:1px solid #b8ad9e}
+.shopItem{display:flex;justify-content:space-between;align-items:center;gap:18px;border-bottom:1px solid #c8beac;padding:15px 0}
+.shopItem div{display:flex;flex-direction:column;gap:5px}
+.shopItem strong{font-size:14px}
+.shopItem span{font-size:12px;color:#69695f;line-height:1.45}
+.shopItem button{flex-shrink:0;border:0;background:#315a4c;color:white;padding:12px;cursor:pointer;font-size:12px}
+.shopItem button:disabled{opacity:.4;cursor:not-allowed}
+.shopPanel .shopMessage{margin:12px 0 0;min-height:20px;color:#315a4c}
+.shopPanel button:focus-visible,.shopPrompt:focus-visible,.bagButton:focus-visible,.bag button:focus-visible{outline:3px solid #967d47;outline-offset:2px}
+@media(max-width:640px){.bagButton{top:90px;right:12px;padding:9px;font-size:11px}.bag{right:12px;top:132px;width:220px}.shopPanel{padding:20px}.shopItem{align-items:flex-start;flex-direction:column;gap:10px}.shopItem button{width:100%}.shopPrompt{bottom:185px;font-size:11px}}
