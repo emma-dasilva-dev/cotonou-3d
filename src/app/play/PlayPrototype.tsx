@@ -24,6 +24,10 @@ const BUILDINGS = [
   { x: 5, z: -4, width: 3.6, depth: 3.8, height: 4.7, color: "#b5b1a5" },
   { x: -5.5, z: 4.5, width: 3.8, depth: 3, height: 2.7, color: "#b6a17c" },
   { x: 5, z: 5, width: 4, depth: 3, height: 3.5, color: "#acb5a7" },
+  { x: -12.7, z: -5.4, width: 3.2, depth: 5, height: 4.2, color: "#d6b99a" },
+  { x: 12.7, z: 5.4, width: 3.2, depth: 5, height: 3.6, color: "#b5bca7" },
+  { x: -12.6, z: 6, width: 3.5, depth: 3.6, height: 3.2, color: "#a8b4be" },
+  { x: 12.4, z: -6, width: 3.4, depth: 4, height: 4.5, color: "#bdaf9c" },
 ];
 const START = new Vector3(0, 0, 0);
 const NPC_POSITION = new Vector3(0, 0, -5.5);
@@ -35,6 +39,8 @@ const SHOP_RADIUS = 1.8;
 const SECOND_NPC = new Vector3(-0.65,0,9);
 const SECOND_RADIUS = 1.7;
 const HELP_KEY = "cotonou-life-proto11-community-help";
+const HELP_TARGET = new Vector3(-11, 0, 0);
+const HELP_RADIUS = 1.7;
 const ITEMS = [
   { id: "water", name: "Eau fraîche", price: 250, description: "Une bouteille d’eau pour la route." },
   { id: "snack", name: "Petit goûter", price: 500, description: "Une pause gourmande dans le quartier." },
@@ -46,7 +52,7 @@ const EMPTY_INVENTORY: Inventory = { water: 0, snack: 0, shirt: 0 };
 type Mission = "available" | "active" | "completed";
 const SAVE_KEY = "cotonou-life-prototype03";
 function canWalk(x: number, z: number) {
-  if (Math.abs(x) > 10.8 || Math.abs(z) > 10.8) return false;
+  if (Math.abs(x) > 17.5 || Math.abs(z) > 17.5) return false;
   if (Math.hypot(x - NPC_POSITION.x, z - NPC_POSITION.z) < 0.56) return false;
   if (Math.hypot(x - SECOND_NPC.x, z - SECOND_NPC.z) < 0.55) return false;
   return !BUILDINGS.some(b =>
@@ -55,7 +61,7 @@ function canWalk(x: number, z: number) {
   );
 }
 
-function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, onSecondProximity, appearance }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; onSecondProximity: (near: boolean) => void; appearance: Appearance }) {
+function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, onSecondProximity, onHelpProximity, appearance }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; onSecondProximity: (near: boolean) => void; onHelpProximity: (near: boolean) => void; appearance: Appearance }) {
   const group = useRef<Group>(null);
   const { camera } = useThree();
   const position = useRef(START.clone());
@@ -67,6 +73,7 @@ function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProxi
   const wasNearDelivery = useRef(false);
   const wasNearShop = useRef(false);
   const wasNearSecond = useRef(false);
+  const wasNearHelp = useRef(false);
   useFrame((_, dt) => {
     if (!group.current) return;
     const input = locked.current ? EMPTY : keys.current;
@@ -113,6 +120,8 @@ function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProxi
     }
     const secondNear = position.current.distanceTo(SECOND_NPC) <= SECOND_RADIUS;
     if (secondNear !== wasNearSecond.current) { wasNearSecond.current = secondNear; onSecondProximity(secondNear); }
+    const nearHelp = position.current.distanceTo(HELP_TARGET) <= HELP_RADIUS;
+    if (nearHelp !== wasNearHelp.current) { wasNearHelp.current = nearHelp; onHelpProximity(nearHelp); }
     group.current.position.copy(position.current);
     // Fixed-angle follow camera; the character stays fully visible.
     desiredCamera.current.set(position.current.x + 6, 5.5, position.current.z + 8);
@@ -145,22 +154,22 @@ function Resident() {
   );
 }
 
-function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, onSecondProximity, mission, appearance }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; onSecondProximity: (near: boolean) => void; mission: Mission; appearance: Appearance }) {
+function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, onSecondProximity, onHelpProximity, mission, helpStep, appearance }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; onSecondProximity: (near: boolean) => void; onHelpProximity: (near: boolean) => void; mission: Mission; helpStep: "available" | "active" | "return" | "done"; appearance: Appearance }) {
   return <>
     <color attach="background" args={["#c9d9d5"]} />
     <fog attach="fog" args={["#c9d9d5", 17, 42]} />
     <ambientLight intensity={1.5} />
     <directionalLight position={[5, 13, 7]} intensity={2.1} castShadow shadow-mapSize={[1024, 1024]} />
     <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-      <planeGeometry args={[24, 24]} />
+      <planeGeometry args={[38, 38]} />
       <meshStandardMaterial color="#b7ad96" />
     </mesh>
     <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-      <planeGeometry args={[4.5, 23]} />
+      <planeGeometry args={[4.5, 37]} />
       <meshStandardMaterial color="#636766" />
     </mesh>
     <mesh position={[0, 0.019, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-      <planeGeometry args={[23, 3.2]} />
+      <planeGeometry args={[37, 3.2]} />
       <meshStandardMaterial color="#636766" />
     </mesh>
     {BUILDINGS.map((b,i) => (
@@ -175,7 +184,7 @@ function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopPr
         </mesh>
       </group>
     ))}
-    {[-9,9].map(x => [-9,9].map(z => (
+    {[-16,16].map(x => [-16,16].map(z => (
       <group key={`${x}-${z}`} position={[x,0,z]}>
         <mesh position={[0,1.2,0]} castShadow>
           <cylinderGeometry args={[0.12,0.18,2.4,7]} />
@@ -220,13 +229,18 @@ function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopPr
       <mesh position={[0,2.28,0]}><sphereGeometry args={[0.2,12,10]} /><meshStandardMaterial color="#25211f" /></mesh>
       <mesh position={[0,2.79,0]}><sphereGeometry args={[0.24,12,10]} /><meshBasicMaterial color="#fcf2da" /></mesh>
     </group>
+    {helpStep === "active" && <group position={[HELP_TARGET.x,0,HELP_TARGET.z]}>
+      <mesh position={[0,0.08,0]}><cylinderGeometry args={[0.72,0.72,0.06,24]} /><meshStandardMaterial color="#d6b276" /></mesh>
+      <mesh position={[0,0.55,0]}><boxGeometry args={[0.9,1.05,0.65]} /><meshStandardMaterial color="#bc8d65" /></mesh>
+      <mesh position={[0,1.27,0]}><octahedronGeometry args={[0.32]} /><meshBasicMaterial color="#fff0b4" /></mesh>
+    </group>}
     <Resident />
     {mission === "active" && <group position={[DELIVERY_POSITION.x,0,DELIVERY_POSITION.z]}>
       <mesh position={[0,0.12,0]}><cylinderGeometry args={[0.8,0.8,0.05,32]} /><meshStandardMaterial color="#d4b269" emissive="#826329" emissiveIntensity={0.2} /></mesh>
       <mesh position={[0,1.25,0]}><boxGeometry args={[0.75,0.9,0.6]} /><meshStandardMaterial color="#5c7667" /></mesh>
       <mesh position={[0,2.3,0]}><octahedronGeometry args={[0.4]} /><meshBasicMaterial color="#f4d482" /></mesh>
     </group>}
-    <Character keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} onSecondProximity={onSecondProximity} appearance={appearance} />
+    <Character keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} onSecondProximity={onSecondProximity} onHelpProximity={onHelpProximity} appearance={appearance} />
   </>;
 }
 
@@ -261,17 +275,28 @@ export default function PlayPrototype() {
   }
   const [mission, setMission] = useState<Mission>("available");
   const [wallet, setWallet] = useState(0);
-  const [helpDone, setHelpDone] = useState(false);
-  const helpDoneRef = useRef(false);
+  const [helpStep, setHelpStep] = useState<"available" | "active" | "return" | "done">("available");
+  const helpStepRef = useRef<"available" | "active" | "return" | "done">("available");
+  const helpNearRef = useRef(false);
+  const [helpNear, setHelpNear] = useState(false);
   const [secondOpen, setSecondOpen] = useState(false);
   const secondOpenRef = useRef(false);
   const [nearSecond, setNearSecond] = useState(false);
   const secondNearRef = useRef(false);
   useEffect(() => {
-    try { if (localStorage.getItem(HELP_KEY) === "done") { helpDoneRef.current = true; setHelpDone(true); } }
+    try { const saved = localStorage.getItem(HELP_KEY); if (saved === "done" || saved === "active" || saved === "return") { helpStepRef.current = saved; setHelpStep(saved); } }
     catch { /* Storage may be unavailable. */ }
   }, []);
   const onSecondProximity = (near: boolean) => { secondNearRef.current = near; setNearSecond(near); };
+  const onHelpProximity = (near: boolean) => { helpNearRef.current = near; setHelpNear(near); };
+  function setCommunityStep(step: "available" | "active" | "return" | "done") {
+    helpStepRef.current = step; setHelpStep(step);
+    try { localStorage.setItem(HELP_KEY,step); } catch { /* Offline save unavailable. */ }
+  }
+  function collectSupplies() {
+    if (!loaded || !helpNearRef.current || helpStepRef.current !== "active" || locked.current) return;
+    setCommunityStep("return");
+  }
   function closeSecond() {
     secondOpenRef.current = false; setSecondOpen(false); locked.current = pausedRef.current;
   }
@@ -280,10 +305,15 @@ export default function PlayPrototype() {
     keys.current = { ...EMPTY }; secondOpenRef.current = true; locked.current = true; setSecondOpen(true);
   }
   function helpNeighbor() {
-    if (!loaded || !secondOpenRef.current || !secondNearRef.current || helpDoneRef.current) return;
-    helpDoneRef.current = true; setHelpDone(true);
+    if (!loaded || !secondOpenRef.current || !secondNearRef.current) return;
+    if (helpStepRef.current === "available") {
+      setCommunityStep("active");
+      closeSecond();
+      return;
+    }
+    if (helpStepRef.current !== "return") return;
+    setCommunityStep("done");
     walletRef.current += 700; setWallet(walletRef.current);
-    try { localStorage.setItem(HELP_KEY,"done"); } catch { /* Offline save unavailable. */ }
   }
   const [inventory, setInventory] = useState<Inventory>({ ...EMPTY_INVENTORY });
   const inventoryRef = useRef<Inventory>({ ...EMPTY_INVENTORY });
@@ -388,6 +418,9 @@ export default function PlayPrototype() {
     const down = (event: KeyboardEvent) => {
       if (event.code === "KeyE" && !event.repeat) {
         if (creatorOpenRef.current || secondOpenRef.current) return;
+        if (helpNearRef.current && helpStepRef.current === "active" && !locked.current && !pausedRef.current) {
+          event.preventDefault(); setCommunityStep("return"); return;
+        }
         if (secondNearRef.current && !locked.current && !pausedRef.current) { event.preventDefault(); keys.current={...EMPTY}; secondOpenRef.current=true; locked.current=true; setSecondOpen(true); return; }
         if (shopRef.current && !shopOpenRef.current && !dialogueRef.current && !pausedRef.current && !locked.current) {
           event.preventDefault(); keys.current = { ...EMPTY }; shopOpenRef.current = true; locked.current = true;
@@ -446,10 +479,10 @@ export default function PlayPrototype() {
   return (
     <main className={styles.root}>
       <Canvas shadows dpr={[1,1.75]} camera={{ position:[6,5.5,8], fov:55, near:0.1, far:90 }} frameloop={isPaused ? "never" : "always"}>
-        <Neighborhood keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} onSecondProximity={onSecondProximity} mission={mission} appearance={appearance} />
+        <Neighborhood keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} onSecondProximity={onSecondProximity} onHelpProximity={onHelpProximity} mission={mission} helpStep={helpStep} appearance={appearance} />
       </Canvas>
       <header className={styles.header}>
-        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 11</span></div>
+        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPES 09–11</span></div>
         <a href="/">Retour à l’exposition ↗</a>
       </header>
       <button type="button" className={styles.creatorButton} onClick={openCreator} disabled={creatorOpen || dialogue || shopOpen || isPaused}>Personnage</button>
@@ -496,13 +529,15 @@ export default function PlayPrototype() {
         {ITEMS.map(item => <div key={item.id}><span>{item.name}</span><strong>× {inventory[item.id]}</strong></div>)}
         <button type="button" onClick={toggleBag}>Fermer</button>
       </aside>}
-      <div className={styles.help}><strong>Explorer le quartier</strong><span>W A S D / flèches · Maj pour courir</span><span>Approchez-vous du résident en orange, puis appuyez sur E.</span></div>
+      <div className={styles.help}><strong>Explorer le quartier</strong><span>W A S D / flèches · Maj pour courir</span><span>{helpStep === "active" ? "Kossi : récupérer les fournitures au marqueur doré à l’ouest." : helpStep === "return" ? "Kossi : lui rapporter les fournitures au sud." : "Parlez à Aïcha au nord ou à Kossi au sud avec E."}</span></div>
+      {helpNear && helpStep === "active" && !creatorOpen && !secondOpen && !shopOpen && !dialogue && !bagOpen && !isPaused && <button type="button" className={styles.deliver} onClick={collectSupplies}>E · Récupérer les fournitures</button>}
       {nearSecond && !secondOpen && !shopOpen && !dialogue && !creatorOpen && !bagOpen && !isPaused && <button type="button" className={styles.shopPrompt} onClick={openSecond}>E · Parler à Kossi</button>}
       {secondOpen && <section className={styles.dialogue} role="dialog" aria-modal="true" aria-labelledby="kossi-name">
         <span className={styles.dialogueEyebrow}>VIE DU QUARTIER · ENTRAIDE</span>
         <h2 id="kossi-name">Kossi</h2>
-        <p>{helpDone ? "Merci pour ton coup de main ! Le quartier avance grâce à ses habitants." : "Salut ! Un coup de main pour remettre les étals en ordre ? Je te donnerai 700 FCFA pour ton aide."}</p>
-        {!helpDone && <button type="button" onClick={helpNeighbor}>Aider Kossi · + 700 FCFA</button>}
+        <p>{helpStep === "done" ? "Merci pour ton coup de main ! Le quartier avance grâce à ses habitants." : helpStep === "available" ? "Peux-tu récupérer les fournitures près du marché à l’ouest ? Rapporte-les ici et tu gagneras 700 FCFA." : helpStep === "active" ? "Va au marqueur doré, à l’ouest du quartier, récupérer les fournitures." : "Tu as les fournitures ! Merci de me les rapporter."}</p>
+        {helpStep === "available" && <button type="button" onClick={helpNeighbor}>Accepter · 700 FCFA</button>}
+        {helpStep === "return" && <button type="button" onClick={helpNeighbor}>Remettre les fournitures · + 700 FCFA</button>}
         <button type="button" onClick={closeSecond}>Fermer</button>
       </section>}
       {nearShop && !secondOpen && !creatorOpen && !dialogue && !shopOpen && !bagOpen && !isPaused && <button type="button" className={styles.shopPrompt} onClick={openShop}>E · Ouvrir la boutique</button>}
