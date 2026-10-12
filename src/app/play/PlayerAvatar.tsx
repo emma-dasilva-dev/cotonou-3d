@@ -3,15 +3,17 @@
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import type { Group } from "three";
+import { HAIR_COLORS, OUTFIT_COLORS, SKIN_COLORS } from "./appearance";
+import type { Appearance } from "./appearance";
 
-type AvatarProps = { speed: React.RefObject<number> };
+type AvatarProps = { speed: React.RefObject<number>; appearance: Appearance };
 
 /**
  * Procedural placeholder avatar. Locomotion is driven by the same resolved
  * speed as player translation, so walking stops when a wall blocks motion.
  * Replace with a rigged model and animation clips after the controller is stable.
  */
-export function PlayerAvatar({ speed }: AvatarProps) {
+export function PlayerAvatar({ speed, appearance }: AvatarProps) {
   const root = useRef<Group>(null);
   const leftArm = useRef<Group>(null);
   const rightArm = useRef<Group>(null);
@@ -33,16 +35,30 @@ export function PlayerAvatar({ speed }: AvatarProps) {
     <group ref={root}>
       <mesh position={[0, 1.2, 0]} castShadow>
         <capsuleGeometry args={[0.32, 0.65, 6, 12]} />
-        <meshStandardMaterial color="#29475a" roughness={0.86} />
+        <meshStandardMaterial color={OUTFIT_COLORS[appearance.outfit]} roughness={0.86} />
       </mesh>
       <mesh position={[0, 1.92, 0]} castShadow>
         <sphereGeometry args={[0.26, 16, 12]} />
-        <meshStandardMaterial color="#946247" roughness={0.96} />
+        <meshStandardMaterial color={SKIN_COLORS[appearance.skin]} roughness={0.96} />
       </mesh>
-      <mesh position={[0, 2.16, -0.025]} castShadow>
+      {appearance.hairstyle === "short" && <mesh position={[0, 2.16, -0.025]} castShadow>
         <sphereGeometry args={[0.245, 16, 10]} />
-        <meshStandardMaterial color="#252421" roughness={0.98} />
-      </mesh>
+        <meshStandardMaterial color={HAIR_COLORS[appearance.hair]} roughness={0.98} />
+      </mesh>}
+      {appearance.hairstyle === "afro" && <mesh position={[0, 2.24, -0.03]} castShadow>
+        <sphereGeometry args={[0.36, 18, 14]} />
+        <meshStandardMaterial color={HAIR_COLORS[appearance.hair]} roughness={1} />
+      </mesh>}
+      {appearance.hairstyle === "bun" && <>
+        <mesh position={[0, 2.16, -0.03]} castShadow>
+          <sphereGeometry args={[0.245, 16, 10]} />
+          <meshStandardMaterial color={HAIR_COLORS[appearance.hair]} roughness={1} />
+        </mesh>
+        <mesh position={[0, 2.36, -0.15]} castShadow>
+          <sphereGeometry args={[0.18, 12, 10]} />
+          <meshStandardMaterial color={HAIR_COLORS[appearance.hair]} roughness={1} />
+        </mesh>
+      </>}
       {([-1, 1] as const).map(side => (
         <group key={side}>
           <group ref={side === -1 ? leftArm : rightArm} position={[side * 0.44, 1.51, 0]}>
