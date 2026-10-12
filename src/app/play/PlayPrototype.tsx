@@ -7,6 +7,8 @@ import type { Group } from "three";
 import styles from "./PlayPrototype.module.css";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { CharacterPreview } from "./CharacterPreview";
+import { StreetAtmosphere, TIMES } from "./StreetAtmosphere";
+import type { TimeOfDay } from "./StreetAtmosphere";
 import { APPEARANCE_KEY, DEFAULT_APPEARANCE, HAIR_COLORS, HAIRSTYLES, OUTFIT_COLORS, SKIN_COLORS, validateAppearance } from "./appearance";
 import type { Appearance } from "./appearance";
 
@@ -154,12 +156,9 @@ function Resident() {
   );
 }
 
-function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, onSecondProximity, onHelpProximity, mission, helpStep, appearance }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; onSecondProximity: (near: boolean) => void; onHelpProximity: (near: boolean) => void; mission: Mission; helpStep: "available" | "active" | "return" | "done"; appearance: Appearance }) {
+function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, onSecondProximity, onHelpProximity, mission, helpStep, appearance, time }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; onSecondProximity: (near: boolean) => void; onHelpProximity: (near: boolean) => void; mission: Mission; helpStep: "available" | "active" | "return" | "done"; appearance: Appearance; time: TimeOfDay }) {
   return <>
-    <color attach="background" args={["#c9d9d5"]} />
-    <fog attach="fog" args={["#c9d9d5", 17, 42]} />
-    <ambientLight intensity={1.5} />
-    <directionalLight position={[5, 13, 7]} intensity={2.1} castShadow shadow-mapSize={[1024, 1024]} />
+    <StreetAtmosphere time={time} />
     <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
       <planeGeometry args={[38, 38]} />
       <meshStandardMaterial color="#b7ad96" />
@@ -248,6 +247,7 @@ export default function PlayPrototype() {
   const keys = useRef<Controls>({ ...EMPTY });
   const creatorOpenRef = useRef(false);
   const [isPaused, setPaused] = useState(false);
+  const [time, setTime] = useState<TimeOfDay>("afternoon");
   const [appearance, setAppearance] = useState<Appearance>({ ...DEFAULT_APPEARANCE });
   const [creatorOpen, setCreatorOpen] = useState(false);
   const [previewTurning, setPreviewTurning] = useState(true);
@@ -479,12 +479,16 @@ export default function PlayPrototype() {
   return (
     <main className={styles.root}>
       <Canvas shadows dpr={[1,1.75]} camera={{ position:[6,5.5,8], fov:55, near:0.1, far:90 }} frameloop={isPaused ? "never" : "always"}>
-        <Neighborhood keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} onSecondProximity={onSecondProximity} onHelpProximity={onHelpProximity} mission={mission} helpStep={helpStep} appearance={appearance} />
+        <Neighborhood keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} onSecondProximity={onSecondProximity} onHelpProximity={onHelpProximity} mission={mission} helpStep={helpStep} appearance={appearance} time={time} />
       </Canvas>
       <header className={styles.header}>
-        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPES 09–11</span></div>
+        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 12</span></div>
         <a href="/">Retour à l’exposition ↗</a>
       </header>
+      <div className={styles.timeSelector} role="group" aria-label="Ambiance du quartier">
+        <span>AMBIANCE</span>
+        <div>{TIMES.map(option => <button key={option.id} type="button" aria-pressed={time === option.id} onClick={() => setTime(option.id)}>{option.label}</button>)}</div>
+      </div>
       <button type="button" className={styles.creatorButton} onClick={openCreator} disabled={creatorOpen || dialogue || shopOpen || isPaused}>Personnage</button>
       {creatorOpen && <section role="dialog" aria-modal="true" aria-labelledby="creator-title" className={styles.creatorPanel}>
         <span className={styles.shopKicker}>MON IDENTITÉ · COTONOU</span>
