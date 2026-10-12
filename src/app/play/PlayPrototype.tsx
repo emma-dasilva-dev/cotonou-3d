@@ -6,6 +6,8 @@ import { Vector3 } from "three";
 import type { Group } from "three";
 import styles from "./PlayPrototype.module.css";
 import { PlayerAvatar } from "./PlayerAvatar";
+import { APPEARANCE_KEY, DEFAULT_APPEARANCE, HAIR_COLORS, HAIRSTYLES, OUTFIT_COLORS, SKIN_COLORS, validateAppearance } from "./appearance";
+import type { Appearance } from "./appearance";
 
 type Key = "forward" | "backward" | "left" | "right";
 type Controls = Record<Key, boolean>;
@@ -48,7 +50,7 @@ function canWalk(x: number, z: number) {
   );
 }
 
-function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProximity }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void }) {
+function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, appearance }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; appearance: Appearance }) {
   const group = useRef<Group>(null);
   const { camera } = useThree();
   const position = useRef(START.clone());
@@ -109,7 +111,7 @@ function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProxi
     camera.position.lerp(desiredCamera.current, 1 - Math.exp(-5 * dt));
     camera.lookAt(position.current.x, 1.1, position.current.z);
   });
-  return <group ref={group}><PlayerAvatar speed={speed} /></group>;
+  return <group ref={group}><PlayerAvatar speed={speed} appearance={appearance} /></group>;
 }
 
 function Resident() {
@@ -135,7 +137,7 @@ function Resident() {
   );
 }
 
-function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, mission }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; mission: Mission }) {
+function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, mission, appearance }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; mission: Mission; appearance: Appearance }) {
   return <>
     <color attach="background" args={["#c9d9d5"]} />
     <fog attach="fog" args={["#c9d9d5", 17, 42]} />
@@ -197,13 +199,38 @@ function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopPr
       <mesh position={[0,1.25,0]}><boxGeometry args={[0.75,0.9,0.6]} /><meshStandardMaterial color="#5c7667" /></mesh>
       <mesh position={[0,2.3,0]}><octahedronGeometry args={[0.4]} /><meshBasicMaterial color="#f4d482" /></mesh>
     </group>}
-    <Character keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} />
+    <Character keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} appearance={appearance} />
   </>;
 }
 
 export default function PlayPrototype() {
   const keys = useRef<Controls>({ ...EMPTY });
+  const creatorOpenRef = useRef(false);
   const [isPaused, setPaused] = useState(false);
+  const [appearance, setAppearance] = useState<Appearance>({ ...DEFAULT_APPEARANCE });
+  const [creatorOpen, setCreatorOpen] = useState(false);
+  const [appearanceLoaded, setAppearanceLoaded] = useState(false);
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(APPEARANCE_KEY);
+      if (stored) setAppearance(validateAppearance(JSON.parse(stored)));
+      else { creatorOpenRef.current = true; setCreatorOpen(true); }
+    } catch { creatorOpenRef.current = true; setCreatorOpen(true); }
+    setAppearanceLoaded(true);
+  }, []);
+  useEffect(() => {
+    if (appearanceLoaded) localStorage.setItem(APPEARANCE_KEY, JSON.stringify(appearance));
+  }, [appearance, appearanceLoaded]);
+  function closeCreator() { creatorOpenRef.current = false; setCreatorOpen(false); }
+  function openCreator() {
+    if (!appearanceLoaded || pausedRef.current || shopOpenRef.current || dialogueRef.current) return;
+    keys.current = { ...EMPTY };
+    setBagOpen(false);
+    creatorOpenRef.current = true; setCreatorOpen(true);
+  }
+  function updateAppearance(patch: Partial<Appearance>) {
+    setAppearance(value => ({ ...value, ...patch }));
+  }
   const [mission, setMission] = useState<Mission>("available");
   const [wallet, setWallet] = useState(0);
   const [inventory, setInventory] = useState<Inventory>({ ...EMPTY_INVENTORY });
@@ -260,7 +287,7 @@ export default function PlayPrototype() {
     setWallet(walletRef.current);
   }
   function openShop() {
-    if (!loaded || !shopRef.current || pausedRef.current || dialogueRef.current || shopOpenRef.current) return;
+    if (creatorOpenRef.current || !loaded || !shopRef.current || pausedRef.current || dialogueRef.current || shopOpenRef.current) return;
     keys.current = { ...EMPTY }; shopOpenRef.current = true; locked.current = true;
     setBagOpen(false); setShopMessage(""); setShopOpen(true);
   }
@@ -284,7 +311,7 @@ export default function PlayPrototype() {
     setShopMessage(`${item.name} ajouté à votre inventaire.`);
   }
   function toggleBag() {
-    if (!loaded || pausedRef.current || shopOpenRef.current || dialogueRef.current) return;
+    if (creatorOpenRef.current || !loaded || pausedRef.current || shopOpenRef.current || dialogueRef.current) return;
     keys.current = { ...EMPTY };
     setBagOpen(value => { locked.current = !value; return !value; });
   }
@@ -299,7 +326,7 @@ export default function PlayPrototype() {
   const onDeliveryProximity = (near: boolean) => { deliveryRef.current = near; setNearDelivery(near); };
   function closeDialogue() { dialogueRef.current = false; setDialogue(false); locked.current = pausedRef.current; }
   function startDialogue() {
-    if (!nearRef.current || dialogueRef.current || pausedRef.current) return;
+    if (creatorOpenRef.current || !nearRef.current || dialogueRef.current || pausedRef.current) return;
     keys.current = { ...EMPTY };
     dialogueRef.current = true;
     locked.current = true;
@@ -308,6 +335,7 @@ export default function PlayPrototype() {
   useEffect(() => {
     const down = (event: KeyboardEvent) => {
       if (event.code === "KeyE" && !event.repeat) {
+        if (creatorOpenRef.current) return;
         if (shopRef.current && !shopOpenRef.current && !dialogueRef.current && !pausedRef.current && !locked.current) {
           event.preventDefault(); keys.current = { ...EMPTY }; shopOpenRef.current = true; locked.current = true;
           setShopMessage(""); setShopOpen(true); return;
@@ -326,6 +354,7 @@ export default function PlayPrototype() {
         }
         return;
       }
+      if (event.code === "Escape" && creatorOpenRef.current) { setCreatorOpen(false); return; }
       if (event.code === "Escape" && shopOpenRef.current) {
         shopOpenRef.current = false; setShopOpen(false); setShopMessage("");
         locked.current = pausedRef.current; return;
@@ -348,9 +377,10 @@ export default function PlayPrototype() {
     return () => { window.removeEventListener("keydown",down); window.removeEventListener("keyup",up); window.removeEventListener("blur",reset); };
   }, []);
   function move(key: Key, pressed: boolean) {
-    if (!locked.current) keys.current[key] = pressed;
+    if (!creatorOpenRef.current && !locked.current) keys.current[key] = pressed;
   }
   function togglePause() {
+    if (creatorOpenRef.current) return;
     keys.current = { ...EMPTY };
     const next = !pausedRef.current;
     pausedRef.current = next;
@@ -360,12 +390,36 @@ export default function PlayPrototype() {
   return (
     <main className={styles.root}>
       <Canvas shadows dpr={[1,1.75]} camera={{ position:[6,5.5,8], fov:55, near:0.1, far:90 }} frameloop={isPaused ? "never" : "always"}>
-        <Neighborhood keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} mission={mission} />
+        <Neighborhood keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} mission={mission} appearance={appearance} />
       </Canvas>
       <header className={styles.header}>
-        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 05</span></div>
+        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 06</span></div>
         <a href="/">Retour à l’exposition ↗</a>
       </header>
+      <button type="button" className={styles.creatorButton} onClick={openCreator} disabled={creatorOpen || dialogue || shopOpen || isPaused}>Personnage</button>
+      {creatorOpen && <section role="dialog" aria-modal="true" aria-labelledby="creator-title" className={styles.creatorPanel}>
+        <span className={styles.shopKicker}>MON IDENTITÉ · COTONOU</span>
+        <h2 id="creator-title">Créer mon personnage</h2>
+        <p>Personnalise ton apparence avant de découvrir le quartier.</p>
+        {([
+          { title: "Carnation", field: "skin", colors: SKIN_COLORS },
+          { title: "Couleur des cheveux", field: "hair", colors: HAIR_COLORS },
+          { title: "Vêtement", field: "outfit", colors: OUTFIT_COLORS },
+        ] as const).map(group => <fieldset className={styles.creatorField} key={group.field}>
+          <legend>{group.title}</legend>
+          <div className={styles.swatches}>{group.colors.map((color, index) => <button
+            key={color} type="button" title={`${group.title} ${index + 1}`}
+            aria-label={`${group.title} ${index + 1}`} aria-pressed={appearance[group.field] === index}
+            className={styles.swatch} style={{ backgroundColor: color }}
+            onClick={() => updateAppearance({ [group.field]: index })} />)}</div>
+        </fieldset>)}
+        <fieldset className={styles.creatorField}><legend>Coiffure</legend>
+          <div className={styles.styles}>{HAIRSTYLES.map((style,index)=><button key={style} type="button"
+            aria-pressed={appearance.hairstyle === style} onClick={()=>updateAppearance({hairstyle:style})}>
+            {["Courte","Afro","Chignon"][index]}</button>)}</div>
+        </fieldset>
+        <button className={styles.creatorDone} type="button" onClick={closeCreator}>Enregistrer et jouer</button>
+      </section>}
       <aside className={styles.missionHud} aria-live="polite"><strong>{wallet.toLocaleString("fr-FR")} FCFA</strong><span>{mission === "available" ? "Nouvelle mission : parlez à Aïcha" : mission === "active" ? "Première course · Livrez au marqueur jaune" : "Première course terminée · +1 500 FCFA"}</span></aside>
       <button type="button" className={styles.bagButton} onClick={toggleBag} disabled={shopOpen || dialogue || isPaused} aria-expanded={bagOpen}>Inventaire ({Object.values(inventory).reduce((a,b)=>a+b,0)})</button>
       {bagOpen && <aside className={styles.bag} aria-label="Inventaire">
@@ -374,7 +428,7 @@ export default function PlayPrototype() {
         <button type="button" onClick={toggleBag}>Fermer</button>
       </aside>}
       <div className={styles.help}><strong>Explorer le quartier</strong><span>W A S D / flèches pour se déplacer</span><span>Approchez-vous du résident en orange, puis appuyez sur E.</span></div>
-      {nearShop && !dialogue && !shopOpen && !bagOpen && !isPaused && <button type="button" className={styles.shopPrompt} onClick={openShop}>E · Ouvrir la boutique</button>}
+      {nearShop && !creatorOpen && !dialogue && !shopOpen && !bagOpen && !isPaused && <button type="button" className={styles.shopPrompt} onClick={openShop}>E · Ouvrir la boutique</button>}
       {shopOpen && <section className={styles.shopPanel} role="dialog" aria-modal="true" aria-labelledby="shop-heading">
         <span className={styles.shopKicker}>COMMERCE DE QUARTIER</span>
         <h2 id="shop-heading">La petite boutique</h2>
@@ -388,8 +442,8 @@ export default function PlayPrototype() {
         <p aria-live="polite" className={styles.shopMessage}>{shopMessage}</p>
         <button type="button" className={styles.closeShop} onClick={closeShop}>Quitter la boutique</button>
       </section>}
-      {nearResident && !dialogue && !shopOpen && !bagOpen && !isPaused && <button type="button" className={styles.interact} onClick={startDialogue}>E · Parler à Aïcha</button>}
-      {nearDelivery && mission === "active" && !dialogue && !shopOpen && !bagOpen && !isPaused && <button type="button" className={styles.deliver} onClick={deliver}>E · Livrer le colis</button>}
+      {nearResident && !creatorOpen && !dialogue && !shopOpen && !bagOpen && !isPaused && <button type="button" className={styles.interact} onClick={startDialogue}>E · Parler à Aïcha</button>}
+      {nearDelivery && mission === "active" && !creatorOpen && !dialogue && !shopOpen && !bagOpen && !isPaused && <button type="button" className={styles.deliver} onClick={deliver}>E · Livrer le colis</button>}
       {dialogue && <section role="dialog" aria-modal="true" aria-labelledby="resident-name" className={styles.dialogue}>
         <span className={styles.dialogueEyebrow}>RENCONTRE · HABITANTE DU QUARTIER</span>
         <h2 id="resident-name">Aïcha</h2>
