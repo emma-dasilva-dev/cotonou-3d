@@ -91,3 +91,9 @@
 .travelPanel .travelClose{background:transparent;color:#303b38;border:1px solid #9a998d;text-align:center}
 .travelPanel button:focus-visible,.travelButton:focus-visible{outline:3px solid #947744;outline-offset:2px}
 @media(max-width:640px){.travelButton{top:171px;right:12px;font-size:11px;padding:9px}.travelPanel{padding:20px}}
+
+
+/* Movement upgrade — touch-accessible jump control */
+.jumpButton{position:absolute;right:28px;bottom:36px;z-index:7;background:#e4c78b;color:#27332e;border:1px solid #8a764f;padding:12px 16px;font-weight:700;font-size:12px;cursor:pointer;touch-action:manipulation}
+.jumpButton:focus-visible{outline:3px solid #fff;outline-offset:3px}
+@media(max-width:640px){.jumpButton{right:12px;bottom:35px;padding:12px;font-size:11px}}
