@@ -67,3 +67,14 @@
 .previewToggle{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:#303b38;color:#fff;border:0;padding:10px 14px;cursor:pointer;white-space:nowrap;font-size:12px}
 .creatorOptions{padding-top:4px}
 @media(max-width:680px){.creatorLayout{grid-template-columns:1fr;gap:16px}.previewPane{min-height:280px;height:280px}.creatorPanel{max-height:calc(100dvh - 20px)}}
+
+
+/* Prototype 12 — atmospheric time-of-day controls */
+.timeSelector{position:absolute;top:24px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:7px;align-items:center;padding:10px 12px;background:#f0ebdfed;border:1px solid #807e734d;box-shadow:0 4px 22px #00000015;z-index:4;max-width:calc(100% - 30px)}
+.timeSelector span{font-size:9px;font-weight:750;letter-spacing:.2em;color:#555e57}
+.timeSelector div{display:flex;gap:4px}
+.timeSelector button{white-space:nowrap;font-size:11px;padding:8px 10px;border:1px solid transparent;background:transparent;color:#3d4942;cursor:pointer}
+.timeSelector button[aria-pressed="true"]{background:#303f38;color:#fff}
+.timeSelector button:focus-visible{outline:2px solid #987b41;outline-offset:2px}
+@media(max-width:850px){.timeSelector{top:auto;bottom:110px;left:50%;padding:7px 8px}.timeSelector span{font-size:8px}.timeSelector button{padding:7px 6px;font-size:10px}}
+@media(max-width:520px){.timeSelector{bottom:96px}.timeSelector button{font-size:9px;padding:7px 5px}}
