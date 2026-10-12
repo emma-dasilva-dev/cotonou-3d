@@ -194,6 +194,19 @@ function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopPr
         <meshStandardMaterial color="#f1e7d3" />
       </mesh>
     </group>
+    {/* Landmark details: shaded market awnings, benches and planter boxes. */}
+    {[-1,1].map(side => <group key={side} position={[side * 7.9,0,0]}>
+      <mesh position={[0,0.35,0]} castShadow><boxGeometry args={[1.8,0.16,0.65]} /><meshStandardMaterial color="#8c6445" /></mesh>
+      {[-0.65,0.65].map(x => <mesh key={x} position={[x,0.17,0]}><boxGeometry args={[0.12,0.34,0.5]} /><meshStandardMaterial color="#4d4d46" /></mesh>)}
+      <mesh position={[0,0.8,-0.3]} castShadow><boxGeometry args={[1.85,0.85,0.12]} /><meshStandardMaterial color="#8c6445" /></mesh>
+      <mesh position={[0,0.08,1.5]}><boxGeometry args={[1.55,0.16,0.8]} /><meshStandardMaterial color="#a87958" /></mesh>
+      <mesh position={[0,0.4,1.5]}><sphereGeometry args={[0.6,10,8]} /><meshStandardMaterial color="#58724c" /></mesh>
+    </group>)}
+    {[-1,1].map(side => <group key={side} position={[side * 7,0,-7]}>
+      <mesh position={[0,1.25,0]} castShadow><boxGeometry args={[2.2,0.13,1.5]} /><meshStandardMaterial color={side === 1 ? "#bc7255" : "#d5b777"} /></mesh>
+      {[-0.9,0.9].map(x => <mesh key={x} position={[x,0.64,0]}><cylinderGeometry args={[0.065,0.065,1.25,6]} /><meshStandardMaterial color="#655849" /></mesh>)}
+      <mesh position={[0,0.38,0]} castShadow><boxGeometry args={[1.8,0.76,0.8]} /><meshStandardMaterial color="#b49370" /></mesh>
+    </group>)}
     <Resident />
     {mission === "active" && <group position={[DELIVERY_POSITION.x,0,DELIVERY_POSITION.z]}>
       <mesh position={[0,0.12,0]}><cylinderGeometry args={[0.8,0.8,0.05,32]} /><meshStandardMaterial color="#d4b269" emissive="#826329" emissiveIntensity={0.2} /></mesh>
@@ -397,7 +410,7 @@ export default function PlayPrototype() {
         <Neighborhood keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} mission={mission} appearance={appearance} />
       </Canvas>
       <header className={styles.header}>
-        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 09</span></div>
+        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 10</span></div>
         <a href="/">Retour à l’exposition ↗</a>
       </header>
       <button type="button" className={styles.creatorButton} onClick={openCreator} disabled={creatorOpen || dialogue || shopOpen || isPaused}>Personnage</button>
