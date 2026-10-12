@@ -23,10 +23,11 @@ function Zem({ vertical, phase, time }: { vertical: boolean; phase: number; time
       <boxGeometry args={[0.29, 0.2, 1.05]} />
       <meshStandardMaterial color="#363b3c" />
     </mesh>
-    {[-0.42, 0.42].map(z => <mesh key={z} position={[0, 0.3, z]} rotation={[0, 0, Math.PI / 2]}>
+    {[-0.42, 0.42].map(z => <mesh key={z} position={[0, 0.3, z]} rotation={[0, Math.PI / 2, 0]}>
       <torusGeometry args={[0.27, 0.075, 6, 10]} />
       <meshStandardMaterial color="#25292b" />
     </mesh>)}
+    <mesh position={[0, 0.48, -0.15]} castShadow><boxGeometry args={[0.45,0.12,0.48]} /><meshStandardMaterial color="#bb8c37" /></mesh>
     <mesh position={[0, 0.9, 0.05]} castShadow>
       <capsuleGeometry args={[0.18, 0.33, 4, 8]} />
       <meshStandardMaterial color="#e7c93b" />
@@ -35,6 +36,7 @@ function Zem({ vertical, phase, time }: { vertical: boolean; phase: number; time
       <sphereGeometry args={[0.19, 10, 8]} />
       <meshStandardMaterial color="#303c41" />
     </mesh>
+    <mesh position={[0, 0.63, 0.39]} castShadow><boxGeometry args={[0.36,0.37,0.36]} /><meshStandardMaterial color="#b3bbc0" /></mesh>
     <mesh position={[0, 0.93, 0.39]}>
       <boxGeometry args={[0.43, 0.07, 0.06]} />
       <meshStandardMaterial color="#3f4444" />
