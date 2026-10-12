@@ -521,7 +521,7 @@ export default function PlayPrototype() {
     setPaused(next);
   }
   return (
-    <main className={styles.root}>
+    <main className={`${styles.root} ${time === "night" ? styles.nightMode : ""}`}>
       <Canvas shadows dpr={[1,1.75]} camera={{ position:[6,5.5,8], fov:55, near:0.1, far:90 }} frameloop={isPaused ? "never" : "always"}>
         <Neighborhood key={zone} zone={zone} keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} onSecondProximity={onSecondProximity} onHelpProximity={onHelpProximity} mission={mission} helpStep={helpStep} appearance={appearance} time={time} />
       </Canvas>
