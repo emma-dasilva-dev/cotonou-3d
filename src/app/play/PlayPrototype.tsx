@@ -24,6 +24,10 @@ const BUILDINGS = [
 const START = new Vector3(0, 0, 0);
 const NPC_POSITION = new Vector3(0, 0, -5.5);
 const TALK_RADIUS = 1.8;
+const DELIVERY_POSITION = new Vector3(0, 0, 6);
+const DELIVERY_RADIUS = 1.5;
+type Mission = "available" | "active" | "completed";
+const SAVE_KEY = "cotonou-life-prototype03";
 function canWalk(x: number, z: number) {
   if (Math.abs(x) > 10.8 || Math.abs(z) > 10.8) return false;
   if (Math.hypot(x - NPC_POSITION.x, z - NPC_POSITION.z) < 0.56) return false;
@@ -33,13 +37,14 @@ function canWalk(x: number, z: number) {
   );
 }
 
-function Character({ keys, locked, onProximity }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void }) {
+function Character({ keys, locked, onProximity }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void }) {
   const group = useRef<Group>(null);
   const { camera } = useThree();
   const position = useRef(START.clone());
   const direction = useRef(new Vector3());
   const desiredCamera = useRef(new Vector3());
   const wasNear = useRef(false);
+  const wasNearDelivery = useRef(false);
   useFrame((_, dt) => {
     if (!group.current) return;
     const input = locked.current ? EMPTY : keys.current;
@@ -63,6 +68,11 @@ function Character({ keys, locked, onProximity }: { keys: React.RefObject<Contro
     if (near !== wasNear.current) {
       wasNear.current = near;
       onProximity(near);
+    }
+    const nearDelivery = position.current.distanceTo(DELIVERY_POSITION) <= DELIVERY_RADIUS;
+    if (nearDelivery !== wasNearDelivery.current) {
+      wasNearDelivery.current = nearDelivery;
+      onDeliveryProximity(nearDelivery);
     }
     group.current.position.copy(position.current);
     // Fixed-angle follow camera; the character stays fully visible.
@@ -111,7 +121,7 @@ function Resident() {
   );
 }
 
-function Neighborhood({ keys, locked, onProximity }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void }) {
+function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, mission }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; mission: Mission }) {
   return <>
     <color attach="background" args={["#c9d9d5"]} />
     <fog attach="fog" args={["#c9d9d5", 17, 42]} />
@@ -154,13 +164,54 @@ function Neighborhood({ keys, locked, onProximity }: { keys: React.RefObject<Con
       </group>
     )))}
     <Resident />
-    <Character keys={keys} locked={locked} onProximity={onProximity} />
+    {mission === "active" && <group position={[DELIVERY_POSITION.x,0,DELIVERY_POSITION.z]}>
+      <mesh position={[0,0.12,0]}><cylinderGeometry args={[0.8,0.8,0.05,32]} /><meshStandardMaterial color="#d4b269" emissive="#826329" emissiveIntensity={0.2} /></mesh>
+      <mesh position={[0,1.25,0]}><boxGeometry args={[0.75,0.9,0.6]} /><meshStandardMaterial color="#5c7667" /></mesh>
+      <mesh position={[0,2.3,0]}><octahedronGeometry args={[0.4]} /><meshBasicMaterial color="#f4d482" /></mesh>
+    </group>}
+    <Character keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} />
   </>;
 }
 
 export default function PlayPrototype() {
   const keys = useRef<Controls>({ ...EMPTY });
   const [isPaused, setPaused] = useState(false);
+  const [mission, setMission] = useState<Mission>("available");
+  const [wallet, setWallet] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+  const missionRef = useRef<Mission>("available");
+  const [nearDelivery, setNearDelivery] = useState(false);
+  const deliveryRef = useRef(false);
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(SAVE_KEY);
+      if (saved) {
+        const data: unknown = JSON.parse(saved);
+        if (data && typeof data === "object" && "mission" in data && "wallet" in data) {
+          const state = data as { mission: unknown; wallet: unknown };
+          if (state.mission === "available" || state.mission === "active" || state.mission === "completed") {
+            missionRef.current = state.mission;
+            setMission(state.mission);
+            if (typeof state.wallet === "number" && Number.isFinite(state.wallet) && state.wallet >= 0) setWallet(Math.floor(state.wallet));
+          }
+        }
+      }
+    } catch { /* Invalid save: begin a fresh prototype session. */ }
+    setLoaded(true);
+  }, []);
+  useEffect(() => {
+    if (loaded) localStorage.setItem(SAVE_KEY, JSON.stringify({ mission, wallet }));
+  }, [loaded, mission, wallet]);
+  function acceptMission() {
+    if (!loaded || missionRef.current !== "available") return;
+    missionRef.current = "active"; setMission("active"); closeDialogue();
+  }
+  function deliver() {
+    if (!loaded || !deliveryRef.current || missionRef.current !== "active" || pausedRef.current || dialogueRef.current) return;
+    missionRef.current = "completed";
+    setMission("completed");
+    setWallet(value => value + 1500);
+  }
   const [nearResident, setNearResident] = useState(false);
   const nearRef = useRef(false);
   const [dialogue, setDialogue] = useState(false);
@@ -168,6 +219,7 @@ export default function PlayPrototype() {
   const dialogueRef = useRef(false);
   const pausedRef = useRef(false);
   const onProximity = (near: boolean) => { nearRef.current = near; setNearResident(near); };
+  const onDeliveryProximity = (near: boolean) => { deliveryRef.current = near; setNearDelivery(near); };
   function closeDialogue() { dialogueRef.current = false; setDialogue(false); locked.current = pausedRef.current; }
   function startDialogue() {
     if (!nearRef.current || dialogueRef.current || pausedRef.current) return;
@@ -179,6 +231,11 @@ export default function PlayPrototype() {
   useEffect(() => {
     const down = (event: KeyboardEvent) => {
       if (event.code === "KeyE" && !event.repeat) {
+        if (deliveryRef.current && missionRef.current === "active" && !pausedRef.current && !dialogueRef.current) {
+          event.preventDefault();
+          missionRef.current = "completed"; setMission("completed"); setWallet(value => value + 1500);
+          return;
+        }
         if (nearRef.current && !dialogueRef.current && !pausedRef.current) {
           event.preventDefault();
           keys.current = { ...EMPTY };
@@ -218,19 +275,22 @@ export default function PlayPrototype() {
   return (
     <main className={styles.root}>
       <Canvas shadows dpr={[1,1.75]} camera={{ position:[6,5.5,8], fov:55, near:0.1, far:90 }} frameloop={isPaused ? "never" : "always"}>
-        <Neighborhood keys={keys} locked={locked} onProximity={onProximity} />
+        <Neighborhood keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} mission={mission} />
       </Canvas>
       <header className={styles.header}>
-        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 02</span></div>
+        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 03</span></div>
         <a href="/">Retour à l’exposition ↗</a>
       </header>
+      <aside className={styles.missionHud} aria-live="polite"><strong>{wallet.toLocaleString("fr-FR")} FCFA</strong><span>{mission === "available" ? "Nouvelle mission : parlez à Aïcha" : mission === "active" ? "Première course · Livrez au marqueur jaune" : "Première course terminée · +1 500 FCFA"}</span></aside>
       <div className={styles.help}><strong>Explorer le quartier</strong><span>W A S D / flèches pour se déplacer</span><span>Approchez-vous du résident en orange, puis appuyez sur E.</span></div>
       {nearResident && !dialogue && !isPaused && <button type="button" className={styles.interact} onClick={startDialogue}>E · Parler à Aïcha</button>}
+      {nearDelivery && mission === "active" && !dialogue && !isPaused && <button type="button" className={styles.deliver} onClick={deliver}>E · Livrer le colis</button>}
       {dialogue && <section role="dialog" aria-modal="true" aria-labelledby="resident-name" className={styles.dialogue}>
         <span className={styles.dialogueEyebrow}>RENCONTRE · HABITANTE DU QUARTIER</span>
         <h2 id="resident-name">Aïcha</h2>
-        <p>Salut ! Bienvenue dans le quartier. Moi, c’est Aïcha. Ici, tout le monde a une histoire. Prends le temps de découvrir les rues !</p>
-        <button type="button" onClick={closeDialogue} autoFocus>Merci, Aïcha · Fermer</button>
+        <p>{mission === "available" ? "Salut ! Bienvenue dans le quartier. Tu peux m’aider ? Dépose ce colis au point de livraison, de l’autre côté de la rue. Je te donnerai 1 500 FCFA." : mission === "active" ? "Le colis t’attend ! Suis le marqueur jaune au sud du quartier pour terminer ta course." : "Merci pour ton aide ! Ton paiement de 1 500 FCFA a été ajouté à ton portefeuille."}</p>
+        {mission === "available" && <button type="button" onClick={acceptMission} autoFocus>Accepter la course · 1 500 FCFA</button>}
+        <button type="button" onClick={closeDialogue} autoFocus={mission !== "available"}>{mission === "available" ? "Pas maintenant" : "Fermer"}</button>
       </section>}
       <button className={styles.pause} type="button" onClick={togglePause} aria-pressed={isPaused}>{isPaused ? "Reprendre" : "Pause"}</button>
       <div className={styles.pad} aria-label="Commandes tactiles">
