@@ -40,3 +40,21 @@
 .shopPanel .shopMessage{margin:12px 0 0;min-height:20px;color:#315a4c}
 .shopPanel button:focus-visible,.shopPrompt:focus-visible,.bagButton:focus-visible,.bag button:focus-visible{outline:3px solid #967d47;outline-offset:2px}
 @media(max-width:640px){.bagButton{top:90px;right:12px;padding:9px;font-size:11px}.bag{right:12px;top:132px;width:220px}.shopPanel{padding:20px}.shopItem{align-items:flex-start;flex-direction:column;gap:10px}.shopItem button{width:100%}.shopPrompt{bottom:185px;font-size:11px}}
+
+
+.creatorButton{position:absolute;top:145px;right:28px;border:1px solid #686b60;background:#efe9dd;color:#28302b;padding:12px 16px;cursor:pointer;font-size:12px}
+.creatorButton:disabled{opacity:.55;cursor:not-allowed}
+.creatorPanel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(460px,calc(100% - 28px));max-height:calc(100dvh - 28px);overflow-y:auto;background:#f0e9dc;border:1px solid #a49a87;box-shadow:0 24px 65px #0005;padding:28px 30px;color:#272d29;z-index:18;touch-action:pan-y}
+.creatorPanel h2{font-size:27px;letter-spacing:-.04em;margin:10px 0}
+.creatorPanel p{font-size:13px;line-height:1.5;color:#65675e;margin:0 0 20px}
+.creatorField{margin:0 0 20px;padding:0;border:0;min-width:0}
+.creatorField legend{font-size:12px;font-weight:600;margin-bottom:10px}
+.swatches{display:flex;flex-wrap:wrap;gap:11px}
+.swatch{width:39px;height:39px;border:2px solid #f0e9dc;border-radius:50%;cursor:pointer}
+.swatch[aria-pressed="true"]{outline:2px solid #1d2926;outline-offset:2px}
+.styles{display:flex;flex-wrap:wrap;gap:9px}
+.styles button{background:transparent;color:#303b38;border:1px solid #a49a87;padding:10px 14px;cursor:pointer}
+.styles button[aria-pressed="true"]{background:#303b38;color:#fff;border-color:#303b38}
+.creatorDone{background:#303b38;color:#fff;border:0;padding:13px 19px;cursor:pointer;width:100%;margin-top:5px}
+.creatorPanel button:focus-visible,.creatorButton:focus-visible{outline:3px solid #987b41;outline-offset:3px}
+@media(max-width:640px){.creatorButton{top:132px;right:12px;font-size:11px;padding:9px}.creatorPanel{padding:20px}}
