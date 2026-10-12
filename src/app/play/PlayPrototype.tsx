@@ -2,7 +2,7 @@
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
-import { Vector3, MathUtils } from "three";
+import { Vector3 } from "three";
 import type { Group } from "three";
 import styles from "./PlayPrototype.module.css";
 
