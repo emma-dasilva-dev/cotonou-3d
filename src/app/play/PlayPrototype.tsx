@@ -372,9 +372,10 @@ export default function PlayPrototype() {
             }
             if ("inventory" in data && data.inventory && typeof data.inventory === "object") {
               const values = data.inventory as Record<string, unknown>;
-              const valid = Object.fromEntries(ITEMS.map(item => [item.id,
-                typeof values[item.id] === "number" && Number.isSafeInteger(values[item.id]) && values[item.id] >= 0 && values[item.id] <= 10000 ? values[item.id] : 0
-              ])) as Inventory;
+              const valid = Object.fromEntries(ITEMS.map(item => {
+                const quantity = values[item.id];
+                return [item.id, typeof quantity === "number" && Number.isSafeInteger(quantity) && quantity >= 0 && quantity <= 10000 ? quantity : 0];
+              })) as Inventory;
               inventoryRef.current = valid; setInventory(valid);
             }
           }
