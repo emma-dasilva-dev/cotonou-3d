@@ -219,7 +219,7 @@ function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopPr
     </group>
     <LivingMarket time={time} />
     <ZemidjanTraffic time={time} />
-    {/* Landmark details: shaded market awnings, benches and planter boxes. */
+    {/* Landmark details: shaded market awnings, benches and planter boxes. */}
     {[-1,1].map(side => <group key={side} position={[side * 7.9,0,0]}>
       <mesh position={[0,0.35,0]} castShadow><boxGeometry args={[1.8,0.16,0.65]} /><meshStandardMaterial color="#8c6445" /></mesh>
       {[-0.65,0.65].map(x => <mesh key={x} position={[x,0.17,0]}><boxGeometry args={[0.12,0.34,0.5]} /><meshStandardMaterial color="#4d4d46" /></mesh>)}
