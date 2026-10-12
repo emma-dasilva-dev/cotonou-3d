@@ -8,3 +8,12 @@
 .dialogue button{background:#303b38;color:white;border:0;padding:12px 17px;cursor:pointer;font-size:12px}
 .dialogue button:focus-visible,.interact:focus-visible{outline:3px solid #698c81;outline-offset:3px}
 @media(max-width:640px){.dialogue{bottom:130px;padding:20px}.dialogue p{font-size:13px;margin-bottom:15px}.interact{bottom:135px;font-size:12px}}
+
+
+.missionHud{position:absolute;top:92px;left:28px;max-width:310px;display:flex;flex-direction:column;gap:6px;padding:13px 17px;background:#efe9ddee;border:1px solid #8b867c55;color:#292c28}
+.missionHud strong{font-size:20px;letter-spacing:-.045em}
+.missionHud span{font-size:12px;line-height:1.45}
+.deliver{position:absolute;left:50%;bottom:105px;transform:translateX(-50%);white-space:nowrap;background:#e0be77;color:#292820;border:1px solid #8d7444;padding:12px 20px;font-size:13px;font-weight:650;cursor:pointer;box-shadow:0 4px 14px #0002}
+.deliver:focus-visible{outline:3px solid white;outline-offset:3px}
+.dialogue button+button{margin-left:10px;background:transparent;color:#303b38;border:1px solid #7a8078}
+@media(max-width:640px){.missionHud{top:91px;left:12px;max-width:225px;padding:10px}.missionHud strong{font-size:16px}.missionHud span{font-size:10px}.deliver{bottom:135px;font-size:12px}.dialogue button+button{margin-left:6px}}
