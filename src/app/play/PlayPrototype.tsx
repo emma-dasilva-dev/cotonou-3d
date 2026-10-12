@@ -8,6 +8,7 @@ import styles from "./PlayPrototype.module.css";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { CharacterPreview } from "./CharacterPreview";
 import { StreetAtmosphere, TIMES } from "./StreetAtmosphere";
+import { LivingMarket } from "./LivingMarket";
 import type { TimeOfDay } from "./StreetAtmosphere";
 import { APPEARANCE_KEY, DEFAULT_APPEARANCE, HAIR_COLORS, HAIRSTYLES, OUTFIT_COLORS, SKIN_COLORS, validateAppearance } from "./appearance";
 import type { Appearance } from "./appearance";
@@ -209,7 +210,8 @@ function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopPr
         <meshStandardMaterial color="#f1e7d3" />
       </mesh>
     </group>
-    {/* Landmark details: shaded market awnings, benches and planter boxes. */}
+    <LivingMarket time={time} />
+    {/* Landmark details: shaded market awnings, benches and planter boxes. */
     {[-1,1].map(side => <group key={side} position={[side * 7.9,0,0]}>
       <mesh position={[0,0.35,0]} castShadow><boxGeometry args={[1.8,0.16,0.65]} /><meshStandardMaterial color="#8c6445" /></mesh>
       {[-0.65,0.65].map(x => <mesh key={x} position={[x,0.17,0]}><boxGeometry args={[0.12,0.34,0.5]} /><meshStandardMaterial color="#4d4d46" /></mesh>)}
@@ -482,7 +484,7 @@ export default function PlayPrototype() {
         <Neighborhood keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} onSecondProximity={onSecondProximity} onHelpProximity={onHelpProximity} mission={mission} helpStep={helpStep} appearance={appearance} time={time} />
       </Canvas>
       <header className={styles.header}>
-        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 12</span></div>
+        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 13</span></div>
         <a href="/">Retour à l’exposition ↗</a>
       </header>
       <div className={styles.timeSelector} role="group" aria-label="Ambiance du quartier">
