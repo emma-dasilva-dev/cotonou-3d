@@ -10,6 +10,7 @@ import { CharacterPreview } from "./CharacterPreview";
 import { StreetAtmosphere, TIMES } from "./StreetAtmosphere";
 import { LivingMarket } from "./LivingMarket";
 import { ZemidjanTraffic } from "./ZemidjanTraffic";
+import { FidjrosseBeach } from "./FidjrosseBeach";
 import type { TimeOfDay } from "./StreetAtmosphere";
 import { APPEARANCE_KEY, DEFAULT_APPEARANCE, HAIR_COLORS, HAIRSTYLES, OUTFIT_COLORS, SKIN_COLORS, validateAppearance } from "./appearance";
 import type { Appearance } from "./appearance";
@@ -33,7 +34,9 @@ const BUILDINGS = [
   { x: -12.6, z: 6, width: 3.5, depth: 3.6, height: 3.2, color: "#a8b4be" },
   { x: 12.4, z: -6, width: 3.4, depth: 4, height: 4.5, color: "#bdaf9c" },
 ];
+type Zone = "quartier" | "fidjrosse";
 const START = new Vector3(0, 0, 0);
+const BEACH_START = new Vector3(0, 0, 6);
 const NPC_POSITION = new Vector3(0, 0, -5.5);
 const TALK_RADIUS = 1.8;
 const DELIVERY_POSITION = new Vector3(0, 0, 6);
@@ -55,7 +58,8 @@ type Inventory = Record<ItemId, number>;
 const EMPTY_INVENTORY: Inventory = { water: 0, snack: 0, shirt: 0 };
 type Mission = "available" | "active" | "completed";
 const SAVE_KEY = "cotonou-life-prototype03";
-function canWalk(x: number, z: number) {
+function canWalk(x: number, z: number, zone: Zone) {
+  if (zone === "fidjrosse") return Math.abs(x) <= 17.5 && z >= -3.7 && z <= 18;
   if (Math.abs(x) > 17.5 || Math.abs(z) > 17.5) return false;
   if (Math.hypot(x - NPC_POSITION.x, z - NPC_POSITION.z) < 0.56) return false;
   if (Math.hypot(x - SECOND_NPC.x, z - SECOND_NPC.z) < 0.55) return false;
@@ -65,10 +69,10 @@ function canWalk(x: number, z: number) {
   );
 }
 
-function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, onSecondProximity, onHelpProximity, appearance }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; onSecondProximity: (near: boolean) => void; onHelpProximity: (near: boolean) => void; appearance: Appearance }) {
+function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, onSecondProximity, onHelpProximity, appearance, zone }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; onSecondProximity: (near: boolean) => void; onHelpProximity: (near: boolean) => void; appearance: Appearance; zone: Zone }) {
   const group = useRef<Group>(null);
   const { camera } = useThree();
-  const position = useRef(START.clone());
+  const position = useRef((zone === "fidjrosse" ? BEACH_START : START).clone());
   const direction = useRef(new Vector3());
   const desiredCamera = useRef(new Vector3());
   const velocity = useRef(new Vector3());
@@ -95,9 +99,9 @@ function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProxi
     const oldZ = position.current.z;
     const nextX = oldX + velocity.current.x * step;
     const nextZ = oldZ + velocity.current.z * step;
-    if (canWalk(nextX, oldZ)) position.current.x = nextX;
+    if (canWalk(nextX, oldZ, zone)) position.current.x = nextX;
     else velocity.current.x = 0;
-    if (canWalk(position.current.x, nextZ)) position.current.z = nextZ;
+    if (canWalk(position.current.x, nextZ, zone)) position.current.z = nextZ;
     else velocity.current.z = 0;
     const deltaX = position.current.x - oldX;
     const deltaZ = position.current.z - oldZ;
@@ -107,24 +111,24 @@ function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProxi
       const turn = Math.atan2(Math.sin(face - group.current.rotation.y), Math.cos(face - group.current.rotation.y));
       group.current.rotation.y += turn * (1 - Math.exp(-12 * step));
     }
-    const near = position.current.distanceTo(NPC_POSITION) <= TALK_RADIUS;
+    const near = zone === "quartier" && position.current.distanceTo(NPC_POSITION) <= TALK_RADIUS;
     if (near !== wasNear.current) {
       wasNear.current = near;
       onProximity(near);
     }
-    const nearDelivery = position.current.distanceTo(DELIVERY_POSITION) <= DELIVERY_RADIUS;
+    const nearDelivery = zone === "quartier" && position.current.distanceTo(DELIVERY_POSITION) <= DELIVERY_RADIUS;
     if (nearDelivery !== wasNearDelivery.current) {
       wasNearDelivery.current = nearDelivery;
       onDeliveryProximity(nearDelivery);
     }
-    const nearShop = position.current.distanceTo(SHOP_POSITION) <= SHOP_RADIUS;
+    const nearShop = zone === "quartier" && position.current.distanceTo(SHOP_POSITION) <= SHOP_RADIUS;
     if (nearShop !== wasNearShop.current) {
       wasNearShop.current = nearShop;
       onShopProximity(nearShop);
     }
-    const secondNear = position.current.distanceTo(SECOND_NPC) <= SECOND_RADIUS;
+    const secondNear = zone === "quartier" && position.current.distanceTo(SECOND_NPC) <= SECOND_RADIUS;
     if (secondNear !== wasNearSecond.current) { wasNearSecond.current = secondNear; onSecondProximity(secondNear); }
-    const nearHelp = position.current.distanceTo(HELP_TARGET) <= HELP_RADIUS;
+    const nearHelp = zone === "quartier" && position.current.distanceTo(HELP_TARGET) <= HELP_RADIUS;
     if (nearHelp !== wasNearHelp.current) { wasNearHelp.current = nearHelp; onHelpProximity(nearHelp); }
     group.current.position.copy(position.current);
     // Fixed-angle follow camera; the character stays fully visible.
@@ -158,7 +162,9 @@ function Resident() {
   );
 }
 
-function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, onSecondProximity, onHelpProximity, mission, helpStep, appearance, time }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; onSecondProximity: (near: boolean) => void; onHelpProximity: (near: boolean) => void; mission: Mission; helpStep: "available" | "active" | "return" | "done"; appearance: Appearance; time: TimeOfDay }) {
+function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, onSecondProximity, onHelpProximity, mission, helpStep, appearance, time, zone }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; onSecondProximity: (near: boolean) => void; onHelpProximity: (near: boolean) => void; mission: Mission; helpStep: "available" | "active" | "return" | "done"; appearance: Appearance; time: TimeOfDay; zone: Zone }) {
+  const player = <Character keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} onSecondProximity={onSecondProximity} onHelpProximity={onHelpProximity} appearance={appearance} zone={zone} />;
+  if (zone === "fidjrosse") return <><FidjrosseBeach time={time} />{player}</>;
   return <>
     <StreetAtmosphere time={time} />
     <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
@@ -243,7 +249,7 @@ function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopPr
       <mesh position={[0,1.25,0]}><boxGeometry args={[0.75,0.9,0.6]} /><meshStandardMaterial color="#5c7667" /></mesh>
       <mesh position={[0,2.3,0]}><octahedronGeometry args={[0.4]} /><meshBasicMaterial color="#f4d482" /></mesh>
     </group>}
-    <Character keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} onSecondProximity={onSecondProximity} onHelpProximity={onHelpProximity} appearance={appearance} />
+    {player}
   </>;
 }
 
@@ -252,6 +258,9 @@ export default function PlayPrototype() {
   const creatorOpenRef = useRef(false);
   const [isPaused, setPaused] = useState(false);
   const [time, setTime] = useState<TimeOfDay>("afternoon");
+  const [zone, setZone] = useState<Zone>("quartier");
+  const [travelOpen, setTravelOpen] = useState(false);
+  const travelRef = useRef(false);
   const [appearance, setAppearance] = useState<Appearance>({ ...DEFAULT_APPEARANCE });
   const [creatorOpen, setCreatorOpen] = useState(false);
   const [previewTurning, setPreviewTurning] = useState(true);
@@ -269,10 +278,26 @@ export default function PlayPrototype() {
   }, [appearance, appearanceLoaded]);
   function closeCreator() { creatorOpenRef.current = false; setCreatorOpen(false); locked.current = pausedRef.current; }
   function openCreator() {
-    if (!appearanceLoaded || pausedRef.current || shopOpenRef.current || dialogueRef.current || secondOpenRef.current) return;
+    if (!appearanceLoaded || pausedRef.current || shopOpenRef.current || dialogueRef.current || secondOpenRef.current || travelRef.current) return;
     keys.current = { ...EMPTY };
     setBagOpen(false);
     creatorOpenRef.current = true; locked.current = true; setCreatorOpen(true);
+  }
+  function openTravel() {
+    if (locked.current || pausedRef.current || creatorOpenRef.current) return;
+    keys.current = { ...EMPTY };
+    travelRef.current = true; locked.current = true; setTravelOpen(true);
+  }
+  function closeTravel() {
+    travelRef.current = false; setTravelOpen(false); locked.current = pausedRef.current;
+  }
+  function travelTo(next: Zone) {
+    if (!travelRef.current) return;
+    keys.current = { ...EMPTY };
+    setZone(next);
+    nearRef.current = false; deliveryRef.current = false; shopRef.current = false; secondNearRef.current = false; helpNearRef.current = false;
+    setNearResident(false); setNearDelivery(false); setNearShop(false); setNearSecond(false); setHelpNear(false);
+    closeTravel();
   }
   function updateAppearance(patch: Partial<Appearance>) {
     setAppearance(value => ({ ...value, ...patch }));
@@ -373,7 +398,7 @@ export default function PlayPrototype() {
     setWallet(walletRef.current);
   }
   function openShop() {
-    if (creatorOpenRef.current || secondOpenRef.current || !loaded || !shopRef.current || pausedRef.current || dialogueRef.current || shopOpenRef.current) return;
+    if (creatorOpenRef.current || secondOpenRef.current || travelRef.current || !loaded || !shopRef.current || pausedRef.current || dialogueRef.current || shopOpenRef.current) return;
     keys.current = { ...EMPTY }; shopOpenRef.current = true; locked.current = true;
     setBagOpen(false); setShopMessage(""); setShopOpen(true);
   }
@@ -412,7 +437,7 @@ export default function PlayPrototype() {
   const onDeliveryProximity = (near: boolean) => { deliveryRef.current = near; setNearDelivery(near); };
   function closeDialogue() { dialogueRef.current = false; setDialogue(false); locked.current = pausedRef.current; }
   function startDialogue() {
-    if (creatorOpenRef.current || secondOpenRef.current || !nearRef.current || dialogueRef.current || pausedRef.current) return;
+    if (creatorOpenRef.current || secondOpenRef.current || travelRef.current || !nearRef.current || dialogueRef.current || pausedRef.current) return;
     keys.current = { ...EMPTY };
     dialogueRef.current = true;
     locked.current = true;
@@ -421,7 +446,7 @@ export default function PlayPrototype() {
   useEffect(() => {
     const down = (event: KeyboardEvent) => {
       if (event.code === "KeyE" && !event.repeat) {
-        if (creatorOpenRef.current || secondOpenRef.current) return;
+        if (creatorOpenRef.current || secondOpenRef.current || travelRef.current) return;
         if (helpNearRef.current && helpStepRef.current === "active" && !locked.current && !pausedRef.current) {
           event.preventDefault(); setCommunityStep("return"); return;
         }
@@ -444,6 +469,7 @@ export default function PlayPrototype() {
         }
         return;
       }
+      if (event.code === "Escape" && travelRef.current) { travelRef.current=false; setTravelOpen(false); locked.current=pausedRef.current; return; }
       if (event.code === "Escape" && secondOpenRef.current) { secondOpenRef.current=false; setSecondOpen(false); locked.current=pausedRef.current; return; }
       if (event.code === "Escape" && creatorOpenRef.current) { creatorOpenRef.current = false; setCreatorOpen(false); locked.current = pausedRef.current; return; }
       if (event.code === "Escape" && shopOpenRef.current) {
@@ -473,7 +499,7 @@ export default function PlayPrototype() {
     if (!creatorOpenRef.current && !locked.current) keys.current[key] = pressed;
   }
   function togglePause() {
-    if (creatorOpenRef.current) return;
+    if (creatorOpenRef.current || travelRef.current) return;
     keys.current = { ...EMPTY };
     const next = !pausedRef.current;
     pausedRef.current = next;
@@ -483,12 +509,21 @@ export default function PlayPrototype() {
   return (
     <main className={styles.root}>
       <Canvas shadows dpr={[1,1.75]} camera={{ position:[6,5.5,8], fov:55, near:0.1, far:90 }} frameloop={isPaused ? "never" : "always"}>
-        <Neighborhood keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} onSecondProximity={onSecondProximity} onHelpProximity={onHelpProximity} mission={mission} helpStep={helpStep} appearance={appearance} time={time} />
+        <Neighborhood key={zone} zone={zone} keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} onSecondProximity={onSecondProximity} onHelpProximity={onHelpProximity} mission={mission} helpStep={helpStep} appearance={appearance} time={time} />
       </Canvas>
       <header className={styles.header}>
-        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 13</span></div>
+        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 14</span></div>
         <a href="/">Retour à l’exposition ↗</a>
       </header>
+      <button type="button" className={styles.travelButton} onClick={travelOpen ? closeTravel : openTravel} disabled={creatorOpen || shopOpen || secondOpen || dialogue || isPaused || bagOpen}>Voyager · {zone === "quartier" ? "Quartier" : "Fidjrossè"}</button>
+      {travelOpen && <section className={styles.travelPanel} role="dialog" aria-modal="true" aria-labelledby="travel-title">
+        <span className={styles.shopKicker}>EXPLORER COTONOU</span>
+        <h2 id="travel-title">Voyager</h2>
+        <p>Choisissez votre destination.</p>
+        <button type="button" onClick={() => travelTo("quartier")} disabled={zone === "quartier"}>Quartier central · Marché {zone === "quartier" ? "— Vous êtes ici" : "↗"}</button>
+        <button type="button" onClick={() => travelTo("fidjrosse")} disabled={zone === "fidjrosse"}>Plage de Fidjrossè {zone === "fidjrosse" ? "— Vous êtes ici" : "↗"}</button>
+        <button type="button" className={styles.travelClose} onClick={closeTravel}>Fermer</button>
+      </section>}
       <div className={styles.timeSelector} role="group" aria-label="Ambiance du quartier">
         <span>AMBIANCE</span>
         <div>{TIMES.map(option => <button key={option.id} type="button" aria-pressed={time === option.id} onClick={() => setTime(option.id)}>{option.label}</button>)}</div>
@@ -537,7 +572,7 @@ export default function PlayPrototype() {
         {ITEMS.map(item => <div key={item.id}><span>{item.name}</span><strong>× {inventory[item.id]}</strong></div>)}
         <button type="button" onClick={toggleBag}>Fermer</button>
       </aside>}
-      <div className={styles.help}><strong>Explorer le quartier</strong><span>W A S D / flèches · Maj pour courir</span><span>{helpStep === "active" ? "Kossi : récupérer les fournitures au marqueur doré à l’ouest." : helpStep === "return" ? "Kossi : lui rapporter les fournitures au sud." : "Parlez à Aïcha au nord ou à Kossi au sud avec E."}</span></div>
+      <div className={styles.help}><strong>{zone === "fidjrosse" ? "Plage de Fidjrossè" : "Explorer le quartier"}</strong><span>W A S D / flèches · Maj pour courir</span><span>{zone === "fidjrosse" ? "Explorez la plage · Voyager pour revenir au quartier." : helpStep === "active" ? "Kossi : récupérer les fournitures au marqueur doré à l’ouest." : helpStep === "return" ? "Kossi : lui rapporter les fournitures au sud." : "Parlez à Aïcha au nord ou à Kossi au sud avec E."}</span></div>
       {helpNear && helpStep === "active" && !creatorOpen && !secondOpen && !shopOpen && !dialogue && !bagOpen && !isPaused && <button type="button" className={styles.deliver} onClick={collectSupplies}>E · Récupérer les fournitures</button>}
       {nearSecond && !secondOpen && !shopOpen && !dialogue && !creatorOpen && !bagOpen && !isPaused && <button type="button" className={styles.shopPrompt} onClick={openSecond}>E · Parler à Kossi</button>}
       {secondOpen && <section className={styles.dialogue} role="dialog" aria-modal="true" aria-labelledby="kossi-name">
