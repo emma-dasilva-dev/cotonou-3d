@@ -513,7 +513,7 @@ export default function PlayPrototype() {
         <Neighborhood key={zone} zone={zone} keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} onSecondProximity={onSecondProximity} onHelpProximity={onHelpProximity} mission={mission} helpStep={helpStep} appearance={appearance} time={time} />
       </Canvas>
       <header className={styles.header}>
-        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 14</span></div>
+        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 15</span></div>
         <a href="/">Retour à l’exposition ↗</a>
       </header>
       <button type="button" className={styles.travelButton} onClick={travelOpen ? closeTravel : openTravel} disabled={creatorOpen || shopOpen || secondOpen || dialogue || isPaused || bagOpen}>Voyager · {zone === "quartier" ? "Quartier" : "Fidjrossè"}</button>
