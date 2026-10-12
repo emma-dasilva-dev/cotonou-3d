@@ -6,6 +6,7 @@ import { Vector3 } from "three";
 import type { Group } from "three";
 import styles from "./PlayPrototype.module.css";
 import { PlayerAvatar } from "./PlayerAvatar";
+import { CharacterPreview } from "./CharacterPreview";
 import { APPEARANCE_KEY, DEFAULT_APPEARANCE, HAIR_COLORS, HAIRSTYLES, OUTFIT_COLORS, SKIN_COLORS, validateAppearance } from "./appearance";
 import type { Appearance } from "./appearance";
 
@@ -209,6 +210,7 @@ export default function PlayPrototype() {
   const [isPaused, setPaused] = useState(false);
   const [appearance, setAppearance] = useState<Appearance>({ ...DEFAULT_APPEARANCE });
   const [creatorOpen, setCreatorOpen] = useState(false);
+  const [previewTurning, setPreviewTurning] = useState(true);
   const [appearanceLoaded, setAppearanceLoaded] = useState(false);
   useEffect(() => {
     try {
@@ -393,14 +395,26 @@ export default function PlayPrototype() {
         <Neighborhood keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} mission={mission} appearance={appearance} />
       </Canvas>
       <header className={styles.header}>
-        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 06</span></div>
+        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 07</span></div>
         <a href="/">Retour à l’exposition ↗</a>
       </header>
       <button type="button" className={styles.creatorButton} onClick={openCreator} disabled={creatorOpen || dialogue || shopOpen || isPaused}>Personnage</button>
       {creatorOpen && <section role="dialog" aria-modal="true" aria-labelledby="creator-title" className={styles.creatorPanel}>
         <span className={styles.shopKicker}>MON IDENTITÉ · COTONOU</span>
         <h2 id="creator-title">Créer mon personnage</h2>
-        <p>Personnalise ton apparence avant de découvrir le quartier.</p>
+        <p>Choisis une silhouette et regarde ton personnage évoluer en direct.</p>
+        <div className={styles.creatorLayout}>
+          <div className={styles.previewPane}>
+            <CharacterPreview appearance={appearance} turning={previewTurning} />
+            <button type="button" className={styles.previewToggle} aria-pressed={previewTurning} onClick={() => setPreviewTurning(value => !value)}>{previewTurning ? "Arrêter la rotation" : "Faire tourner"}</button>
+          </div>
+          <div className={styles.creatorOptions}>
+            <fieldset className={styles.creatorField}><legend>Silhouette</legend>
+              <div className={styles.styles}>
+                <button type="button" aria-pressed={appearance.body === "masculine"} onClick={() => updateAppearance({body:"masculine"})}>Masculin</button>
+                <button type="button" aria-pressed={appearance.body === "feminine"} onClick={() => updateAppearance({body:"feminine"})}>Féminin</button>
+              </div>
+            </fieldset>
         {([
           { title: "Carnation", field: "skin", colors: SKIN_COLORS },
           { title: "Couleur des cheveux", field: "hair", colors: HAIR_COLORS },
@@ -418,6 +432,7 @@ export default function PlayPrototype() {
             aria-pressed={appearance.hairstyle === style} onClick={()=>updateAppearance({hairstyle:style})}>
             {["Courte","Afro","Chignon"][index]}</button>)}</div>
         </fieldset>
+        </div></div>
         <button className={styles.creatorDone} type="button" onClick={closeCreator}>Enregistrer et jouer</button>
       </section>}
       <aside className={styles.missionHud} aria-live="polite"><strong>{wallet.toLocaleString("fr-FR")} FCFA</strong><span>{mission === "available" ? "Nouvelle mission : parlez à Aïcha" : mission === "active" ? "Première course · Livrez au marqueur jaune" : "Première course terminée · +1 500 FCFA"}</span></aside>
