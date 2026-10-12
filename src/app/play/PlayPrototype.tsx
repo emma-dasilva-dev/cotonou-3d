@@ -11,8 +11,8 @@ import { APPEARANCE_KEY, DEFAULT_APPEARANCE, HAIR_COLORS, HAIRSTYLES, OUTFIT_COL
 import type { Appearance } from "./appearance";
 
 type Key = "forward" | "backward" | "left" | "right";
-type Controls = Record<Key, boolean>;
-const EMPTY: Controls = { forward: false, backward: false, left: false, right: false };
+type Controls = Record<Key, boolean> & { run: boolean };
+const EMPTY: Controls = { forward: false, backward: false, left: false, right: false, run: false };
 const KEY_MAP: Record<string, Key> = {
   KeyW: "forward", ArrowUp: "forward",
   KeyS: "backward", ArrowDown: "backward",
@@ -70,8 +70,8 @@ function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProxi
     direction.current.set(horizontal, 0, vertical);
     if (direction.current.lengthSq() > 0) direction.current.normalize();
     const step = Math.min(dt, 0.05);
-    const targetX = direction.current.x * 3.6;
-    const targetZ = direction.current.z * 3.6;
+    const targetX = direction.current.x * (input.run ? 5.7 : 3.6);
+    const targetZ = direction.current.z * (input.run ? 5.7 : 3.6);
     const ease = 1 - Math.exp(-(locked.current ? 20 : 11) * step);
     velocity.current.x += (targetX - velocity.current.x) * ease;
     velocity.current.z += (targetZ - velocity.current.z) * ease;
@@ -365,10 +365,12 @@ export default function PlayPrototype() {
         dialogueRef.current = false; setDialogue(false); locked.current = pausedRef.current;
         return;
       }
+      if (event.code === "ShiftLeft" || event.code === "ShiftRight") { keys.current.run = true; return; }
       const key = KEY_MAP[event.code];
       if (key) { event.preventDefault(); if (!event.repeat && !locked.current && !creatorOpenRef.current) keys.current[key] = true; }
     };
     const up = (event: KeyboardEvent) => {
+      if (event.code === "ShiftLeft" || event.code === "ShiftRight") { keys.current.run = false; return; }
       const key = KEY_MAP[event.code];
       if (key) { event.preventDefault(); keys.current[key] = false; }
     };
@@ -395,7 +397,7 @@ export default function PlayPrototype() {
         <Neighborhood keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} mission={mission} appearance={appearance} />
       </Canvas>
       <header className={styles.header}>
-        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 07</span></div>
+        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 09</span></div>
         <a href="/">Retour à l’exposition ↗</a>
       </header>
       <button type="button" className={styles.creatorButton} onClick={openCreator} disabled={creatorOpen || dialogue || shopOpen || isPaused}>Personnage</button>
@@ -442,7 +444,7 @@ export default function PlayPrototype() {
         {ITEMS.map(item => <div key={item.id}><span>{item.name}</span><strong>× {inventory[item.id]}</strong></div>)}
         <button type="button" onClick={toggleBag}>Fermer</button>
       </aside>}
-      <div className={styles.help}><strong>Explorer le quartier</strong><span>W A S D / flèches pour se déplacer</span><span>Approchez-vous du résident en orange, puis appuyez sur E.</span></div>
+      <div className={styles.help}><strong>Explorer le quartier</strong><span>W A S D / flèches · Maj pour courir</span><span>Approchez-vous du résident en orange, puis appuyez sur E.</span></div>
       {nearShop && !creatorOpen && !dialogue && !shopOpen && !bagOpen && !isPaused && <button type="button" className={styles.shopPrompt} onClick={openShop}>E · Ouvrir la boutique</button>}
       {shopOpen && <section className={styles.shopPanel} role="dialog" aria-modal="true" aria-labelledby="shop-heading">
         <span className={styles.shopKicker}>COMMERCE DE QUARTIER</span>
