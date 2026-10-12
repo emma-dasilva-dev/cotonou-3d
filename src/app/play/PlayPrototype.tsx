@@ -22,6 +22,8 @@ const BUILDINGS = [
   { x: 5, z: 5, width: 4, depth: 3, height: 3.5, color: "#acb5a7" },
 ];
 const START = new Vector3(0, 0, 0);
+const NPC_POSITION = new Vector3(0, 0, -5.5);
+const TALK_RADIUS = 1.8;
 function canWalk(x: number, z: number) {
   if (Math.abs(x) > 10.8 || Math.abs(z) > 10.8) return false;
   return !BUILDINGS.some(b =>
@@ -30,15 +32,16 @@ function canWalk(x: number, z: number) {
   );
 }
 
-function Character({ keys }: { keys: React.RefObject<Controls> }) {
+function Character({ keys, locked, onProximity }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void }) {
   const group = useRef<Group>(null);
   const { camera } = useThree();
   const position = useRef(START.clone());
   const direction = useRef(new Vector3());
   const desiredCamera = useRef(new Vector3());
+  const wasNear = useRef(false);
   useFrame((_, dt) => {
     if (!group.current) return;
-    const input = keys.current;
+    const input = locked.current ? EMPTY : keys.current;
     const horizontal = Number(input.right) - Number(input.left);
     const vertical = Number(input.backward) - Number(input.forward);
     direction.current.set(horizontal, 0, vertical);
@@ -54,6 +57,11 @@ function Character({ keys }: { keys: React.RefObject<Controls> }) {
       const face = Math.atan2(direction.current.x, direction.current.z);
       const turn = Math.atan2(Math.sin(face - group.current.rotation.y), Math.cos(face - group.current.rotation.y));
       group.current.rotation.y += turn * Math.min(1, dt * 12);
+    }
+    const near = position.current.distanceTo(NPC_POSITION) <= TALK_RADIUS;
+    if (near !== wasNear.current) {
+      wasNear.current = near;
+      onProximity(near);
     }
     group.current.position.copy(position.current);
     // Fixed-angle follow camera; the character stays fully visible.
@@ -79,7 +87,30 @@ function Character({ keys }: { keys: React.RefObject<Controls> }) {
   );
 }
 
-function Neighborhood({ keys }: { keys: React.RefObject<Controls> }) {
+function Resident() {
+  return (
+    <group position={[NPC_POSITION.x, 0, NPC_POSITION.z]}>
+      <mesh position={[0, 1, 0]} castShadow>
+        <capsuleGeometry args={[0.32, 1.02, 6, 12]} />
+        <meshStandardMaterial color="#bc7849" roughness={0.9} />
+      </mesh>
+      <mesh position={[0, 1.87, 0]} castShadow>
+        <sphereGeometry args={[0.28, 14, 10]} />
+        <meshStandardMaterial color="#75472f" />
+      </mesh>
+      <mesh position={[0, 2.23, 0]}>
+        <sphereGeometry args={[0.2, 12, 8]} />
+        <meshStandardMaterial color="#282624" />
+      </mesh>
+      <mesh position={[0, 2.78, 0]}>
+        <sphereGeometry args={[0.27, 20, 12]} />
+        <meshBasicMaterial color="#faf2de" />
+      </mesh>
+    </group>
+  );
+}
+
+function Neighborhood({ keys, locked, onProximity }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void }) {
   return <>
     <color attach="background" args={["#c9d9d5"]} />
     <fog attach="fog" args={["#c9d9d5", 17, 42]} />
@@ -121,17 +152,47 @@ function Neighborhood({ keys }: { keys: React.RefObject<Controls> }) {
         </mesh>
       </group>
     )))}
-    <Character keys={keys} />
+    <Resident />
+    <Character keys={keys} locked={locked} onProximity={onProximity} />
   </>;
 }
 
 export default function PlayPrototype() {
   const keys = useRef<Controls>({ ...EMPTY });
   const [isPaused, setPaused] = useState(false);
+  const [nearResident, setNearResident] = useState(false);
+  const nearRef = useRef(false);
+  const [dialogue, setDialogue] = useState(false);
+  const locked = useRef(false);
+  const dialogueRef = useRef(false);
+  const pausedRef = useRef(false);
+  const onProximity = (near: boolean) => { nearRef.current = near; setNearResident(near); };
+  function closeDialogue() { dialogueRef.current = false; setDialogue(false); locked.current = pausedRef.current; }
+  function startDialogue() {
+    if (!nearRef.current || dialogueRef.current || pausedRef.current) return;
+    keys.current = { ...EMPTY };
+    dialogueRef.current = true;
+    locked.current = true;
+    setDialogue(true);
+  }
   useEffect(() => {
     const down = (event: KeyboardEvent) => {
+      if (event.code === "KeyE" && !event.repeat) {
+        if (nearRef.current && !dialogueRef.current && !pausedRef.current) {
+          event.preventDefault();
+          keys.current = { ...EMPTY };
+          dialogueRef.current = true;
+          locked.current = true;
+          setDialogue(true);
+        }
+        return;
+      }
+      if (event.code === "Escape" && dialogueRef.current) {
+        dialogueRef.current = false; setDialogue(false); locked.current = pausedRef.current;
+        return;
+      }
       const key = KEY_MAP[event.code];
-      if (key) { event.preventDefault(); if (!event.repeat) keys.current[key] = true; }
+      if (key) { event.preventDefault(); if (!event.repeat && !locked.current) keys.current[key] = true; }
     };
     const up = (event: KeyboardEvent) => {
       const key = KEY_MAP[event.code];
@@ -144,22 +205,32 @@ export default function PlayPrototype() {
     return () => { window.removeEventListener("keydown",down); window.removeEventListener("keyup",up); window.removeEventListener("blur",reset); };
   }, []);
   function move(key: Key, pressed: boolean) {
-    if (!isPaused) keys.current[key] = pressed;
+    if (!locked.current) keys.current[key] = pressed;
   }
   function togglePause() {
     keys.current = { ...EMPTY };
-    setPaused(p => !p);
+    const next = !pausedRef.current;
+    pausedRef.current = next;
+    locked.current = next || dialogueRef.current;
+    setPaused(next);
   }
   return (
     <main className={styles.root}>
       <Canvas shadows dpr={[1,1.75]} camera={{ position:[6,5.5,8], fov:55, near:0.1, far:90 }} frameloop={isPaused ? "never" : "always"}>
-        <Neighborhood keys={keys} />
+        <Neighborhood keys={keys} locked={locked} onProximity={onProximity} />
       </Canvas>
       <header className={styles.header}>
-        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 01</span></div>
+        <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 02</span></div>
         <a href="/">Retour à l’exposition ↗</a>
       </header>
-      <div className={styles.help}><strong>Explorer le quartier</strong><span>W A S D / flèches pour se déplacer</span><span>Les bâtiments bloquent le passage</span></div>
+      <div className={styles.help}><strong>Explorer le quartier</strong><span>W A S D / flèches pour se déplacer</span><span>Approchez-vous du résident en orange, puis appuyez sur E.</span></div>
+      {nearResident && !dialogue && !isPaused && <button type="button" className={styles.interact} onClick={startDialogue}>E · Parler à Aïcha</button>}
+      {dialogue && <section role="dialog" aria-modal="true" aria-labelledby="resident-name" className={styles.dialogue}>
+        <span className={styles.dialogueEyebrow}>RENCONTRE · HABITANTE DU QUARTIER</span>
+        <h2 id="resident-name">Aïcha</h2>
+        <p>Salut ! Bienvenue dans le quartier. Moi, c’est Aïcha. Ici, tout le monde a une histoire. Prends le temps de découvrir les rues !</p>
+        <button type="button" onClick={closeDialogue} autoFocus>Merci, Aïcha · Fermer</button>
+      </section>}
       <button className={styles.pause} type="button" onClick={togglePause} aria-pressed={isPaused}>{isPaused ? "Reprendre" : "Pause"}</button>
       <div className={styles.pad} aria-label="Commandes tactiles">
         {(["forward","left","backward","right"] as Key[]).map(key => (
