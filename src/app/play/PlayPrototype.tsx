@@ -37,7 +37,7 @@ function canWalk(x: number, z: number) {
   );
 }
 
-function Character({ keys, locked, onProximity }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void }) {
+function Character({ keys, locked, onProximity, onDeliveryProximity }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void }) {
   const group = useRef<Group>(null);
   const { camera } = useThree();
   const position = useRef(START.clone());
