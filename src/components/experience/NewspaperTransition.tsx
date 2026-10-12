@@ -24,18 +24,14 @@ export function NewspaperTransition({
   const t = transitionText[language];
 
   useLayoutEffect(() => {
-    if (!rootRef.current) return;
+    const root = rootRef.current;
+    if (!root) return;
+    const strip = root.querySelector(".newspaper-transition__strip");
+    const sheet = root.querySelector(".newspaper-transition__sheet");
+    if (!strip || !sheet) return;
+    const lines = root.querySelectorAll("[data-transition-line]");
 
     const context = gsap.context(() => {
-      const strip = rootRef.current?.querySelector(
-        ".newspaper-transition__strip",
-      );
-      const sheet = rootRef.current?.querySelector(
-        ".newspaper-transition__sheet",
-      );
-      const lines = rootRef.current?.querySelectorAll(
-        "[data-transition-line]",
-      );
 
       const timeline = gsap.timeline({
         onComplete,
@@ -43,7 +39,7 @@ export function NewspaperTransition({
 
       if (mode === "open") {
         timeline
-          .set(rootRef.current, { opacity: 1 })
+          .set(root, { opacity: 1 })
           .fromTo(
             strip,
             { scaleX: 0, transformOrigin: "left center" },
@@ -88,7 +84,7 @@ export function NewspaperTransition({
             "-=0.08",
           )
           .to(
-            rootRef.current,
+            root,
             {
               opacity: 0,
               duration: 0.16,
@@ -98,7 +94,7 @@ export function NewspaperTransition({
           );
       } else {
         timeline
-          .set(rootRef.current, { opacity: 1 })
+          .set(root, { opacity: 1 })
           .fromTo(
             sheet,
             {
@@ -142,7 +138,7 @@ export function NewspaperTransition({
             ease: "power4.inOut",
           })
           .to(
-            rootRef.current,
+            root,
             {
               opacity: 0,
               duration: 0.1,
