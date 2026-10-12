@@ -11,6 +11,7 @@ import { StreetAtmosphere, TIMES } from "./StreetAtmosphere";
 import { LivingMarket } from "./LivingMarket";
 import { ZemidjanTraffic } from "./ZemidjanTraffic";
 import { FidjrosseBeach } from "./FidjrosseBeach";
+import { TownDetails } from "./TownDetails";
 import type { TimeOfDay } from "./StreetAtmosphere";
 import { APPEARANCE_KEY, DEFAULT_APPEARANCE, HAIR_COLORS, HAIRSTYLES, OUTFIT_COLORS, SKIN_COLORS, validateAppearance } from "./appearance";
 import type { Appearance } from "./appearance";
@@ -228,6 +229,7 @@ function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopPr
       </mesh>
     </group>
     <LivingMarket time={time} />
+    <TownDetails time={time} />
     <ZemidjanTraffic time={time} />
     {/* Landmark details: shaded market awnings, benches and planter boxes. */}
     {[-1,1].map(side => <group key={side} position={[side * 7.9,0,0]}>
