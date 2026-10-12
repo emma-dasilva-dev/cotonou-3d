@@ -34,7 +34,7 @@ export function PlayerAvatar({ speed, appearance }: AvatarProps) {
   return (
     <group ref={root}>
       <mesh position={[0, 1.2, 0]} castShadow>
-        <capsuleGeometry args={[0.32, 0.65, 6, 12]} />
+        <capsuleGeometry args={[appearance.body === "masculine" ? 0.36 : 0.30, 0.65, 6, 12]} />
         <meshStandardMaterial color={OUTFIT_COLORS[appearance.outfit]} roughness={0.86} />
       </mesh>
       <mesh position={[0, 1.92, 0]} castShadow>
@@ -61,13 +61,13 @@ export function PlayerAvatar({ speed, appearance }: AvatarProps) {
       </>}
       {([-1, 1] as const).map(side => (
         <group key={side}>
-          <group ref={side === -1 ? leftArm : rightArm} position={[side * 0.44, 1.51, 0]}>
+          <group ref={side === -1 ? leftArm : rightArm} position={[side * (appearance.body === "masculine" ? 0.47 : 0.38), 1.51, 0]}>
             <mesh position={[side * 0.015, -0.30, 0]} castShadow>
               <capsuleGeometry args={[0.12, 0.36, 4, 8]} />
               <meshStandardMaterial color="#946247" />
             </mesh>
           </group>
-          <group ref={side === -1 ? leftLeg : rightLeg} position={[side * 0.16, 0.84, 0]}>
+          <group ref={side === -1 ? leftLeg : rightLeg} position={[side * (appearance.body === "masculine" ? 0.19 : 0.16), 0.84, 0]}>
             <mesh position={[0, -0.33, 0]} castShadow>
               <capsuleGeometry args={[0.14, 0.42, 4, 8]} />
               <meshStandardMaterial color="#363b40" />
