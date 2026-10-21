@@ -12,6 +12,7 @@ import { LivingMarket } from "./LivingMarket";
 import { ZemidjanTraffic } from "./ZemidjanTraffic";
 import { FidjrosseBeach } from "./FidjrosseBeach";
 import { TownDetails } from "./TownDetails";
+import { MiniMap } from "./MiniMap";
 import type { TimeOfDay } from "./StreetAtmosphere";
 import { APPEARANCE_KEY, DEFAULT_APPEARANCE, HAIR_COLORS, HAIRSTYLES, OUTFIT_COLORS, SKIN_COLORS, validateAppearance } from "./appearance";
 import type { Appearance } from "./appearance";
@@ -70,7 +71,7 @@ function canWalk(x: number, z: number, zone: Zone) {
   );
 }
 
-function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, onSecondProximity, onHelpProximity, appearance, zone }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; onSecondProximity: (near: boolean) => void; onHelpProximity: (near: boolean) => void; appearance: Appearance; zone: Zone }) {
+function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, onSecondProximity, onHelpProximity, onPosition, appearance, zone }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; onSecondProximity: (near: boolean) => void; onHelpProximity: (near: boolean) => void; onPosition: (x: number, z: number) => void; appearance: Appearance; zone: Zone }) {
   const group = useRef<Group>(null);
   const { camera } = useThree();
   const position = useRef((zone === "fidjrosse" ? BEACH_START : START).clone());
@@ -85,6 +86,7 @@ function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProxi
   const wasNearShop = useRef(false);
   const wasNearSecond = useRef(false);
   const wasNearHelp = useRef(false);
+  const mapElapsed = useRef(0);
   useFrame((_, dt) => {
     if (!group.current) return;
     const input = locked.current ? EMPTY : keys.current;
@@ -140,6 +142,8 @@ function Character({ keys, locked, onProximity, onDeliveryProximity, onShopProxi
       jumpVelocity.current -= 17 * step;
       if (jumpHeight.current <= 0) { jumpHeight.current = 0; jumpVelocity.current = 0; }
     }
+    mapElapsed.current += step;
+    if (mapElapsed.current >= 0.18) { mapElapsed.current = 0; onPosition(position.current.x, position.current.z); }
     group.current.position.copy(position.current);
     group.current.position.y = jumpHeight.current;
     // Fixed-angle follow camera; the character stays fully visible.
@@ -173,8 +177,8 @@ function Resident() {
   );
 }
 
-function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, onSecondProximity, onHelpProximity, mission, helpStep, appearance, time, zone }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; onSecondProximity: (near: boolean) => void; onHelpProximity: (near: boolean) => void; mission: Mission; helpStep: "available" | "active" | "return" | "done"; appearance: Appearance; time: TimeOfDay; zone: Zone }) {
-  const player = <Character keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} onSecondProximity={onSecondProximity} onHelpProximity={onHelpProximity} appearance={appearance} zone={zone} />;
+function Neighborhood({ keys, locked, onProximity, onDeliveryProximity, onShopProximity, onSecondProximity, onHelpProximity, onPosition, mission, helpStep, appearance, time, zone }: { keys: React.RefObject<Controls>; locked: React.RefObject<boolean>; onProximity: (near: boolean) => void; onDeliveryProximity: (near: boolean) => void; onShopProximity: (near: boolean) => void; onSecondProximity: (near: boolean) => void; onHelpProximity: (near: boolean) => void; onPosition: (x: number, z: number) => void; mission: Mission; helpStep: "available" | "active" | "return" | "done"; appearance: Appearance; time: TimeOfDay; zone: Zone }) {
+  const player = <Character keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} onSecondProximity={onSecondProximity} onHelpProximity={onHelpProximity} onPosition={onPosition} appearance={appearance} zone={zone} />;
   if (zone === "fidjrosse") return <><FidjrosseBeach time={time} />{player}</>;
   return <>
     <StreetAtmosphere time={time} />
@@ -271,6 +275,8 @@ export default function PlayPrototype() {
   const [isPaused, setPaused] = useState(false);
   const [time, setTime] = useState<TimeOfDay>("afternoon");
   const [zone, setZone] = useState<Zone>("quartier");
+  const [mapPosition, setMapPosition] = useState({ x: 0, z: 0 });
+  const onPosition = (x: number, z: number) => setMapPosition(previous => previous.x === x && previous.z === z ? previous : { x, z });
   const [travelOpen, setTravelOpen] = useState(false);
   const travelRef = useRef(false);
   const [appearance, setAppearance] = useState<Appearance>({ ...DEFAULT_APPEARANCE });
@@ -306,6 +312,7 @@ export default function PlayPrototype() {
   function travelTo(next: Zone) {
     if (!travelRef.current) return;
     keys.current = { ...EMPTY };
+    setMapPosition(next === "fidjrosse" ? { x: 0, z: 6 } : { x: 0, z: 0 });
     setZone(next);
     nearRef.current = false; deliveryRef.current = false; shopRef.current = false; secondNearRef.current = false; helpNearRef.current = false;
     setNearResident(false); setNearDelivery(false); setNearShop(false); setNearSecond(false); setHelpNear(false);
@@ -523,8 +530,9 @@ export default function PlayPrototype() {
   return (
     <main className={`${styles.root} ${time === "night" ? styles.nightMode : ""}`}>
       <Canvas shadows dpr={[1,1.75]} camera={{ position:[6,5.5,8], fov:55, near:0.1, far:90 }} frameloop={isPaused ? "never" : "always"}>
-        <Neighborhood key={zone} zone={zone} keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} onSecondProximity={onSecondProximity} onHelpProximity={onHelpProximity} mission={mission} helpStep={helpStep} appearance={appearance} time={time} />
+        <Neighborhood key={zone} zone={zone} keys={keys} locked={locked} onProximity={onProximity} onDeliveryProximity={onDeliveryProximity} onShopProximity={onShopProximity} onSecondProximity={onSecondProximity} onHelpProximity={onHelpProximity} onPosition={onPosition} mission={mission} helpStep={helpStep} appearance={appearance} time={time} />
       </Canvas>
+      <MiniMap zone={zone} x={mapPosition.x} z={mapPosition.z} missionActive={mission === "active"} />
       <header className={styles.header}>
         <div><strong>COTONOU / 3D</strong><span>SIMULATEUR · PROTOTYPE 15</span></div>
         <a href="/">Retour à l’exposition ↗</a>
