@@ -6,24 +6,54 @@ import { PlayerAvatar } from "./PlayerAvatar";
 import type { Appearance } from "./appearance";
 import type { TimeOfDay } from "./StreetAtmosphere";
 
-const RESIDENTS: { x:number; z:number; phase:number; move:boolean; appearance:Appearance }[] = [
-  {x:3.2,z:9,phase:0,move:true,appearance:{body:"feminine",skin:1,hair:0,outfit:2,hairstyle:"afro"}},
-  {x:-2.9,z:-10.2,phase:2,move:true,appearance:{body:"masculine",skin:3,hair:1,outfit:1,hairstyle:"short"}},
-  {x:8.5,z:9,phase:4,move:false,appearance:{body:"feminine",skin:0,hair:0,outfit:4,hairstyle:"bun"}},
-  {x:-8,z:11,phase:6,move:false,appearance:{body:"masculine",skin:2,hair:0,outfit:3,hairstyle:"short"}},
+type Stop = { x: number; z: number; pause?: number };
+type Resident = { route: Stop[]; pace: number; appearance: Appearance };
+const RESIDENTS: Resident[] = [
+  { route: [{x:3.2,z:9,pause:1.2},{x:3.2,z:12.1,pause:2.5},{x:5.7,z:12.1,pause:1.6},{x:5.7,z:9,pause:2}], pace:0.9, appearance:{body:"feminine",skin:1,hair:0,outfit:2,hairstyle:"afro"} },
+  { route: [{x:-2.9,z:-10.2,pause:1},{x:-2.9,z:-13,pause:2.4},{x:-5.4,z:-13,pause:2},{x:-5.4,z:-10.2,pause:1.5}], pace:1.15, appearance:{body:"masculine",skin:3,hair:1,outfit:1,hairstyle:"short"} },
+  { route: [{x:8.5,z:9,pause:3},{x:8.5,z:12.1,pause:1},{x:10.8,z:12.1,pause:2},{x:10.8,z:9,pause:1.5}], pace:0.76, appearance:{body:"feminine",skin:0,hair:0,outfit:4,hairstyle:"bun"} },
+  { route: [{x:-8,z:11,pause:2},{x:-8,z:13,pause:2.4},{x:-10.7,z:13,pause:3},{x:-10.7,z:11,pause:1}], pace:1.05, appearance:{body:"masculine",skin:2,hair:0,outfit:3,hairstyle:"short"} },
 ];
-function Pedestrian({ resident }: {resident:(typeof RESIDENTS)[number]}) {
-  const group=useRef<Group>(null);
-  const velocity=useRef(0);
-  useFrame(({clock})=>{
-    if(!group.current || !resident.move)return;
-    const t=clock.elapsedTime*0.34+resident.phase;
-    group.current.position.x=resident.x+Math.sin(t)*0.85;
-    group.current.position.z=resident.z+Math.cos(t)*0.5;
-    group.current.rotation.y=Math.cos(t)>=0?Math.PI/2:-Math.PI/2;
-    velocity.current=1;
+const TURN_RATE = 7;
+function Pedestrian({ resident }: {resident:Resident}) {
+  const group = useRef<Group>(null);
+  const velocity = useRef(0);
+  const destination = useRef(1);
+  const pause = useRef(resident.route[0].pause ?? 0);
+  const target = resident.route;
+  useFrame((_, frameDelta) => {
+    const actor = group.current;
+    if (!actor) return;
+    const dt = Math.min(frameDelta, 0.05);
+    if (pause.current > 0) {
+      pause.current = Math.max(0, pause.current - dt);
+      velocity.current = 0;
+      return;
+    }
+    const point = target[destination.current];
+    const dx = point.x - actor.position.x;
+    const dz = point.z - actor.position.z;
+    const distance = Math.hypot(dx, dz);
+    if (distance < 0.12) {
+      actor.position.set(point.x, 0, point.z);
+      destination.current = (destination.current + 1) % target.length;
+      pause.current = point.pause ?? 1;
+      velocity.current = 0;
+      return;
+    }
+    const angle = Math.atan2(dx, dz);
+    const difference = Math.atan2(Math.sin(angle - actor.rotation.y), Math.cos(angle - actor.rotation.y));
+    actor.rotation.y += difference * Math.min(1, TURN_RATE * dt);
+    const alignment = Math.max(0, 1 - Math.abs(difference) / Math.PI);
+    const pace = resident.pace * (0.35 + alignment * 0.65);
+    const distanceThisFrame = Math.min(distance, pace * dt);
+    actor.position.x += (dx / distance) * distanceThisFrame;
+    actor.position.z += (dz / distance) * distanceThisFrame;
+    velocity.current = pace;
   });
-  return <group ref={group} position={[resident.x,0,resident.z]}><PlayerAvatar appearance={resident.appearance} speed={velocity}/></group>;
+  return <group ref={group} position={[target[0].x,0,target[0].z]}>
+    <PlayerAvatar appearance={resident.appearance} speed={velocity}/>
+  </group>;
 }
 export function TownDetails({time}:{time:TimeOfDay}) {
   return <>
