@@ -108,3 +108,14 @@
 .nightMode .timeSelector span{color:#374842}
 .nightMode .shopPrompt,.nightMode .interact,.nightMode .deliver{box-shadow:0 5px 25px #07132399}
 .nightMode .jumpButton{background:#f1cc7f;color:#172929;border-color:#a2803c;box-shadow:0 3px 15px #07132366}
+
+
+/* Prototype 17 — live navigation, kept separate from gameplay state */
+.root :global(.game-mini-map){position:absolute;left:28px;top:190px;width:165px;padding:10px;background:#f6f0e8f2;color:#263a35;border:1px solid #8b9388;box-shadow:0 9px 25px #0003;z-index:4;pointer-events:none}
+.root :global(.game-mini-map__heading){display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.root :global(.game-mini-map__heading strong){font-size:10px;letter-spacing:.15em}
+.root :global(.game-mini-map__heading span){font-size:9px}
+.root :global(.game-mini-map svg){width:100%;height:auto;display:block;border:1px solid #b9b7a6}
+.root :global(.game-mini-map__legend){display:flex;justify-content:space-between;gap:5px;margin-top:7px;font-size:9px}
+.root :global(.game-mini-map__legend i){display:inline-block;width:7px;height:7px;border-radius:50%;background:#243f38;margin-right:3px}
+@media(max-width:640px){.root :global(.game-mini-map){left:12px;top:182px;width:112px;padding:7px}.root :global(.game-mini-map__heading){display:block}.root :global(.game-mini-map__heading span){display:block;margin-top:3px;font-size:8px}.root :global(.game-mini-map__legend){font-size:8px}}
